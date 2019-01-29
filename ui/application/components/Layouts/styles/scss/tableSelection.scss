@@ -1,0 +1,55 @@
+.table-tools-container {
+    position: absolute;
+    min-width: 100px;
+    max-width: 300px;
+    // max-width: 156px;
+    padding: 7px;
+    display: none;
+    border: 1px solid #D1D1D1;
+    background: #FFF;
+    z-index: 1010;
+
+    .table-tools-close {
+        position: absolute;
+        top: -15px;
+        right: -15px;
+        background: #FFF;
+        border: 1px solid rgba(0, 0, 0, .1);
+        border-radius: 50%;
+        width: 25px;
+        cursor: pointer;
+        text-align: center;
+        font-size: 1.2em;
+    }
+
+    .table-tools-footer {
+        width: 100%;
+        text-align: center;
+    }
+
+}
+
+.table-tools-container.open {
+    display: block;
+}
+
+.cell-container {
+    display: inline-block;
+    width: 100%;
+    height: 100%;    
+}
+
+.cell {
+    display: inline-block;
+    position: relative;
+    width: 12px;
+    height: 12px;
+    margin: 1px;
+    border: 1px solid;
+    cursor: pointer;
+}
+
+.cell-selected {
+   border-color: #ff7f50;
+}
+

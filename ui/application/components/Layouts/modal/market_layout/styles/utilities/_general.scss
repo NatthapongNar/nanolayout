@@ -1,0 +1,668 @@
+@import './_variable.scss';
+
+// :global {
+
+    .hide { display: none !important; }
+    .show { display: block !important; }
+    .icon { cursor: pointer; }    
+    .bold { font-weight: bold; }
+    .inline { display: inline; }
+    .lineHeight_none { line-height: normal; }
+    .absolute { position: absolute; }
+
+    .touch_icon:hover::before {
+        font-family: "FontAwesome" !important;
+        content: "\f06e";
+        color: brown;
+    }
+
+    .touch_icon.jump:hover::before {
+        font-family: "FontAwesome" !important;
+        content: "\f08e";
+        color: brown;
+    }
+
+    .verticalTop { vertical-align: top; }
+    .verticalMiddle { vertical-align: middle; }
+    .verticalBottom { vertical-align: bottom; }
+    
+    /*CLEAR MARGIN & padding */
+    .marg_none {margin: $set-none;}
+    .marg_l_none {margin-left: $set-none;}
+    .marg_r_none {margin-right: $set-none;}
+    .marg_t_none {margin-top: $set-none;}
+    .marg_b_none {margin-bottom: $set-none;}
+    .marg_lr_none {margin-left: $set-none; margin-right: $set-none;}
+    .marg_tb_none {margin-top: $set-none; margin-bottom: $set-none;}
+
+    .pad_none {padding: $set-none;}
+    .pad_l_none {padding-left: $set-none;}
+    .pad_r_none {padding-right: $set-none;}  
+    .pad_t_none {padding-top: $set-none;}
+    .pad_b_none {padding-bottom: $set-none;}      
+    .pad_lr_none {padding-left: $set-none; padding-right: $set-none;}
+    .pad_tb_none {padding-top: $set-none; padding-bottom: $set-none;}
+
+    /* FONT TRANSFORM */
+    .text_upper { text-transform: uppercase; }
+    .text_lower { text-transform: lowercase; }
+    .text_capital { text-transform: capitalize }
+
+    /* ALIGN & FLOAT */
+    .text-left, .text-left > div[class^="ant-form"], th.text-left, td.text-left {text-align: left !important;}
+    .text-right, .text-right > div[class^="ant-form"], th.text-right, td.text-right {text-align: right !important;}    
+    .text-center, .text-center > div[class^="ant-form"], th.text-center, td.text-center {text-align: center !important;}
+    .text-bottom, .text-bottom  > div[class^="ant-form"], th.text-bottom, td.text-bottom {text-align: bottom !important;}
+
+    .place-right {float: right !important;}
+    .place-left {float: left !important;}
+    
+
+    /* BORDER */
+    .border_none {border: $set-none;}
+    .border_l_none {border-left: $set-none;}
+    .border_r_none {border-right: $set-none;}
+    .border_lr_none {border-left: $set-none; border-right: $set-none;}
+    .border_tb_none {border-top: $set-none; border-bottom: $set-none;}
+    .border_normal { border: $set-brd-normal;}    
+
+    /* BACKGROUND COLOR STYLE */
+    .bg_transparent {background-color: $transparent;}
+    .bg_black {background-color: $black;}
+    .bg_white {background-color: $white;}
+    .bg_lime {background-color: $lime;}
+    .bg_green {background-color: $green;}
+    .bg_emerald {background-color: $emerald;}
+    .bg_teal {background-color: $teal;}
+    .bg_cyan {background-color: $cyan;}
+    .bg_cobalt {background-color: $cobalt;}
+    .bg_indigo {background-color: $indigo;}
+    .bg_violet {background-color: $violet;}
+    .bg_pink {background-color: $pink;}
+    .bg_magenta {background-color: $magenta;}
+    .bg_crimson {background-color: $crimson;}
+    .bg_red {background-color: $red;}
+    .bg_orange {background-color: $orange;}
+    .bg_amber {background-color: $amber;}
+    .bg_yellow {background-color: $yellow;}
+    .bg_brown {background-color: $brown;}
+    .bg_olive {background-color: $olive;}
+    .bg_steel {background-color: $steel;}
+    .bg_mauve {background-color: $mauve;}
+    .bg_taupe {background-color: $taupe;}
+    .bg_gray {background-color: $gray;}
+    .bg_darkGray {background:$darkGray;}
+    .bg_dark {background-color: $dark;}
+    .bg_darker {background-color: $darker;}
+    .bg_darkBrown {background-color: $darkBrown;}
+    .bg_darkCrimson {background-color: $darkCrimson;}
+    .bg_darkMagenta {background-color: $darkMagenta;}
+    .bg_darkIndigo {background-color: $darkIndigo;}
+    .bg_darkCyan {background-color: $darkCyan;}
+    .bg_darkCobalt {background-color: $darkCobalt;}
+    .bg_darkTeal {background-color: $darkTeal;}
+    .bg_darkEmerald {background-color: $darkEmerald;}
+    .bg_darkGreen {background-color: $darkGreen;}
+    .bg_darkOrange {background-color: $darkOrange;}
+    .bg_darkRed {background-color: $darkRed;}
+    .bg_darkPink {background-color: $darkPink;}
+    .bg_darkViolet {background-color: $darkViolet;}
+    .bg_darkBlue {background-color: $darkBlue;}
+    .bg_lightBlue {background-color: $lightBlue;}
+    .bg_lightRed {background-color: $lightRed;}
+    .bg_lightGreen {background-color: $lightGreen;}
+    .bg_lighterBlue {background-color: $lighterBlue;}
+    .bg_lightTeal {background-color: $lightTeal;}
+    .bg_lightOlive {background-color: $lightOlive;}
+    .bg_lightOrange {background-color: $lightOrange;}
+    .bg_lightPink {background-color: $lightPink;}
+    .bg_grayDark {background-color: $grayDark;}
+    .bg_grayDarker {background-color: $grayDarker;}
+    .bg_grayLight {background-color: $grayLight;}
+    .bg_grayLighter {background-color: $grayLighter;}
+    .bg_blue {background-color: $blue;}
+    .bg_thinLightBlue {background-color: $thinLightBlue;}
+    .bg_thinTeal {background-color: $thinTeal;}
+    .bg_redSoft {background-color: $redSoft;}
+    .bg_blackSoft {background-color: $blackSoft;}
+    .bg_lemon { background-color: $lemon; }
+    .bg_yellowG1 { background-color: $yellow_g1; }
+    .bg_orangeG1 { background-color: $orange_g1; }
+    
+    /* BORDER COLOR STYLE */
+    .br_transparent {border: 1px solid $transparent;}
+    .br_black {border: 1px solid $black;}
+    .br_white {border: 1px solid $white;}
+    .br_lime {border: 1px solid $lime;}
+    .br_green {border: 1px solid $green;}
+    .br_emerald {border: 1px solid $emerald;}
+    .br_teal {border: 1px solid $teal;}
+    .br_cyan {border: 1px solid $cyan;}
+    .br_cobalt {border: 1px solid $cobalt;}
+    .br_indigo {border: 1px solid $indigo;}
+    .br_violet {border: 1px solid $violet;}
+    .br_pink {border: 1px solid $pink;}
+    .br_magenta {border: 1px solid $magenta;}
+    .br_crimson {border: 1px solid $crimson;}
+    .br_red {border: 1px solid $red;}
+    .br_orange {border: 1px solid $orange;}
+    .br_amber {border: 1px solid $amber;}
+    .br_yellow {border: 1px solid $yellow;}
+    .br_brown {border: 1px solid $brown;}
+    .br_olive {border: 1px solid $olive;}
+    .br_steel {border: 1px solid $steel;}
+    .br_mauve {border: 1px solid $mauve;}
+    .br_taupe {border: 1px solid $taupe;}
+    .br_gray {border: 1px solid $gray;}
+    .br_darkGray {border-color:$darkGray;}
+    .br_dark {border: 1px solid $dark;}
+    .br_darker {border: 1px solid $darker;}
+    .br_darkBrown {border: 1px solid $darkBrown;}
+    .br_darkCrimson {border: 1px solid $darkCrimson;}
+    .br_darkMagenta {border: 1px solid $darkMagenta;}
+    .br_darkIndigo {border: 1px solid $darkIndigo;}
+    .br_darkCyan {border: 1px solid $darkCyan;}
+    .br_darkCobalt {border: 1px solid $darkCobalt;}
+    .br_darkTeal {border: 1px solid $darkTeal;}
+    .br_darkEmerald {border: 1px solid $darkEmerald;}
+    .br_darkGreen {border: 1px solid $darkGreen;}
+    .br_darkOrange {border: 1px solid $darkOrange;}
+    .br_darkRed {border: 1px solid $darkRed;}
+    .br_darkPink {border: 1px solid $darkPink;}
+    .br_darkViolet {border: 1px solid $darkViolet;}
+    .br_darkBlue {border: 1px solid $darkBlue;}
+    .br_lightBlue {border: 1px solid $lightBlue;}
+    .br_lightRed {border: 1px solid $lightRed;}
+    .br_lightGreen {border: 1px solid $lightGreen;}
+    .br_lighterBlue {border: 1px solid $lighterBlue;}
+    .br_lightTeal {border: 1px solid $lightTeal;}
+    .br_lightOlive {border: 1px solid $lightOlive;}
+    .br_lightOrange {border: 1px solid $lightOrange;}
+    .br_lightPink {border: 1px solid $lightPink;}
+    .br_grayDark {border: 1px solid $grayDark;}
+    .br_grayDarker {border: 1px solid $grayDarker;}
+    .br_grayLight {border: 1px solid $grayLight;}
+    .br_grayLighter {border: 1px solid $grayLighter;}
+    .br_blue {border: 1px solid $blue;}
+    .br_thinLightBlue {border: 1px solid $thinLightBlue;}
+    .br_thinTeal {border: 1px solid $thinTeal;}
+    .br_redSoft {border: 1px solid $redSoft;}
+    .br_blackSoft {border: 1px solid $blackSoft;}
+    .br_lemon { border: 1px solid $lemon; }
+    .br_yellowG1 { border: 1px solid $yellow_g1; }
+    .br_orangeG1 { border: 1px solid $orange_g1; }
+
+    /* FONT COLOR STYLE */
+    .fg_transparent {color: $transparent;}
+    .fg_black {color: $black;}
+    .fg_white {color: $white;}
+    .fg_lime {color: $lime;}
+    .fg_green {color: $green;}
+    .fg_emerald {color: $emerald;}
+    .fg_teal {color: $teal;}
+    .fg_cyan {color: $cyan;}
+    .fg_cobalt {color: $cobalt;}
+    .fg_indigo {color: $indigo;}
+    .fg_violet {color: $violet;}
+    .fg_pink {color: $pink;}
+    .fg_magenta {color: $magenta;}
+    .fg_crimson {color: $crimson;}
+    .fg_red {color: $red;}
+    .fg_orange {color: $orange;}
+    .fg_amber {color: $amber;}
+    .fg_yellow {color: $yellow;}
+    .fg_brown {color: $brown;}
+    .fg_olive {color: $olive;}
+    .fg_steel {color: $steel;}
+    .fg_mauve {color: $mauve;}
+    .fg_taupe {color: $taupe;}
+    .fg_gray {color: $gray;}
+    .fg_dark {color: $dark;}
+    .fg_darker {color: $darker;}
+    .fg_darkBrown {color: $darkBrown;}
+    .fg_darkCrimson {color: $darkCrimson;}
+    .fg_darkMagenta {color: $darkMagenta;}
+    .fg_darkIndigo {color: $darkIndigo;}
+    .fg_darkCyan {color: $darkCyan;}
+    .fg_darkCobalt {color: $darkCobalt;}
+    .fg_darkTeal {color: $darkTeal;}
+    .fg_darkEmerald {color: $darkEmerald;}
+    .fg_darkGreen {color: $darkGreen;}
+    .fg_darkOrange {color: $darkOrange;}
+    .fg_darkRed {color: $darkRed;}
+    .fg_darkPink {color: $darkPink;}
+    .fg_darkViolet {color: $darkViolet;}
+    .fg_darkBlue {color: $darkBlue;}
+    .fg_lightBlue {color: $lightBlue;}
+    .fg_lightRed {color: $lightRed;}
+    .fg_lightGreen {color: $lightGreen;}
+    .fg_lighterBlue {color: $lighterBlue;}
+    .fg_lightTeal {color: $lightTeal;}
+    .fg_lightOlive {color: $lightOlive;}
+    .fg_lightOrange {color: $lightOrange;}
+    .fg_lightPink {color: $lightPink;}
+    .fg_grayDark {color: $grayDark;}
+    .fg_grayDarker {color: $grayDarker;}
+    .fg_grayLight {color: $grayLight;}
+    .fg_grayLighter {color: $grayLighter;}
+    .fg_blue {color: $blue;}
+    .fg_thinLightBlue {color: $thinLightBlue;}
+    .fg_thinTeal {color: $thinTeal;}
+    .fg_redSoft {color: $redSoft;}
+    .fg_blackSoft {color: $blackSoft;}
+    .fg_lemon { color: $lemon; }
+    .fg_yellowG1 { color: $yellow_g1; }
+    .fg_orangeG1 { color: $orange_g1; }
+    .fg_grayG1 { color: $gray_g1; } 
+
+    /* PANEL COLOR STYLE */
+    .panel_transparent {background-color: $transparent; border-color: $transparent;}
+    .panel_black {background-color: $black; border-color: $black;}
+    .panel_white {background-color: $white; border-color: $white;}
+    .panel_lime {background-color: $lime; border-color: $lime;}
+    .panel_green {background-color: $green; border-color: $green;}
+    .panel_emerald {background-color: $emerald; border-color: $emerald;}
+    .panel_teal {background-color: $teal; border-color: $teal;}
+    .panel_cyan {background-color: $cyan; border-color: $cyan;}
+    .panel_cobalt {background-color: $cobalt; border-color: $cobalt;}
+    .panel_indigo {background-color: $indigo; border-color: $indigo;}
+    .panel_violet {background-color: $violet; border-color: $violet;}
+    .panel_pink {background-color: $pink; border-color: $pink;}
+    .panel_magenta {background-color: $magenta; border-color: $magenta;}
+    .panel_crimson {background-color: $crimson; border-color: $crimson;}
+    .panel_red {background-color: $red; border-color: $red;}
+    .panel_orange {background-color: $orange; border-color: $orange;}
+    .panel_amber {background-color: $amber; border-color: $amber;}
+    .panel_yellow {background-color: $yellow; border-color: $yellow;}
+    .panel_brown {background-color: $brown; border-color: $brown;}
+    .panel_olive {background-color: $olive; border-color: $olive;}
+    .panel_steel {background-color: $steel; border-color: $steel;}
+    .panel_mauve {background-color: $mauve; border-color: $mauve;}
+    .panel_taupe {background-color: $taupe; border-color: $taupe;}
+    .panel_gray {background-color: $gray; border-color: $gray;}
+    .panel_dark {background-color: $dark; border-color: $dark;}
+    .panel_darker {background-color: $darker; border-color: $darker;}
+    .panel_darkBrown {background-color: $darkBrown; border-color: $darkBrown;}
+    .panel_darkCrimson {background-color: $darkCrimson; border-color: $darkCrimson;}
+    .panel_darkMagenta {background-color: $darkMagenta; border-color: $darkMagenta;}
+    .panel_darkIndigo {background-color: $darkIndigo; border-color: $darkIndigo;}
+    .panel_darkCyan {background-color: $darkCyan; border-color: $darkCyan;}
+    .panel_darkCobalt {background-color: $darkCobalt; border-color: $darkCobalt;}
+    .panel_darkTeal {background-color: $darkTeal; border-color: $darkTeal;}
+    .panel_darkEmerald {background-color: $darkEmerald; border-color: $darkEmerald;}
+    .panel_darkGreen {background-color: $darkGreen; border-color: $darkGreen;}
+    .panel_darkOrange {background-color: $darkOrange; border-color: $darkOrange;}
+    .panel_darkRed {background-color: $darkRed; border-color: $darkRed;}
+    .panel_darkPink {background-color: $darkPink; border-color: $darkPink;}
+    .panel_darkViolet {background-color: $darkViolet; border-color: $darkViolet;}
+    .panel_darkBlue {background-color: $darkBlue; border-color: $darkBlue;}
+    .panel_lightBlue {background-color: $lightBlue; border-color: $lightBlue;}
+    .panel_lightRed {background-color: $lightRed; border-color: $lightRed;}
+    .panel_lightGreen {background-color: $lightGreen; border-color: $lightGreen;}
+    .panel_lighterBlue {background-color: $lighterBlue; border-color: $lighterBlue;}
+    .panel_lightTeal {background-color: $lightTeal; border-color: $lightTeal;}
+    .panel_lightOlive {background-color: $lightOlive; border-color: $lightOlive;}
+    .panel_lightOrange {background-color: $lightOrange; border-color: $lightOrange;}
+    .panel_lightPink {background-color: $lightPink; border-color: $lightPink;}
+    .panel_grayDark {background-color: $grayDark; border-color: $grayDark;}
+    .panel_grayDarker {background-color: $grayDarker; border-color: $grayDarker;}
+    .panel_grayLight {background-color: $grayLight; border-color: $grayLight;}
+    .panel_grayLighter {background-color: $grayLighter; border-color: $grayLighter;}
+    .panel_blue {background-color: $blue; border-color: $blue;}
+    .panel_thinLightBlue {background: $thinLightBlue; border-color: $thinLightBlue;}
+    .panel_thinTeal {background: $thinTeal; border-color: $thinTeal;}
+    .panel_redSoft {background: $redSoft;}
+    .panel_blackSoft {background: $blackSoft;}
+
+    /* HACK PROGRESS*/
+    .progress_transparent .ant-progress-bg {background-color: $transparent;}
+    .progress_black .ant-progress-bg {background-color: $black;}
+    .progress_white .ant-progress-bg {background-color: $white;}
+    .progress_lime .ant-progress-bg {background-color: $lime;}
+    .progress_green .ant-progress-bg {background-color: $green;}
+    .progress_emerald .ant-progress-bg {background-color: $emerald;}
+    .progress_teal .ant-progress-bg {background-color: $teal;}
+    .progress_cyan .ant-progress-bg {background-color: $cyan;}
+    .progress_cobalt .ant-progress-bg {background-color: $cobalt;}
+    .progress_indigo .ant-progress-bg {background-color: $indigo;}
+    .progress_violet .ant-progress-bg {background-color: $violet;}
+    .progress_pink .ant-progress-bg {background-color: $pink;}
+    .progress_magenta .ant-progress-bg {background-color: $magenta;}
+    .progress_crimson .ant-progress-bg {background-color: $crimson;}
+    .progress_red .ant-progress-bg {background-color: $red;}
+    .progress_orange .ant-progress-bg {background-color: $orange;}
+    .progress_amber .ant-progress-bg {background-color: $amber;}
+    .progress_yellow .ant-progress-bg {background-color: $yellow;}
+    .progress_brown .ant-progress-bg {background-color: $brown;}
+    .progress_olive .ant-progress-bg {background-color: $olive;}
+    .progress_steel .ant-progress-bg {background-color: $steel;}
+    .progress_mauve .ant-progress-bg {background-color: $mauve;}
+    .progress_taupe .ant-progress-bg {background-color: $taupe;}
+    .progress_gray .ant-progress-bg {background-color: $gray;}
+    .progress_dark .ant-progress-bg {background-color: $dark;}
+    .progress_darker .ant-progress-bg {background-color: $darker;}
+    .progress_darkBrown .ant-progress-bg {background-color: $darkBrown;}
+    .progress_darkCrimson .ant-progress-bg {background-color: $darkCrimson;}
+    .progress_darkMagenta .ant-progress-bg {background-color: $darkMagenta;}
+    .progress_darkIndigo .ant-progress-bg {background-color: $darkIndigo;}
+    .progress_darkCyan .ant-progress-bg {background-color: $darkCyan;}
+    .progress_darkCobalt .ant-progress-bg {background-color: $darkCobalt;}
+    .progress_darkTeal .ant-progress-bg {background-color: $darkTeal;}
+    .progress_darkEmerald .ant-progress-bg {background-color: $darkEmerald;}
+    .progress_darkGreen .ant-progress-bg {background-color: $darkGreen;}
+    .progress_darkOrange .ant-progress-bg {background-color: $darkOrange;}
+    .progress_darkRed .ant-progress-bg {background-color: $darkRed;}
+    .progress_darkPink .ant-progress-bg {background-color: $darkPink;}
+    .progress_darkViolet .ant-progress-bg {background-color: $darkViolet;}
+    .progress_darkBlue .ant-progress-bg {background-color: $darkBlue;}
+    .progress_lightBlue .ant-progress-bg {background-color: $lightBlue;}
+    .progress_lightRed .ant-progress-bg {background-color: $lightRed;}
+    .progress_lightGreen .ant-progress-bg {background-color: $lightGreen;}
+    .progress_lighterBlue .ant-progress-bg {background-color: $lighterBlue;}
+    .progress_lightTeal .ant-progress-bg {background-color: $lightTeal;}
+    .progress_lightOlive .ant-progress-bg {background-color: $lightOlive;}
+    .progress_lightOrange .ant-progress-bg {background-color: $lightOrange;}
+    .progress_lightPink .ant-progress-bg {background-color: $lightPink;}
+    .progress_grayDark .ant-progress-bg {background-color: $grayDark;}
+    .progress_grayDarker .ant-progress-bg {background-color: $grayDarker;}
+    .progress_grayLight .ant-progress-bg {background-color: $grayLight;}
+    .progress_grayLighter .ant-progress-bg {background-color: $grayLighter;}
+    .progress_blue .ant-progress-bg {background-color: $blue;}
+    .progress_thinLightBlue .ant-progress-bg {background-color: $thinLightBlue;}
+    .progress_thinTeal .ant-progress-bg {background-color: $thinTeal;}
+    .progress_redSoft {background-color: $redSoft;}
+    .progress_blackSoft {background-color: $blackSoft;}
+
+    /* MARGIN & PADDING */        
+    .marg_top10 { margin-top: 10px; }
+    .marg_top20 { margin-top: 20px; }
+    .marg_top30 { margin-top: 30px; }
+    .marg_top40 { margin-top: 40px; } 
+    .marg_top50 { margin-top: 50px; } 
+    .marg_top60 { margin-top: 60px; }
+    .marg_top70 { margin-top: 70px; }  
+    .marg_top80 { margin-top: 80px; }  
+    .marg_top90 { margin-top: 90px; } 
+    .marg_top100 { margin-top: 100px; }   
+
+    .marg_left10 { margin-left: 10px; }
+    .marg_left20 { margin-left: 20px; }
+    .marg_left30 { margin-left: 30px; }
+    .marg_left40 { margin-left: 40px; } 
+    .marg_left50 { margin-left: 50px; } 
+    .marg_left60 { margin-left: 60px; } 
+    .marg_left70 { margin-left: 70px; } 
+    .marg_left80 { margin-left: 80px; }  
+    .marg_left90 { margin-left: 90px; } 
+    .marg_left100 { margin-left: 100px; } 
+
+    .marg_right10 { margin-right: 10px; }
+    .marg_right20 { margin-right: 20px; }
+    .marg_right30 { margin-right: 30px; }
+    .marg_right40 { margin-right: 40px; }
+    .marg_right50 { margin-right: 50px; }
+    .marg_right60 { margin-right: 60px; }
+    .marg_right70 { margin-right: 70px; }
+    .marg_right80 { margin-right: 80px; }  
+    .marg_right90 { margin-right: 90px; } 
+    .marg_right100 { margin-right: 100px; }   
+
+    .marg_bottom10 { margin-bottom: 10px; }
+    .marg_bottom20 { margin-bottom: 20px; }
+    .marg_bottom30 { margin-bottom: 30px; }
+    .marg_bottom40 { margin-bottom: 40px; } 
+    .marg_bottom50 { margin-bottom: 50px; } 
+    .marg_bottom60 { margin-bottom: 60px; } 
+    .marg_bottom70 { margin-bottom: 70px; } 
+    .marg_bottom80 { margin-bottom: 80px; }  
+    .marg_bottom90 { margin-bottom: 90px; } 
+    .marg_bottom100 { margin-bottom: 100px; }   
+
+    .marg_top5 { margin-top: 5px; }
+    .marg_right5 { margin-right: 5px; }
+    .marg_bottom5 { margin-bottom: 5px; } 
+    .marg_left5 { margin-left: 5px; }
+
+    .marg_top15 { margin-top: 15px; }
+    .marg_right15 { margin-right: 15px; }
+    .marg_bottom15 { margin-bottom: 15px; } 
+    .marg_left15 { margin-left: 15px; }
+
+    .marg_top25 { margin-top: 25px; }
+    .marg_right25 { margin-right: 25px; }
+    .marg_bottom25 { margin-bottom: 25px; } 
+    .marg_left25 { margin-left: 25px; }
+
+    .marg_top35 { margin-top: 35px; }
+    .marg_right35 { margin-right: 35px; }
+    .marg_bottom35 { margin-bottom: 35px; } 
+    .marg_left35 { margin-left: 35px; }
+
+    .marg_top45 { margin-top: 45px; }
+    .marg_right45 { margin-right: 45px; }
+    .marg_bottom45 { margin-bottom: 45px; } 
+    .marg_left45 { margin-left: 45px; }
+
+    .marg_top55 { margin-top: 55px; }
+    .marg_right55 { margin-right: 55px; }
+    .marg_bottom55 { margin-bottom: 55px; } 
+    .marg_left55 { margin-left: 55px; }
+
+    .marg_top65 { margin-top: 65px; }
+    .marg_right65 { margin-right: 65px; }
+    .marg_bottom65 { margin-bottom: 65px; } 
+    .marg_left65 { margin-left: 65px; }
+
+    .marg_tp_easing10 { margin-top: -10px; }
+    .marg_tp_easing20 { margin-top: -20px; }
+    .marg_tp_easing30 { margin-top: -30px; }
+    .marg_tp_easing40 { margin-top: -40px; } 
+    .marg_tp_easing50 { margin-top: -50px; } 
+    .marg_tp_easing60 { margin-top: -60px; }
+    .marg_tp_easing70 { margin-top: -70px; }  
+
+    .marg_lf_easing10 { margin-left: -10px; }
+    .marg_lf_easing20 { margin-left: -20px; }
+    .marg_lf_easing30 { margin-left: -30px; }
+    .marg_lf_easing40 { margin-left: -40px; } 
+    .marg_lf_easing50 { margin-left: -50px; } 
+    .marg_lf_easing60 { margin-left: -60px; } 
+    .marg_lf_easing70 { margin-left: -70px; } 
+
+    .marg_rt_easing10 { margin-right: -10px; }
+    .marg_rt_easing20 { margin-right: -20px; }
+    .marg_rt_easing30 { margin-right: -30px; }
+    .marg_rt_easing40 { margin-right: -40px; }
+    .marg_rt_easing50 { margin-right: -50px; }
+    .marg_rt_easing60 { margin-right: -60px; }
+    .marg_rt_easing70 { margin-right: -70px; }
+
+    .marg_bm_easing10 { margin-bottom: -10px; }
+    .marg_bm_easing20 { margin-bottom: -20px; }
+    .marg_bm_easing30 { margin-bottom: -30px; }
+    .marg_bm_easing40 { margin-bottom: -40px; } 
+    .marg_bm_easing50 { margin-bottom: -50px; } 
+    .marg_bm_easing60 { margin-bottom: -60px; } 
+    .marg_bm_easing70 { margin-bottom: -70px; } 
+
+    .marg_tp_easing5 { margin-top: -5px; }
+    .marg_rt_easing5 { margin-right: -5px; }
+    .marg_bm_easing5 { margin-bottom: -5px; } 
+    .marg_lf_easing5 { margin-left: -5px; }
+
+    .marg_tp_easing15 { margin-top: -15px; }
+    .marg_rt_easing15 { margin-right: -15px; }
+    .marg_bm_easing15 { margin-bottom: -15px; } 
+    .marg_lf_easing15 { margin-left: -15px; }
+
+    .marg_tp_easing25 { margin-top: -25px; }
+    .marg_rt_easing25 { margin-right: -25px; }
+    .marg_bm_easing25 { margin-bottom: -25px; } 
+    .marg_lf_easing25 { margin-left: -25px; }
+
+    .marg_tp_easing35 { margin-top: -35px; }
+    .marg_rt_easing35 { margin-right: -35px; }
+    .marg_bm_easing35 { margin-bottom: -35px; } 
+    .marg_lf_easing35 { margin-left: -35px; }
+
+    .marg_tp_easing45 { margin-top: -45px; }
+    .marg_rt_easing45 { margin-right: -45px; }
+    .marg_bm_easing45 { margin-bottom: -45px; } 
+    .marg_lf_easing45 { margin-left: -45px; }
+
+    .marg_tp_easing55 { margin-top: -55px; }
+    .marg_rt_easing55 { margin-right: -55px; }
+    .marg_bm_easing55 { margin-bottom: -55px; } 
+    .marg_lf_easing55 { margin-left: -55px; }
+
+    .marg_tp_easing65 { margin-top: -65px; }
+    .marg_rt_easing65 { margin-right: -65px; }
+    .marg_bm_easing65 { margin-bottom: -65px; } 
+    .marg_lf_easing65 { margin-left: -65px; }
+
+    .marg_lr5 { margin-left: 5px; margin-right: 5px; }
+    .marg_lr10 { margin-left: 10px; margin-right: 10px; }
+    .marg_lr15 { margin-left: 15px; margin-right: 15px; }
+    .marg_lr20 { margin-left: 20px; margin-right: 20px; }
+    .marg_lr25 { margin-left: 25px; margin-right: 25px; }
+    .marg_lr30 { margin-left: 30px; margin-right: 30px; }
+    .marg_lr35 { margin-left: 35px; margin-right: 35px; }
+    .marg_lr40 { margin-left: 40px; margin-right: 40px; }
+
+    .marg_tb5 { margin-top: 5px; margin-bottom: 5px; }
+    .marg_tb10 { margin-top: 10px; margin-bottom: 10px; }
+    .marg_tb15 { margin-top: 15px; margin-bottom: 15px; }
+    .marg_tb20 { margin-top: 20px; margin-bottom: 20px; }
+    .marg_tb25 { margin-top: 25px; margin-bottom: 25px; }
+    .marg_tb30 { margin-top: 30px; margin-bottom: 30px; }
+    .marg_tb35 { margin-top: 35px; margin-bottom: 35px; }
+    .marg_tb40 { margin-top: 40px; margin-bottom: 40px; }
+
+    .pad5 { padding: 5px; }
+    .pad15 { padding: 15px; }
+    .pad25 { padding: 25px; }
+    .pad35 { padding: 35px; } 
+    .pad45 { padding: 45px; } 
+    .pad55 { padding: 55px; }
+    .pad65 { padding: 65px; }  
+
+    .pad10 { padding: 10px; }
+    .pad20 { padding: 20px; }
+    .pad30 { padding: 30px; }
+    .pad40 { padding: 40px; } 
+    .pad50 { padding: 50px; } 
+    .pad60 { padding: 60px; }
+    .pad70 { padding: 70px; } 
+
+    .pad_top5 { padding-top: 5px; }
+    .pad_top15 { padding-top: 15px; }
+    .pad_top25 { padding-top: 25px; }
+    .pad_top35 { padding-top: 35px; } 
+    .pad_top45 { padding-top: 45px; } 
+    .pad_top55 { padding-top: 55px; }
+    .pad_top65 { padding-top: 65px; }  
+
+    .pad_top10 { padding-top: 10px; }
+    .pad_top20 { padding-top: 20px; }
+    .pad_top30 { padding-top: 30px; }
+    .pad_top40 { padding-top: 40px; } 
+    .pad_top50 { padding-top: 50px; } 
+    .pad_top60 { padding-top: 60px; }
+    .pad_top70 { padding-top: 70px; }  
+
+    .pad_left5 { padding-left: 5px; }
+    .pad_left15 { padding-left: 15px; }
+    .pad_left25 { padding-left: 25px; }
+    .pad_left35 { padding-left: 35px; } 
+    .pad_left45 { padding-left: 45px; } 
+    .pad_left55 { padding-left: 55px; }
+    .pad_left65 { padding-left: 65px; } 
+
+    .pad_left10 { padding-left: 10px; }
+    .pad_left20 { padding-left: 20px; }
+    .pad_left30 { padding-left: 30px; }
+    .pad_left40 { padding-left: 40px; } 
+    .pad_left50 { padding-left: 50px; } 
+    .pad_left60 { padding-left: 60px; }
+    .pad_left70 { padding-left: 70px; }  
+
+    .pad_right5 { padding-right: 5px; }
+    .pad_right15 { padding-right: 15px; }
+    .pad_right25 { padding-right: 25px; }
+    .pad_right35 { padding-right: 35px; } 
+    .pad_right45 { padding-right: 45px; } 
+    .pad_right55 { padding-right: 55px; }
+    .pad_right65 { padding-right: 65px; } 
+
+    .pad_right10 { padding-right: 10px; }
+    .pad_right20 { padding-right: 20px; }
+    .pad_right30 { padding-right: 30px; }
+    .pad_right40 { padding-right: 40px; } 
+    .pad_right50 { padding-right: 50px; } 
+    .pad_right60 { padding-right: 60px; }
+    .pad_right70 { padding-right: 70px; }  
+
+    .pad_bottom5 { padding-bottom: 5px; }
+    .pad_bottom15 { padding-bottom: 15px; }
+    .pad_bottom25 { padding-bottom: 25px; }
+    .pad_bottom35 { padding-bottom: 35px; } 
+    .pad_bottom45 { padding-bottom: 45px; } 
+    .pad_bottom55 { padding-bottom: 55px; }
+    .pad_bottom65 { padding-bottom: 65px; } 
+
+    .pad_bottom10 { padding-bottom: 10px; }
+    .pad_bottom20 { padding-bottom: 20px; }
+    .pad_bottom30 { padding-bottom: 30px; }
+    .pad_bottom40 { padding-bottom: 40px; } 
+    .pad_bottom50 { padding-bottom: 50px; } 
+    .pad_bottom60 { padding-bottom: 60px; }
+    .pad_bottom70 { padding-bottom: 70px; }  
+
+    .pad_lr5 { margin-left: 5px; margin-right: 5px; }
+    .pad_lr10 { margin-left: 10px; margin-right: 10px; }
+    .pad_lr15 { margin-left: 15px; margin-right: 15px; }
+    .pad_lr20 { margin-left: 20px; margin-right: 20px; }
+    .pad_lr25 { margin-left: 25px; margin-right: 25px; }
+    .pad_lr30 { margin-left: 30px; margin-right: 30px; }
+    .pad_lr35 { margin-left: 35px; margin-right: 35px; }
+    .pad_lr40 { margin-left: 40px; margin-right: 40px; }
+    .pad_lr45 { margin-left: 45px; margin-right: 45px; }
+    .pad_lr50 { margin-left: 50px; margin-right: 50px; }
+
+    .pad_tb5 { padding-top: 5px; padding-bottom: 5px; }
+    .pad_tb10 { padding-top: 10px; padding-bottom: 10px; }
+    .pad_tb15 { padding-top: 15px; padding-bottom: 15px; }
+    .pad_tb20 { padding-top: 20px; padding-bottom: 20px; }
+    .pad_tb25 { padding-top: 25px; padding-bottom: 25px; }
+    .pad_tb30 { padding-top: 30px; padding-bottom: 30px; }
+    .pad_tb35 { padding-top: 35px; padding-bottom: 35px; }
+    .pad_tb40 { padding-top: 40px; padding-bottom: 40px; }
+    .pad_tb45 { padding-top: 45px; padding-bottom: 45px; }
+    .pad_tb50 { padding-top: 50px; padding-bottom: 50px; }
+
+    .animated {animation-duration:1s;animation-fill-mode:both}
+    .animated.infinite {animation-iteration-count:infinite}
+    .animated.hinge {animation-duration:2s}
+    .zoomIn { animation-name: zoomIn }
+    .zoomOut { animation-name: zoomOut }
+
+    @keyframes zoomIn { 
+        0% {
+            opacity:0;
+            transform:scale3d(.3,.3,.3)
+        }
+        50% {
+            opacity:1
+        }
+    }
+
+    @keyframes zoomOut {
+        0% { opacity:1 }
+        50% { 
+            opacity:0;
+            transform: scale3d(.3,.3,.3)
+        }
+        to{ opacity:0 }
+    }
+
+// }

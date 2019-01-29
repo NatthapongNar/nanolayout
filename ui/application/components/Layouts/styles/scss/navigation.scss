@@ -1,0 +1,184 @@
+.menu_layout {
+    font-size: 11px;
+    min-height: 38px; 
+    max-height: 38px; 
+    color: #FFFFFF;
+    border-right: 1px solid rgba(0, 0, 0, .1) !important;
+    background-color: #5f9ea0 !important;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none; 
+    -khtml-user-select: none; 
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
+    span {color: #FFFFFF}
+    li[class^="ant-menu-item"], li[class$="ant-menu-submenu"], li[class^="ant-menu-submenu ant-menu-submenu-horizontal"]  { 
+        top: 0px !important;
+        min-height: 38px; 
+        max-height: 38px; 
+    }
+
+    li[class^="ant-menu-item-disabled"], li[class$="ant-menu-item-disabled"], li[class$="ant-menu-submenu-disabled ant-menu-submenu"] { 
+        span { opacity:.2; } 
+    }    
+    li {
+        opacity: 0;
+        animation: fadeIn 0.9s 1;
+        -webkit-animation: fadeIn 0.9s 1;
+        animation-fill-mode: forwards;
+        -webkit-animation-fill-mode: forwards;
+    }  
+    li:nth-child(15n+1) {
+        -webkit-animation-delay: 0.2s;
+        animation-delay: 0.2s;
+    } 
+    li:nth-child(15n+2) {
+        -webkit-animation-delay: 0.4s;
+        animation-delay: 0.4s;
+    }
+    li:nth-child(15n+3) {
+        -webkit-animation-delay: 0.6s;
+        animation-delay: 0.6s;
+    }      
+    li:nth-child(15n+4) {
+        -webkit-animation-delay: 0.8s;
+        animation-delay: 0.8s;
+    }      
+    li:nth-child(15n+5) {
+        -webkit-animation-delay: 1s;
+        animation-delay: 1s;
+    }
+    li:nth-child(15n+6) {
+        -webkit-animation-delay: 1.2s;
+        animation-delay: 1.2s;
+    }
+    li:nth-child(15n+7) {
+        -webkit-animation-delay: 1.4s;
+        animation-delay: 1.4s;
+    }
+    li:nth-child(15n+8) {
+        -webkit-animation-delay: 1.6s;
+        animation-delay: 1.6s;
+    }
+    li:nth-child(15n+9) {
+        -webkit-animation-delay: 1.8s;
+        animation-delay: 1.8s;
+    }
+    li:nth-child(15n+10) {
+        -webkit-animation-delay: 2.0s;
+        animation-delay: 2.0s;
+    }
+    li:nth-child(15n+11) {
+        -webkit-animation-delay: 2.2s;
+        animation-delay: 2.2s;
+    }
+    li:nth-child(15n+12) {
+        -webkit-animation-delay: 2.4s;
+        animation-delay: 2.4s;
+    }
+    li:nth-child(15n+13) {
+        -webkit-animation-delay: 2.6s;
+        animation-delay: 2.6s;
+    }
+    li:nth-child(15n+14) {
+        -webkit-animation-delay: 2.8s;
+        animation-delay: 2.8s;
+    }
+    li:nth-child(15n+11) {
+        -webkit-animation-delay: 3.0s;
+        animation-delay: 3.0s;
+    } 
+    li[class^="ant-menu-item"]:hover span {
+        transform: scale(1.2);
+        -webkit-transform: scale(1.2);
+    }
+    .fr { float:right !important; }
+}
+
+li[class^="ant-menu-item-active"].nav_details {
+    color: #FFF !important;
+    border-bottom: 0 !important;
+}
+
+.nav_details {
+    font-size: 12px;
+    min-width: 350px;
+    padding: 0 10px;
+}
+
+.menu_detail_container {
+    position: relative;
+    height: -webkit-fill-available;
+
+    .menu_detail_header {
+        position: absolute;
+        min-height: 19px;
+        max-height: 19px;
+        top: 0px;
+        line-height: 1.5;
+    }
+    .menu_detail_footer {
+        position: absolute;
+        min-height: 19px;
+        max-height: 19px;
+        top: 19px;
+        line-height: 1.2;
+    }
+}
+
+.menu_handler {
+    position: absolute;
+    width: 65px;
+    height: 38px;
+    right: 0;
+    text-align: center;
+    border-left: 1px solid #ededed;
+    border-bottom: 1px solid #ededed;
+    background-color: transparent !important;
+    z-index: 2147483647;
+    cursor: pointer;
+    span {
+         color: gray;
+         line-height: 35px;
+         cursor: pointer;
+    }
+}
+
+.menu_handler:hover {border-bottom: 2px solid #108ee9}
+.icon_blink {animation: blink 1s ease-in infinite}
+
+.sideOpen {
+    transform: rotate(180deg);
+    -webkit-transform: rotate(180deg);
+    transition: .3s all ease;        
+}
+
+.sideClose {
+    transform: rotate(0deg);
+    -webkit-transform: rotate(0deg);
+    transition: .3s all ease;        
+}
+
+.dn { display: none !important; }
+.db { display: block !important; }
+
+@-webkit-keyframes blink {
+    from, to { opacity: 1 }
+    50% { opacity: .4 }
+}
+
+@keyframes blink {
+    from, to { opacity: 1 }
+    50% { opacity: .4 }
+}
+
+@-webkit-keyframes fadeIn {
+    0% {opacity: 0.0}
+    100% {opacity: 1.0}
+}
+
+@keyframes fadeIn {
+    0% {opacity: 0.0}
+    100% {opacity: 1.0}
+}

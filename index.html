@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Nano Layout</title>
+    <link rel="icon" href="/images/tcrbank.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/vendor/fonts/kanit.min.css">
+    <link rel="stylesheet" href="/vendor/semantic.min.css">
+    <link rel="stylesheet" href="/vendor/jquery/jquery-ui.min.css">
+    <link rel="stylesheet" href="/vendor/fontawesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/vendor/animate/animate.min.css">
+    <link rel="stylesheet" href="/vendor/tachyons/tachyons.min.css" />
+    <link rel="stylesheet" href="/vendor/contextmenu/jquery.contextMenu.min.css">
+    <link rel="stylesheet" href="/vendor/lightbox/css/lightbox.min.css">
+    <link rel="stylesheet" href="/vendor/themify-icons/themify-icons.css">
+    <style type="text/css">
+        i['class^="fa"'],span['class^="fa"'] {font-family: 'FontAwesome';}
+    </style>
+</head>
+<body>
+    <div id="app"></div>
+    <script src="/vendor/jquery/jquery-3.2.1.min.js"></script>
+    <script src="/vendor/jquery/jquery-ui.min.js"></script>
+    <script src="/vendor/jquery/modernizr.min.js"></script>
+    <script src="/vendor/jquery/classie.min.js"></script>    
+    <script src="/vendor/contextmenu/jquery.contextMenu.min.js"></script>
+    <script src="/vendor/contextmenu/jquery.ui.position.min.js"></script>
+    <script src="/vendor/justgage/justgage.min.js"></script>
+    <script src="/vendor/justgage/raphael.min.js"></script>
+    <script src="/vendor/mousedirect.min.js"></script>    
+    <script src="/vendor/lightbox/js/lightbox.min.js"></script>
+    <script src="/vendor/pdfmake/pdfmake.custom.js"></script>
+    <script src="/vendor/pdfmake/vfs_fonts.js"></script>	
+    <script src="/vendor/detectzoom/detect-zoom.min.js"></script>
+    <script src="/vendor/panzoom/jquery.panzoom.min.js"></script>
+    <script src="/static/bundle.js"></script>
+    <script>
+        $(document).keydown(function (e) { 1 != e.ctrlKey || "61" != e.which && "107" != e.which && "173" != e.which && "109" != e.which && "187" != e.which && "189" != e.which || e.preventDefault() }), $(window).bind("mousewheel DOMMouseScroll", function (e) { 1 == e.ctrlKey && e.preventDefault() });
+        (function ($,sr) {
+            var debounce = function (func, threshold, execAsap) {
+            var timeout
+
+            return function debounced () {
+                var obj = this, args = arguments;
+                function delayed () {
+                    if (!execAsap)
+                        func.apply(obj, args);
+                    timeout = null
+                }
+
+                if (timeout)
+                    clearTimeout(timeout)
+                else if (execAsap)
+                    func.apply(obj, args)
+
+                timeout = setTimeout(delayed, threshold || 100)
+            }
+        }
+
+        jQuery.fn[sr] = function(fn) {  
+            return fn ? this.bind('resize', debounce(fn)) : this.trigger(sr); 
+        };
+
+        })(jQuery,'smartresize');
+
+
+        function getZoomValues () {
+            var zoom = detectZoom.zoom();
+            var device = detectZoom.device();
+            var newZoomVal = parseFloat(zoom,10).toFixed(2);
+            var newDeviceVal = parseFloat(device,10).toFixed(2);
+            console.info([{ 'zoom': newZoomVal, 'device': newDeviceVal }])         
+       
+        }
+
+        $(document).ready(function() { getZoomValues(); });
+        $(window).smartresize(function() { getZoomValues(); });
+    </script>
+</body>
+
+</html>  

@@ -1,0 +1,12 @@
+.potential_container { 
+    & span[class^="ant-input-group-addon"] {
+        padding: 0px !important;
+        background-color: unset !important;
+        border: 0px !important;
+
+        & input[class="ant-input"] {
+            height: 32px !important; 
+            border-radius: 0 4px 4px 0 !important;
+        }
+    }
+}

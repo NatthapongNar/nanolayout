@@ -1,0 +1,21 @@
+.split_container {
+    position: absolute;
+    padding: 2px 0px 2px 8px;
+    border: 1px solid #D1D1D1;
+    background: #efeee8;
+    z-index: 1010;
+    display: none;
+
+    div[class^="ant-input-number"] {
+        margin-right: 0px !important;
+    }
+
+    div[class$="ant-form-item"] {
+        margin-right: 8px !important;
+    }
+
+}
+
+.split_container.open {
+    display: block;
+}

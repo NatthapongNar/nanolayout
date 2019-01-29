@@ -1,0 +1,35 @@
+.tools-container {
+    position: absolute;
+    min-width: 200px;
+    max-width: 200px;
+    display: none;
+    border: 1px solid #D1D1D1;
+    background: #FFF;
+    z-index: 1010;
+
+    .tools-header {
+        font-size: 12px;
+        font-weight: bold;
+        padding: 5px;
+        background-color: #1b6eae;
+        color: #FFF;
+        width: 100%;
+    }
+
+    .tools-content, .tools-footer {
+        width: 100%;
+        padding: 0px 7px;
+    }
+
+    div[class$="ant-form-item"] {
+        margin-bottom: 10px !important;
+    }
+
+    & label[class$="ant-checkbox-wrapper"] + label[class$="ant-checkbox-wrapper"] {
+        margin-left: 0px !important;
+    }
+}
+
+.tools-container.open {
+    display: block;
+}

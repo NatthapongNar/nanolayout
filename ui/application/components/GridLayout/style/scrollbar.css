@@ -1,0 +1,26 @@
+
+.griddashboard_wrapper ::-webkit-scrollbar {
+    background: transparent;
+    width: 0px;
+}
+.griddashboard_wrapper ::-webkit-scrollbar-y {
+    background: transparent;
+    width: 0px !important;
+}
+.griddashboard_wrapper ::-webkit-scrollbar-x {
+    background: transparent;
+    width: 0px !important;
+}
+.griddashboard_wrapper ::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border: 8px solid white;
+}
+
+.griddashboard_wrapper ::-webkit-scrollbar-thumb:before {
+    content: "\E620";
+    font-family: "anticon" !important;
+}
+
+.griddashboard_wrapper ::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(0, 0, 0, 0.3);
+}

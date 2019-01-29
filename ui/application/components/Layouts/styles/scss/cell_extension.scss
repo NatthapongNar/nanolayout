@@ -1,0 +1,67 @@
+.tools-extension-container {
+    position: absolute;
+    min-width: 38px;
+    display: none;
+    background: rgba(0, 0, 0, .7);
+    // padding: 7px;
+    padding: 3px;
+    z-index: 501;
+
+    .tools-extension-close {
+        position: absolute;
+        border-radius: 50%;
+        background-color: #f5222d;
+        width: 17px;
+        padding: 3px;
+        // right: -10px;
+        // top: -12px;
+        right: -12px;
+        top: -14px;
+        text-align: center;
+        cursor: pointer;
+        font-size: 0.6em;
+        &:hover {
+            background-color: #ff0000;
+        }
+        & i {
+            color: #FFFFFF;
+        }
+    }
+
+    .tools-extension-content, .tools-extension-footer {
+        width: 100%;
+        padding: 0px 0px;
+    }
+
+    .tools-extension-content {
+        display: inline;        
+    }
+
+    .cell-box {
+        font-weight: 500;
+        color: #adadad;
+        cursor: pointer;
+        border: 1px solid;
+        text-align: center;
+        height: 38px !important;
+        width: 38px !important;
+        max-height: 38px !important;
+        max-width: 38px !important;
+        min-height: 38px !important;
+        min-width: 38px !important;
+        padding: 0px !important;
+        z-index: 1;
+        float: left;
+        -webkit-touch-callout: none;
+        -webkit-user-select: none; 
+        -khtml-user-select: none; 
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+    
+}
+
+.tools-extension-container.open {
+    display: block;
+}
