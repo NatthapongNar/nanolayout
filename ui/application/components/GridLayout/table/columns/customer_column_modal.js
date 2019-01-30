@@ -804,17 +804,29 @@ class PopoverTabletHist extends Component {
                 className="pointer"
                 onClick={this.handleTabletHist.bind(this, dataItems)} 
                 content={
-                    <div id={`TABLET_${dataItems.AccountNo}`} style={{ width: '350px', opacity: 0 }}>
+                    <div id={`TABLET_${dataItems.AccountNo}`} style={{ width: '300px', opacity: 0 }}>
                         <List
                             loading={this.state.dataLoading}
                             size="small"
                             dataSource={this.state.dataHist}
                             renderItem={(item, i) => (
-                                <ListItem style={{ fontSize: '0.95em', lineHeight: '24px', padding: '0px 0px 2px 5px' }}> 
+                                <ListItem style={{ fontSize: '1em', lineHeight: '24px', padding: '0px 0px 2px 5px' }}> 
                                     <span style={{ fontSize: '2em'}}>
                                         {(i + 1)}. &nbsp;
-                                        <Avatar src={`http://172.17.9.94/newservices/LBServices.svc/employee/image/${(item && item.created_id) ? item.created_id : null}`} shape="square" size="small" style={{ borderRadius: '0px' }} />
-                                        <Tag color={this.handleLayerColorByPosit(item.created_position)} style={{ borderRadius: '0px' }}>{`${(item && item.created_position) ? ` ${item.created_position} ` : ''} `}</Tag>
+                                        <span onMouseOver={this.handleTabletEmpImg.bind(this, { items: dataItems, index: (i+1) })}>
+                                            <Popover 
+                                                shape="square"
+                                                placement="top"                                           
+                                                content={(
+                                                    <div id={`TABLET_IMG_${dataItems.AccountNo}_${(i+1)}`} style={{ opacity: 0 }}>
+                                                        <Avatar src={`http://172.17.9.94/newservices/LBServices.svc/employee/image/${(item && item.created_id) ? item.created_id : null}`} style={{ width: '75px', height: '75px', borderRadius: '0px' }} />
+                                                    </div>
+                                                )}                                             
+                                            >
+                                                <Avatar src={`http://172.17.9.94/newservices/LBServices.svc/employee/image/${(item && item.created_id) ? item.created_id : null}`} shape="square" size="small" style={{ borderRadius: '0px', cursor: 'pointer' }} />
+                                            </Popover>
+                                        </span>
+                                        <Tag color={this.handleLayerColorByPosit(item.created_position)} style={{ borderRadius: '0px', minHeight: '24px' }}>{`${(item && item.created_position) ? ` ${item.created_position} ` : ''} `}</Tag>
                                         {`${(item && item.created_date) ? moment(item.created_date).format('DD/MM/YYYY') : ''} : `}
                                         {`${(item && item.latest_note) ? item.latest_note: ''}`}
                                     </span>
@@ -850,7 +862,7 @@ class PopoverTabletHist extends Component {
             _.delay(() => {
                 let e = `TABLET_${data.AccountNo}`    
                 _.delay(() => { 
-                    $(`#${e}`).css({ opacity: 1 }) 
+                    $(`#${e}`).css({ opacity: 1, border: '2px solid #D1D1D1' }) 
                     $(`#${e}`).addClass('animated fadeIn')
                 }, 300)
                 let element = $(`#${e}`).parents()
@@ -873,29 +885,48 @@ class PopoverTabletHist extends Component {
 
     }
 
+    handleTabletEmpImg = (data) => {
+        console.log(data)
+        _.delay(() => {
+            let e = `TABLET_IMG_${data.items.AccountNo}_${data.index}`    
+            _.delay(() => { 
+                $(`#${e}`).css({ opacity: 1 }) 
+                $(`#${e}`).addClass('animated fadeIn')
+            }, 300)
+            let element = $(`#${e}`).parents()
+            if(element) {
+                $(element[0]).css('padding', '0px')
+                $(element[0]).addClass(`${cls['unset']}`)
+                $(element[1]).css('background', '#FFF ')
+                $(element[2]).addClass(cls['unset'])
+                $(element[2]).addClass('animated bounceIn')
+    
+                let el_arrow = $(element[3]).children()[0]            
+                if(el_arrow) {
+                    $(el_arrow).addClass(cls['unset'])
+                }
+            }
+            
+        }, 200)
+
+    }
+
     handleLayerColorByPosit = (position) => {
         switch(position) {
             case 'RD':
                 return 'green'
-            break
             case 'AM':
                 return 'cyan'
-            break
             case 'ZM':
                 return 'orange'
-            break
             case 'TM':
                 return 'gold'
-            break
             case 'FCR':
-                return 'lightsalmon'
-            break
+                return 'yellowgreen'
             case 'PCA':
                 return 'volcano'
-            break
             default: 
                 return 'red'
-            break
         }
     }
 
