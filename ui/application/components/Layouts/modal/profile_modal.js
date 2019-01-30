@@ -333,7 +333,7 @@ class ProfileModal extends Component {
                             <Row type="flex" gutter={0} style={{ paddingTop: '2px' }}>
                                 <Col span={7} className={`${cls['grid_label']} ${cls['repad']} bb b--light-gray`}>Ref / Lock No</Col>
                                 <Col span={17} className={`${cls['grid_control']} ${cls['repad']} bb b--light-gray`}>
-                                    {`${reference_no}`} / 001                                    
+                                    {`${reference_no}`}                              
                                     <div className={`${cls['noteContainer']} ${(parseBool(preview)) && cls['hidden']} ${parseBool(previewBigScale) && cls['hidden']}`}>
                                         <i className={`${cls['handleInputNote']} fa fa-comments-o fr`} onClick={this.handleUseNote}></i>
                                         <span className={`${cls['handleNoteArea']} ${(this.state.useNote) && cls['open']}`}>

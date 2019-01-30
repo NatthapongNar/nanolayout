@@ -240,11 +240,10 @@ class CustProfileModal extends Component {
         const convinient_time = (mktCustFilter && mktCustFilter.profile && mktCustFilter.profile.OpenHours) ? mktCustFilter.profile.OpenHours : '-'
         const cause_notice = (mktCustFilter && mktCustFilter.profile && mktCustFilter.profile.Cause) ? mktCustFilter.profile.Cause :''
         const callreport = (mktCustFilter && mktCustFilter.profile && mktCustFilter.profile.Cause_Detail) ? mktCustFilter.profile.Cause_Detail : ''
-        const active_cell = (mktCustFilter && mktCustFilter.cellable) ? mktCustFilter.cellable[0].getAttribute('ref') : null
-        const lockno_cell = (mktCustFilter && mktCustFilter.cellable) ? mktCustFilter.cellable[0].getAttribute('data-ref') : ''
+        const active_cell = (mktCustFilter && mktCustFilter.profile && mktCustFilter.profile.ColumnCell) ? mktCustFilter.profile.ColumnCell : null
         const tenor = (mktCustFilter && mktCustFilter.profile && mktCustFilter.profile.Tenor) ? numberWithCommas(mktCustFilter.profile.Tenor):0
         const total_topup = '-'
-        let reference_no = (active_cell) ? active_cell : lockno_cell
+        let reference_no = (active_cell) ? active_cell : ''
 
         const principle = (mktCustFilter && mktCustFilter.profile && mktCustFilter.profile.Principle) ? mktCustFilter.profile.Principle:null
         let acc_close = (principle && principle > 0) ? 'N':'Y'
@@ -288,7 +287,7 @@ class CustProfileModal extends Component {
                             <Row type="flex" gutter={0} style={{ paddingTop: '2px' }}>
                                 <Col span={7} className={`${cls['grid_label']} ${cls['repad']} bb b--light-gray`}>Ref / Lock No</Col>
                                 <Col span={17} className={`${cls['grid_control']} ${cls['repad']} bb b--light-gray`}>
-                                    {`${reference_no}`} / 001
+                                    {`${reference_no}`}
                                 </Col>
                             </Row>
                             <Row type="flex" gutter={0}>

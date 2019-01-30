@@ -1024,7 +1024,7 @@ class CustomerDashboard extends Component {
         const parentTable = document.querySelector(`.${cls['grid_customer']}`)
         const default_class = ['ttu tl', 'tl', 'tl', 'tc',  'tc', 'tc', 'tc', 'tl', 'tc', 'tc', 'tr', 'tc', 'tc', 'tr', 'tr', 'tr', 'tc', 'tr', 'tr', 'tc', 'tc', 'tc', 'tr', 'tr', 'tr', 'tr', 'tr', 'tl', 'tc'] 
         
-        const short_numtodigit = 8
+        const short_numtodigit = 7
         if(parentTable) {
             let grid_size = []
             _.forEach(default_class, (v, i) => { 
@@ -1034,8 +1034,6 @@ class CustomerDashboard extends Component {
                     grid_size.push(width_outer)
                 }
             })
-
-            console.log(currentPageData)
 
             let credit_limit = roundFixed(_.sumBy(currentPageData, 'CreditLimit'), 0)
             let credit_limit_all = roundFixed(_.sumBy(data.source, 'CreditLimit'), 0)
@@ -1062,9 +1060,9 @@ class CustomerDashboard extends Component {
                 },
                 all: {
                     0: lang_field_default.footer.total_title,
-                    11: numberWithCommas(largeNumberToShort(roundFixed(_.sumBy(data.source, 'Limit'), 2), 8, 2)),
-                    13: numberWithCommas(largeNumberToShort(roundFixed(_.sumBy(data.source, 'Principle'), 2), 8, 2)),
-                    18: numberWithCommas(largeNumberToShort(roundFixed(_.sumBy(data.source, 'Week_Installment'), 2), 8, 2)),
+                    11: numberWithCommas(largeNumberToShort(roundFixed(_.sumBy(data.source, 'Limit'), 2), short_numtodigit, 2)),
+                    13: numberWithCommas(largeNumberToShort(roundFixed(_.sumBy(data.source, 'Principle'), 2), short_numtodigit, 2)),
+                    18: numberWithCommas(largeNumberToShort(roundFixed(_.sumBy(data.source, 'Week_Installment'), 2), short_numtodigit, 2)),
                     19: numberWithCommas(largeNumberToShort(roundFixed(_.sumBy(data.source, 'Mth_Installment'), 0), short_numtodigit)),
                     24: numberWithCommas(largeNumberToShort(roundFixed(_.sumBy(data.source, 'OverdueAmt'), 0), short_numtodigit)),
                     25: numberWithCommas(largeNumberToShort(roundFixed(_.sumBy(data.source, 'Mth_AmtPastDue'), 0), short_numtodigit)),

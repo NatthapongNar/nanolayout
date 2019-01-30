@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import moment from 'moment'
 import Scrollbar from 'react-smooth-scrollbar'
-import { Table, Input, Button, Icon, Tooltip, Popover, Modal, Popconfirm, notification } from 'antd'
+import { Table, List, Input, Button, Avatar, Tag, Icon, Tooltip, Popover, Modal, Popconfirm, notification } from 'antd'
 import { Cookies } from 'react-cookie'
 import { createElement, in_array, parseBool, parseNumberShort, str_replace, compareByAlph, compareByDate, compareByAmount, roundFixed, numberWithCommas } from '../../../../containers/Layouts/function'
 import { config } from '../../../../containers/Layouts/config'
@@ -34,6 +34,7 @@ const onHandAmtLessThen = 'red'
 
 const { TextArea } = Input
 const confirm = Modal.confirm
+const ListItem = List.Item
 
 const status_content = (
     <div className={cls['popHandle']}>
@@ -758,44 +759,13 @@ export const customer_column_modal = [
                     }
                 },
                 render: (strText, record) => {
-                    let Cause = (record.Cause) ? `${record.Cause}` : 'ไม่ระบุ'
-                    let CauseDetail = (record.CauseDetail) ? `${record.CauseDetail}` : ''
-                    let CA_NotFound = (record.CA_NotFound) ? `${record.CA_NotFound}` : null
-                    let CA_Cause = (record.CA_Cause) ? `${record.CA_Cause}` : 'ไม่ระบุ'
-                    let CA_Cause_Detail = (record.CA_Cause_Detail) ? `${record.CA_Cause_Detail}` : ''
 
                     let TMNote_Cause = (record.Cause) ? `${record.Cause}` : null
                     let CANote_Cause = (record.CA_Cause) ? `${record.CA_Cause}` : null
 
                     let note_check = (CANote_Cause && CANote_Cause !== '') ? CANote_Cause : TMNote_Cause
-                
-                    const content = (
-                        <div id={`NOTICE_${record.ApplicationNo}`} style={{ width: '300px', opacity: 0 }}>
-                            <div className="ttu" style={{ fontSize: '0.8em' }}><Icon type="notification" /> <b>TM Note</b></div>
-                            <div style={{ fontSize: '0.8em' }}><b>เหตุผล:</b> {`${Cause}`}</div>
-                            <div style={{ fontSize: '0.8em' }}><b>หมายเหตุ:</b> {`${CauseDetail}`}</div>
-                            <hr/>
-                            <div className="ttu" style={{ fontSize: '0.8em' }}><Icon type="notification" /> <b>CA Note</b></div>
-                            {
-                                (CA_NotFound) ? 
-                                (<div style={{ fontSize: '0.8em' }}><b>ไม่พบลูกค้า:</b> {`${CA_NotFound}`}</div>) : 
-                                (
-                                <div>
-                                    <div style={{ fontSize: '0.8em' }}><b>เหตุผล:</b> {`${CA_Cause}`}</div>
-                                    <div style={{ fontSize: '0.8em' }}><b>หมายเหตุ:</b> {`${CA_Cause_Detail}`}</div>
-                                </div>
-                                )
-                            }
-                        </div>
-                    )
-                    
-                    return (
-                        <Popover content={content} placement="left">
-                            <div onMouseOver={handleNoteTooltip.bind(this, `NOTICE_${record.ApplicationNo}`)}>
-                                {`${(note_check && note_check !== '') ? note_check : ''}`}
-                            </div>
-                        </Popover>
-                    )
+
+                    return (<PopoverTabletHist latestNote={note_check} dataItems={record} />) 
 
                 }
             },
@@ -815,6 +785,121 @@ export const customer_column_modal = [
         ]
     }
 ]
+
+class PopoverTabletHist extends Component {
+
+    state = {
+        dataHist: [],
+        dataLoading: true
+    }
+
+    render() {
+        const { latestNote, dataItems } = this.props
+
+        return (            
+            <Popover 
+                trigger="click"             
+                mouseEnterDelay={3} 
+                placement="left" 
+                className="pointer"
+                onClick={this.handleTabletHist.bind(this, dataItems)} 
+                content={
+                    <div id={`TABLET_${dataItems.AccountNo}`} style={{ width: '350px', opacity: 0 }}>
+                        <List
+                            loading={this.state.dataLoading}
+                            size="small"
+                            dataSource={this.state.dataHist}
+                            renderItem={(item, i) => (
+                                <ListItem style={{ fontSize: '0.95em', lineHeight: '24px', padding: '0px 0px 2px 5px' }}> 
+                                    <span style={{ fontSize: '2em'}}>
+                                        {(i + 1)}. &nbsp;
+                                        <Avatar src={`http://172.17.9.94/newservices/LBServices.svc/employee/image/${(item && item.created_id) ? item.created_id : null}`} shape="square" size="small" style={{ borderRadius: '0px' }} />
+                                        <Tag color={this.handleLayerColorByPosit(item.created_position)} style={{ borderRadius: '0px' }}>{`${(item && item.created_position) ? ` ${item.created_position} ` : ''} `}</Tag>
+                                        {`${(item && item.created_date) ? moment(item.created_date).format('DD/MM/YYYY') : ''} : `}
+                                        {`${(item && item.latest_note) ? item.latest_note: ''}`}
+                                    </span>
+                                </ListItem>
+                            )}
+                        />
+                    </div>
+                }
+            > 
+                <Tooltip placement="left" title="คลิก เพื่อดูประวัติย้อนหลัง">{latestNote}</Tooltip>
+            </Popover>
+        )
+    }
+
+    handleTabletHist = (data) => {
+        if(data && data.AccountNo) {
+            const request_set = new Request(`${config.hostapi}/tablethist/acc_code/${data.AccountNo}/tablet_note`, {
+                method: 'GET',
+                cache: 'no-cache',
+                header: new Headers({
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json; charset="UTF-8";'
+                })
+            })
+        
+            fetch(request_set)
+            .then(response => response.json())
+            .then(resp => { 
+                this.setState({ dataHist: (resp.status) ? resp.data : [], dataLoading: false  })  
+            })
+            .catch(err => { console.log(`fetch error ${err}`) })
+
+            _.delay(() => {
+                let e = `TABLET_${data.AccountNo}`    
+                _.delay(() => { 
+                    $(`#${e}`).css({ opacity: 1 }) 
+                    $(`#${e}`).addClass('animated fadeIn')
+                }, 300)
+                let element = $(`#${e}`).parents()
+                if(element) {
+                    $(element[0]).css('padding', '0px')
+                    $(element[0]).addClass(`${cls['unset']}`)
+                    $(element[1]).css('background', '#FFF ')
+                    $(element[2]).addClass(cls['unset'])
+                    $(element[2]).addClass('animated bounceIn')
+        
+                    let el_arrow = $(element[3]).children()[0]            
+                    if(el_arrow) {
+                        $(el_arrow).addClass(cls['unset'])
+                    }
+                }
+                
+            }, 200)
+
+        }
+
+    }
+
+    handleLayerColorByPosit = (position) => {
+        switch(position) {
+            case 'RD':
+                return 'green'
+            break
+            case 'AM':
+                return 'cyan'
+            break
+            case 'ZM':
+                return 'orange'
+            break
+            case 'TM':
+                return 'gold'
+            break
+            case 'FCR':
+                return 'lightsalmon'
+            break
+            case 'PCA':
+                return 'volcano'
+            break
+            default: 
+                return 'red'
+            break
+        }
+    }
+
+}
 
 class PopoverNote extends Component {
 
