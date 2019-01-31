@@ -181,7 +181,7 @@ export const customer_column_modal = [
                         const { isMktLayout } = data
 
                         if(parseBool(isMktLayout.view)) {
-                            if(data && !_.isEmpty(data.ColumnCell) || !_.isEmpty(data.MarketTypeID)) {
+                            if(data && !_.isEmpty(data.ColumnCell)) {
 
                                 const content = (
                                     <div id={`EXTENSION_CELL_${data.ApplicationNo}`} className={`${style_cell['tools-extension-container']} ${style_cell['open']}`}>
@@ -233,7 +233,7 @@ export const customer_column_modal = [
                 onHeaderCell: () => {
                     return {
                         onClick: () => {
-                            let element = $('th.ant-table-column-has-filters.mktcol_modal_4').find('.ant-table-column-sorter > span')
+                            let element = $('th.ant-table-column-has-filters.mktcol_modal_5').find('.ant-table-column-sorter > span')
                             headAutoSort(element)                    
                         }
                     }
@@ -252,7 +252,7 @@ export const customer_column_modal = [
                 onHeaderCell: () => {
                     return {
                         onClick: () => {
-                            let element = $('th.ant-table-column-has-filters.mktcol_modal_5').find('.ant-table-column-sorter > span')
+                            let element = $('th.ant-table-column-has-filters.mktcol_modal_6').find('.ant-table-column-sorter > span')
                             headAutoSort(element)                    
                         }
                     }
@@ -270,7 +270,7 @@ export const customer_column_modal = [
                 onHeaderCell: () => {
                     return {
                         onClick: () => {
-                            let element = $('th.ant-table-column-has-filters.mktcol_modal_6').find('.ant-table-column-sorter > span')
+                            let element = $('th.ant-table-column-has-filters.mktcol_modal_7').find('.ant-table-column-sorter > span')
                             headAutoSort(element)                    
                         }
                     }
@@ -292,7 +292,7 @@ export const customer_column_modal = [
                 onHeaderCell: () => {
                     return {
                         onClick: () => {
-                            let element = $('th.ant-table-column-has-filters.mktcol_modal_7').find('.ant-table-column-sorter > span')
+                            let element = $('th.ant-table-column-has-filters.mktcol_modal_8').find('.ant-table-column-sorter > span')
                             headAutoSort(element)                    
                         }
                     }
@@ -321,7 +321,7 @@ export const customer_column_modal = [
                 onHeaderCell: () => {
                     return {
                         onClick: () => {
-                            let element = $('th.ant-table-column-has-filters.mktcol_modal_8').find('.ant-table-column-sorter > span')
+                            let element = $('th.ant-table-column-has-filters.mktcol_modal_9').find('.ant-table-column-sorter > span')
                             headAutoSort(element)                    
                         }
                     }
@@ -344,7 +344,7 @@ export const customer_column_modal = [
                 onHeaderCell: () => {
                     return {
                         onClick: () => {
-                            let element = $('th.ant-table-column-has-filters.mktcol_modal_9').find('.ant-table-column-sorter > span')
+                            let element = $('th.ant-table-column-has-filters.mktcol_modal_10').find('.ant-table-column-sorter > span')
                             headAutoSort(element)                    
                         }
                     }
@@ -362,7 +362,7 @@ export const customer_column_modal = [
                 onHeaderCell: () => {
                     return {
                         onClick: () => {
-                            let element = $('th.ant-table-column-has-filters.mktcol_modal_10').find('.ant-table-column-sorter > span')
+                            let element = $('th.ant-table-column-has-filters.mktcol_modal_11').find('.ant-table-column-sorter > span')
                             headAutoSort(element)                    
                         }
                     }
@@ -408,7 +408,7 @@ export const customer_column_modal = [
         onHeaderCell: () => {
             return {
                 onClick: () => {
-                    let element = $('th.ant-table-column-has-filters.mktcol_modal_11').find('.ant-table-column-sorter > span')
+                    let element = $('th.ant-table-column-has-filters.mktcol_modal_12').find('.ant-table-column-sorter > span')
                     headAutoSort(element)                    
                 }
             }
@@ -443,7 +443,7 @@ export const customer_column_modal = [
                 onHeaderCell: () => {
                     return {
                         onClick: () => {
-                            let element = $('th.ant-table-column-has-filters.mktcol_modal_12').find('.ant-table-column-sorter > span')
+                            let element = $('th.ant-table-column-has-filters.mktcol_modal_13').find('.ant-table-column-sorter > span')
                             headAutoSort(element)                    
                         }
                     }
@@ -479,7 +479,7 @@ export const customer_column_modal = [
                 onHeaderCell: () => {
                     return {
                         onClick: () => {
-                            let element = $('th.ant-table-column-has-filters.mktcol_modal_13').find('.ant-table-column-sorter > span')
+                            let element = $('th.ant-table-column-has-filters.mktcol_modal_14').find('.ant-table-column-sorter > span')
                             headAutoSort(element)                    
                         }
                     }
@@ -504,7 +504,7 @@ export const customer_column_modal = [
                 onHeaderCell: () => {
                     return {
                         onClick: () => {
-                            let element = $('th.ant-table-column-has-filters.mktcol_modal_14').find('.ant-table-column-sorter > span')
+                            let element = $('th.ant-table-column-has-filters.mktcol_modal_15').find('.ant-table-column-sorter > span')
                             headAutoSort(element)                    
                         }
                     }
@@ -519,7 +519,7 @@ export const customer_column_modal = [
                 onHeaderCell: () => {
                     return {
                         onClick: () => {
-                            let element = $('th.ant-table-column-has-filters.mktcol_modal_15').find('.ant-table-column-sorter > span')
+                            let element = $('th.ant-table-column-has-filters.mktcol_modal_16').find('.ant-table-column-sorter > span')
                             headAutoSort(element)                    
                         }
                     }
@@ -534,7 +534,7 @@ export const customer_column_modal = [
                 onHeaderCell: () => {
                     return {
                         onClick: () => {
-                            let element = $('th.ant-table-column-has-filters.mktcol_modal_16').find('.ant-table-column-sorter > span')
+                            let element = $('th.ant-table-column-has-filters.mktcol_modal_17').find('.ant-table-column-sorter > span')
                             headAutoSort(element)                    
                         }
                     }
@@ -549,7 +549,7 @@ export const customer_column_modal = [
                 onHeaderCell: () => {
                     return {
                         onClick: () => {
-                            let element = $('th.ant-table-column-has-filters.mktcol_modal_17').find('.ant-table-column-sorter > span')
+                            let element = $('th.ant-table-column-has-filters.mktcol_modal_18').find('.ant-table-column-sorter > span')
                             headAutoSort(element)                    
                         }
                     }
@@ -567,7 +567,7 @@ export const customer_column_modal = [
                 onHeaderCell: () => {
                     return {
                         onClick: () => {
-                            let element = $('th.ant-table-column-has-filters.mktcol_modal_18').find('.ant-table-column-sorter > span')
+                            let element = $('th.ant-table-column-has-filters.mktcol_modal_19').find('.ant-table-column-sorter > span')
                             headAutoSort(element)                    
                         }
                     }
@@ -592,7 +592,7 @@ export const customer_column_modal = [
                 onHeaderCell: () => {
                     return {
                         onClick: () => {
-                            let element = $('th.ant-table-column-has-filters.mktcol_modal_19').find('.ant-table-column-sorter > span')
+                            let element = $('th.ant-table-column-has-filters.mktcol_modal_20').find('.ant-table-column-sorter > span')
                             headAutoSort(element)                    
                         }
                     }
@@ -612,7 +612,7 @@ export const customer_column_modal = [
                 onHeaderCell: () => {
                     return {
                         onClick: () => {
-                            let element = $('th.ant-table-column-has-filters.mktcol_modal_20').find('.ant-table-column-sorter > span')
+                            let element = $('th.ant-table-column-has-filters.mktcol_modal_21').find('.ant-table-column-sorter > span')
                             headAutoSort(element)                    
                         }
                     }
@@ -655,7 +655,7 @@ export const customer_column_modal = [
                 onHeaderCell: () => {
                     return {
                         onClick: () => {
-                            let element = $('th.ant-table-column-has-filters.mktcol_modal_21').find('.ant-table-column-sorter > span')
+                            let element = $('th.ant-table-column-has-filters.mktcol_modal_22').find('.ant-table-column-sorter > span')
                             headAutoSort(element)                    
                         }
                     }
@@ -677,7 +677,7 @@ export const customer_column_modal = [
                 onHeaderCell: () => {
                     return {
                         onClick: () => {
-                            let element = $('th.ant-table-column-has-filters.mktcol_modal_20').find('.ant-table-column-sorter > span')
+                            let element = $('th.ant-table-column-has-filters.mktcol_modal_23').find('.ant-table-column-sorter > span')
                             headAutoSort(element)                    
                         }
                     }
@@ -697,7 +697,7 @@ export const customer_column_modal = [
                 onHeaderCell: () => {
                     return {
                         onClick: () => {
-                            let element = $('th.ant-table-column-has-filters.mktcol_modal_21').find('.ant-table-column-sorter > span')
+                            let element = $('th.ant-table-column-has-filters.mktcol_modal_24').find('.ant-table-column-sorter > span')
                             headAutoSort(element)                    
                         }
                     }
@@ -714,7 +714,7 @@ export const customer_column_modal = [
                 onHeaderCell: () => {
                     return {
                         onClick: () => {
-                            let element = $('th.ant-table-column-has-filters.mktcol_modal_24').find('.ant-table-column-sorter > span')
+                            let element = $('th.ant-table-column-has-filters.mktcol_modal_25').find('.ant-table-column-sorter > span')
                             headAutoSort(element)                    
                         }
                     }
@@ -733,7 +733,7 @@ export const customer_column_modal = [
                 onHeaderCell: () => {
                     return {
                         onClick: () => {
-                            let element = $('th.ant-table-column-has-filters.mktcol_modal_25').find('.ant-table-column-sorter > span')
+                            let element = $('th.ant-table-column-has-filters.mktcol_modal_26').find('.ant-table-column-sorter > span')
                             headAutoSort(element)                    
                         }
                     }
@@ -753,7 +753,7 @@ export const customer_column_modal = [
                 onHeaderCell: () => {
                     return {
                         onClick: () => {
-                            let element = $('th.ant-table-column-has-filters.mktcol_modal_26').find('.ant-table-column-sorter > span')
+                            let element = $('th.ant-table-column-has-filters.mktcol_modal_27').find('.ant-table-column-sorter > span')
                             headAutoSort(element)                    
                         }
                     }
