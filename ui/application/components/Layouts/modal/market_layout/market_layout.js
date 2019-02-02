@@ -511,12 +511,12 @@ class MarketLayout extends Component {
                                 $('#zoom_parent').css({ width: '-webkit-fill-available', height: '-webkit-fill-available' })
                             }
 
-                            if(FullScreen === false && !zoomDisable) {
+                            if(FullScreen === false) {
                                 let $section = $('#grid_wrapper')
                                 let $panzoom = $section.find('.panzoom').panzoom({ 
                                     startTransform: 'scale(0.5)', 
-                                    minScale: 0.5
-                                    // contain: true
+                                    minScale: 0.5,
+                                    maxScale: 1.5
                                 })
 
                                 $panzoom
@@ -533,13 +533,12 @@ class MarketLayout extends Component {
                             }
 
                             
-                            if(FullScreen === true && !zoomDisable) {
-
+                            if(FullScreen === true) {
                                 let $section = $('#grid_wrapper')
                                 let $panzoom = $section.find('.panzoom').panzoom({ 
                                     startTransform: 'scale(1.0)', 
-                                    minScale: 0.5
-                                    // contain: true
+                                    minScale: 0.5,
+                                    maxScale: 1.5
                                 })
 
                                 $panzoom
@@ -553,75 +552,6 @@ class MarketLayout extends Component {
                                         focal: e
                                     })
                                 })
-
-                                /*
-                                let translateX = 0,
-                                    translateY = 0,
-                                    translateZ = 0,
-                                    stepZ = 10,
-                                    stepX = 60,
-                                    stepY = 90,
-                                    initial_obj_X = 0,
-                                    initial_obj_Y = 0,
-                                    initial_mouse_X = 0,
-                                    initial_mouse_Y = 0
-                            
-                                function apply_coords() {
-                                    $("#grid_previews").css("transform", 'perspective(100px) translate3d(' + translateX + 'px, ' + translateY + 'px, ' + translateZ + 'px)');
-                                }
-           
-                                $("#zoom_parent").on("mousewheel DOMMouseScroll", function(e) {                        
-                                    e.preventDefault()
-
-                                    let delta = e.delta || e.originalEvent.wheelDelta
-                                    let zoomOut
-
-                                    if (delta === undefined) {
-                                        delta = e.originalEvent.detail
-                                        zoomOut = delta ? delta < 0 : e.originalEvent.deltaY > 0
-                                        zoomOut = !zoomOut
-                                    } else {
-                                        zoomOut = delta ? delta < 0 : e.originalEvent.deltaY > 0
-                                    }
-
-                                    if (zoomOut) {
-                                        translateZ = translateZ - stepZ
-                                        translateX = translateX - stepX
-                                        translateY = translateY - stepY
-                                    } else {
-                                        translateZ = translateZ + stepZ
-                                        translateX = translateX + stepX
-                                        translateY = translateY + stepY
-                                    }
-
-                                    if(zoomOut == false) {                                    
-                                        if(translateZ <= 0) {
-                                            apply_coords()                                       
-                                        } else {
-                                            translateX = 0
-                                            translateY = 0
-                                            translateZ = 0
-                                            stepZ = 10
-                                            stepX = 60,
-                                            stepY = 90,
-                                            initial_obj_X = 0
-                                            initial_obj_Y = 0
-                                            initial_mouse_X = 0
-                                            initial_mouse_Y = 0
-                                            $('#grid_previews').css({ height: `${heightMaxScreen}px`, width: `${widthMaxScreen}px`})
-                                        }
-                                    } else {
-                                        apply_coords()
-                                        if(translateZ <= 50) {
-                                            $('#grid_previews').css({ height: `fit-content`, width: `fit-content`})
-                                        }
-                                    
-                                    }
-                                })
-                    
-                                // BINDING MOUSEWHEEL DISABLED
-                                $('#zoom_parent').bind("mousewheel", function() { return false })
-                                */
                             }
 
                             // GET PARENT MODAL
@@ -1372,7 +1302,7 @@ class MarketLayout extends Component {
             })
 
             if(isGetCell) {
-                $(el_target).find('td').on(profileClickEvent, (event) => { 
+                $(el_target).find('td').on('dblclick', (event) => { 
                     const cell = $(event.target).parent()
                     if(cell.prop("tagName") == 'TD' && !in_array(cls['cell_extended'], cell[0].classList)) {
                         handleGetCell(cell) 

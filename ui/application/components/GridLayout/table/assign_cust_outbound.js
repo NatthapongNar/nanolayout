@@ -206,7 +206,7 @@ class AssignCustOutbound extends Component {
                             body: JSON.stringify(request_data),
                             cache: 'no-cache'
                         })
-        
+
                         fetch(request_set)
                         .then(resp => resp.json())
                         .then(resp => {

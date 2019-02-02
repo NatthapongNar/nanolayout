@@ -1035,14 +1035,14 @@ class CustomerDashboard extends Component {
                 }
             })
 
-            let credit_limit = roundFixed(_.sumBy(currentPageData, 'CreditLimit'), 0)
-            let credit_limit_all = roundFixed(_.sumBy(data.source, 'CreditLimit'), 0)
+            let credit_limit = roundFixed(_.sumBy(currentPageData, (v) => { return v.CreditLimit }), 0)
+            let credit_limit_all = roundFixed(_.sumBy(data.source, (v) => { return v.CreditLimit }), 0)
 
-            let principle_start = roundFixed(_.sumBy(currentPageData, 'PrincipleStart'), 0)
-            let principle_now = roundFixed(_.sumBy(currentPageData, 'Principle'), 0)
+            let principle_start = roundFixed(_.sumBy(currentPageData, (v) => { return v.PrincipleStart }), 0)
+            let principle_now = roundFixed(_.sumBy(currentPageData, (v) => { return v.Principle }), 0)
 
-            let principle_allstart = roundFixed(_.sumBy(data.source, 'PrincipleStart'), 0)
-            let principle_allnow = roundFixed(_.sumBy(data.source, 'Principle'), 0)
+            let principle_allstart = roundFixed(_.sumBy(data.source, (v) => { return v.PrincipleStart }), 0)
+            let principle_allnow = roundFixed(_.sumBy(data.source, (v) => { return v.Principle }), 0)
 
             let total_os_start = (principle_start && principle_start > 0) ? numberWithCommas(principle_start) : 0
 
