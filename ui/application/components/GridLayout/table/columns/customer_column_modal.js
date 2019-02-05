@@ -183,6 +183,8 @@ export const customer_column_modal = [
                         if(parseBool(isMktLayout.view)) {
                             if(data && !_.isEmpty(data.ColumnCell)) {
 
+                                let font_color = (data.ColumnCell == 'OUT') ? 'red':'green'
+
                                 const content = (
                                     <div id={`EXTENSION_CELL_${data.ApplicationNo}`} className={`${style_cell['tools-extension-container']} ${style_cell['open']}`}>
                                         <div className={`${style_cell['tools-extension-close']} dn`}>
@@ -200,10 +202,10 @@ export const customer_column_modal = [
                                                 (isMktLayout.edit) ? 
                                                 (
                                                     <Tooltip placement="left" title={`กรณีต้องการรีเซ็ตข้อมูลลูกค้าในแผง คลิกขวา`}>
-                                                        <i id={`CONTEXT_CELL_${data.ApplicationNo}`} className="fa fa-check-square-o green" aria-hidden="true" style={{ fontSize: '1.1em' }} />
+                                                        <i id={`CONTEXT_CELL_${data.ApplicationNo}`} className={`fa fa-check-square-o ${font_color}`} aria-hidden="true" style={{ fontSize: '1.1em' }} />
                                                     </Tooltip>
                                                 ):
-                                                (<i className="fa fa-check-square-o green" aria-hidden="true" style={{ fontSize: '1.1em' }} />)
+                                                (<i className={`fa fa-check-square-o ${font_color}`} aria-hidden="true" style={{ fontSize: '1.1em' }} />)
                                             }
                                         </div>
                                     </Popover>
