@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { LocaleProvider, Layout, Menu, Dropdown, Icon, Avatar, Tooltip } from 'antd'
 import { withRouter } from 'react-router-dom'
 import { config } from '../../containers/GridLayout/config'
+import moment from 'moment'
 import _ from 'lodash'
 
 import Dashboard from './dashboard'
@@ -21,7 +22,7 @@ import th from 'antd/lib/locale-provider/th_TH'
 
 import 'moment/locale/en-gb'
 import 'moment/locale/th'
-import { parseBool, in_array } from '../../containers/Layouts/function';
+import { parseBool, in_array } from '../../containers/Layouts/function'
 
 const { Header, Content, Footer, Sider } = Layout
 const MenuItem = Menu.Item
@@ -161,7 +162,7 @@ class GridLayoutTemplate extends Component {
                         </article>
                     </Content>
                     <Footer className={`${cls['grid_footer']}`}>
-                        NANO LAYOUT ©2017 TCRBANK
+                        {`NANO LAYOUT ©2017-${parseInt(moment().format('YYYY'))-1} TCRBANK`}
                     </Footer>
                 </Layout>
             </Layout>

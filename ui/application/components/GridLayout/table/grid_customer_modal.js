@@ -482,7 +482,7 @@ class CustomerDashboard extends Component {
             MonthOverdueTo: (this.state.handleMDPD) ? param.OverdueTo2 : null,         
             Topup: (topup_list && topup_list.length > 0) ? topup_list.join(',') : null,
             Product: (product_list && product_list.length > 0) ? product_list.join(',') : null,
-            Isactive: (param.CustomerStatus) ? param.CustomerStatus:null,
+            Isactive: (param.CustomerStatus) ? param.CustomerStatus:'Active',
             NPLFlag: (enable_checkDPD && select_new_npl && select_new_npl.length > 0) ? select_new_npl.join(','): null,
             Optional: (option_list && option_list.length > 0) ? option_list.join(',') : null,
             ModeType: (view_mode && view_mode.length > 0) ? view_mode.join(',') : null

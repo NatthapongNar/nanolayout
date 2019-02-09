@@ -66,7 +66,7 @@ export const config = {
     tester: ['57251', '56225', '57170','59151','58202', '56367'],
     version: {
         name: (process.env && process.env.NODE_ENV == 'dev') ? 'Alpha' : 'Beta',
-        code: '1.2.0'
+        code: '1.2.1'
     }
 }
 

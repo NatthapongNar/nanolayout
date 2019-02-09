@@ -54,6 +54,11 @@ const maxHeightScreen = window.screen.availHeight - (window.outerHeight - window
 const update_feature = (
     <div className={cls['feature']} style={{ padding: '10px', background: '#FFF', color: 'black', height: '400px', fontSize: '1em', overflow: 'scroll' }}>
         <h4 className="ttu"><b>Feature update</b></h4>
+        <div><b>Version Version 1.2.1 <small className="tr fr">(09 Feb 2019)</small></b></div>
+        <div>1. เพิ่ม Column New Booking ใหม่ในโหมด Port Quality</div>
+        <div>2. ปรับปรุงระบบข้อความจากระบบ Tablet ใหม่</div>
+        <div>3. เพิ่มโหมดการดู Inactive, และ All ในหน้า Customer Info</div>
+        <div>4. แก้ไขปัญหาภายในระบบและปรับปรุงระบบข้อมูลใหม่</div>      
         <div><b>Version Version 1.2.0 <small className="tr fr">(07 Dec 2018)</small></b></div>
         <div>1. เพิ่ม Add Note ในหน้า Customer Info.</div>
         <div>2. ปรับปรุงข้อมูลในหน้า Customer Info</div>
@@ -554,6 +559,10 @@ class GridMangement extends Component {
                             let sum_mth_bal = _.sumBy(currentPageData, 'TotalBal_M1_2')
                             let sum_npl_bal = _.sumBy(currentPageData, 'TotalBal_NPL')
 
+                            // UPDATE 09 Feb 2019
+                            let sum_new_booking_vol = _.sumBy(dataSoruce, 'New_Booking_Vol')
+                            let sum_new_booking_npl_vol = _.sumBy(dataSoruce, 'New_BookingNPL_Vol')
+
                             let os_pmt_succ = (sum_pmt_succ / sum_pmt_total) * 100
                             let os_newnpl_bal = (sum_newnpl_bal / sum_total_osvol_full) * 100
                             
@@ -564,13 +573,15 @@ class GridMangement extends Component {
                             let os_mth_ach = (sum_mth_bal / sum_total_osvol) * 100
                             let os_npl_ach = (sum_npl_bal / sum_total_osvol) * 100
 
+                            let npl_newbooking = (sum_new_booking_npl_vol / sum_new_booking_vol) * 100
+
                             // Move to new footer
                             footer.flow_rate_w0 = '-'
                             footer.flow_rate_w1 = '-'
                             footer.flow_rate_m1 = '-'
                             // footer.new_customer = '-'
                             footer.pmt_success = (os_pmt_succ && os_pmt_succ > 0) ? `${roundFixed(os_pmt_succ, 1)}%` : '0.0%'
-                            footer.nb_new_npl = `0.0%`
+                            footer.nb_new_npl = (npl_newbooking && npl_newbooking > 0) ? `${roundFixed(npl_newbooking, 2)}%` : '0.0%'
                             footer.ytd_new_npl = (os_newnpl_bal && os_newnpl_bal > 0) ? `${roundFixed(os_newnpl_bal, 1)}%` : '0.0%'
                             footer.bucket_w0 = (os_w0_ach) ? `${roundFixed(os_w0_ach, 1)}%` : '0.0%'
                             footer.bucket_week1 = (os_w1_ach) ? `${roundFixed(os_w1_ach, 1)}%` : '0.0%'
@@ -593,6 +604,10 @@ class GridMangement extends Component {
                             let grand_sum_mth_bal = _.sumBy(dataSoruce, 'TotalBal_M1_2')
                             let grand_sum_npl_bal = _.sumBy(dataSoruce, 'TotalBal_NPL')
 
+                            // UPDATE 09 Feb 2019
+                            let grand_sum_new_booking_vol = _.sumBy(dataSoruce, 'New_Booking_Vol')
+                            let grand_sum_new_booking_npl_vol = _.sumBy(dataSoruce, 'New_BookingNPL_Vol')
+
                             let grand_os_pmt_succ = (grand_sum_pmt_succ / grand_sum_pmt_total) * 100
                             let grand_os_newnpl_bal = (grand_sum_newnpl_bal / sum_grandtotal_osvol_full) * 100
                             
@@ -602,13 +617,14 @@ class GridMangement extends Component {
                             let grand_os_xday_ach = (grand_sum_xday_bal / sum_grandtotal_osvol) * 100
                             let grand_os_mth_ach = (grand_sum_mth_bal / sum_grandtotal_osvol) * 100
                             let grand_os_npl_ach = (grand_sum_npl_bal / sum_grandtotal_osvol) * 100
+                            let grand_npl_newbooking = (grand_sum_new_booking_npl_vol / grand_sum_new_booking_vol) * 100
 
                             grand_footer.flow_rate_w0 = '-'
                             grand_footer.flow_rate_w1 = '-'
                             grand_footer.flow_rate_m1 = '-'
                             // grand_footer.new_customer = '-'
                             grand_footer.pmt_success = (grand_os_pmt_succ && grand_os_pmt_succ > 0) ? `${roundFixed(grand_os_pmt_succ, 1)}%` : '0.0%'
-                            grand_footer.nb_new_npl = `0.0%`
+                            grand_footer.nb_new_npl = (grand_npl_newbooking && grand_npl_newbooking > 0) ? `${roundFixed(grand_npl_newbooking, 2)}%` : '0.0%'
                             grand_footer.ytd_new_npl = (grand_os_newnpl_bal && grand_os_newnpl_bal > 0) ? `${roundFixed(grand_os_newnpl_bal, 1)}%` : '0.0%'
                             grand_footer.bucket_w0 = (grand_os_w0_ach) ? `${roundFixed(grand_os_w0_ach, 1)}%` : '0.0%'
                             grand_footer.bucket_week1 = (grand_os_w1_ach) ? `${roundFixed(grand_os_w1_ach, 1)}%` : '0.0%'
