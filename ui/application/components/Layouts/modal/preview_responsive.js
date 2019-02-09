@@ -416,11 +416,19 @@ class PreviewResponsive extends Component {
 
             } else {
                 if (in_array(result.StatusDigit, ['A'])) {
-                    if (!in_array(result.Cust_DPDBucketNow, bktFullNotRisks)) 
-                        return `${cls['cell_active']} ${cls['cell_overdue']}`
-                    else 
+
+                    if (!in_array(result.Cust_DPDBucketNow, bktFullNotRisks)) { 
+                        if(result.Cust_DPDBucketNow == bucketFullRisks[0]) {
+                            return `${cls['cell_active']} ${cls['cell_overdue_xday']}`
+                        } else if(in_array(result.Cust_DPDBucketNow, [bucketFullRisks[1], bucketFullRisks[2]])) {
+                            return `${cls['cell_active']} ${cls['cell_overdue_month']}`
+                        } else {
+                            return `${cls['cell_active']} ${cls['cell_overdue']}`
+                        }
+                    } else {
                         return cls['cell_active']
-    
+                    }
+
                 } else if (in_array(result.StatusDigit, ['C', 'R'])) {
                     return `${cls['cell_active']} ${cls['cell_reject']}`
     

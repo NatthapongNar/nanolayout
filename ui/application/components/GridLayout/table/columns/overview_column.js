@@ -1685,41 +1685,41 @@ export const collection_columns = [
                     )
                    
                 }
-            },
-            {
-                title: '%TOP',
-                dataIndex: 'OS_TopupPercent',
-                className: `gridctrl_11 ${cls['bg_option1']} ttu tracked tc pointer`,
-                width: standardWidthFix,
-                sorter: (a, b) => compareByAmount(a.OS_TopupPercent, b.OS_TopupPercent),
-                onHeaderCell: () => {
-                    return {
-                        onClick: () => {
-                            let element = $('th.ant-table-column-has-filters.gridctrl_11').find('.ant-table-column-sorter > span')
-                            headAutoSort(element)                    
-                        }
-                    }
-                },
-                render: (per, rowData) => {
-                    let os_unit = (rowData && rowData.OS_Unit > 0) ? rowData.OS_Unit : 0
-                    let os_topup_unit = (rowData && rowData.OS_TopupApp > 0) ? rowData.OS_TopupApp : 0
-                    let os_topup_vol = (rowData && rowData.OS_TopupVol > 0) ? rowData.OS_TopupVol : 0   
-                    let os_topup_cust_share = (numValid(os_topup_unit) / numValid(os_unit)) * 100
+            }
+            // {
+            //     title: '%TOP',
+            //     dataIndex: 'OS_TopupPercent',
+            //     className: `gridctrl_11 ${cls['bg_option1']} ttu tracked tc pointer`,
+            //     width: standardWidthFix,
+            //     sorter: (a, b) => compareByAmount(a.OS_TopupPercent, b.OS_TopupPercent),
+            //     onHeaderCell: () => {
+            //         return {
+            //             onClick: () => {
+            //                 let element = $('th.ant-table-column-has-filters.gridctrl_11').find('.ant-table-column-sorter > span')
+            //                 headAutoSort(element)                    
+            //             }
+            //         }
+            //     },
+            //     render: (per, rowData) => {
+            //         let os_unit = (rowData && rowData.OS_Unit > 0) ? rowData.OS_Unit : 0
+            //         let os_topup_unit = (rowData && rowData.OS_TopupApp > 0) ? rowData.OS_TopupApp : 0
+            //         let os_topup_vol = (rowData && rowData.OS_TopupVol > 0) ? rowData.OS_TopupVol : 0   
+            //         let os_topup_cust_share = (numValid(os_topup_unit) / numValid(os_unit)) * 100
 
-                    const content = (
-                        <div>
-                          <div><b>Vol:</b> {`${os_topup_vol}Mb (${roundFixed(strFloat(per), 1)}%)`}</div>
-                          <div><b>Cust:</b> {`${numberWithCommas(os_topup_unit)} (${roundFixed(strFloat(os_topup_cust_share), 1)}%)`}</div>
-                        </div>
-                    )
-                    return (
-                        <Popover content={content}>
-                            <span className={`${cls['spanTootltip']}`}>{`${(per && per > 0) ? `${roundFixed(strFloat(per), 1)}%`:'0%'}`}</span>
-                        </Popover>
-                    )
+            //         const content = (
+            //             <div>
+            //               <div><b>Vol:</b> {`${os_topup_vol}Mb (${roundFixed(strFloat(per), 1)}%)`}</div>
+            //               <div><b>Cust:</b> {`${numberWithCommas(os_topup_unit)} (${roundFixed(strFloat(os_topup_cust_share), 1)}%)`}</div>
+            //             </div>
+            //         )
+            //         return (
+            //             <Popover content={content}>
+            //                 <span className={`${cls['spanTootltip']}`}>{`${(per && per > 0) ? `${roundFixed(strFloat(per), 1)}%`:'0%'}`}</span>
+            //             </Popover>
+            //         )
                    
-                }
-            }                      
+            //     }
+            // }                      
         ]
     },
     {
@@ -1827,39 +1827,89 @@ export const collection_columns = [
         }
     },
     {
-        title:  (<div>New<br/>NPL</div>),
-        dataIndex: 'OS_TotalNew_NPLPercent',
-        className: `gridctrl_14 ${cls['bg_option3']} ttu tracked tc pointer`,
-        width: standardWidthFix,
-        sorter: (a, b) => compareByAmount(a.OS_TotalNew_NPLPercent, b.OS_TotalNew_NPLPercent),
-        onHeaderCell: () => {
-            return {
-                onClick: () => {
-                    let element = $('th.ant-table-column-has-filters.gridctrl_14').find('.ant-table-column-sorter > span')
-                    headAutoSort(element)                    
+        title: `New NPL`, // ${moment().format('YYYY')}
+        dataIndex: 'NewNPLColomns',
+        className: `${cls['bg_option3']} ttu tracked tc`,
+        children: [
+            {
+                title: (<Tooltip title="New booking">NB_18</Tooltip>),
+                dataIndex: 'OS_TotalNewBooking_NPLPercent',
+                className: `${cls['bg_option3']} ttu tracked tc pointer`,
+                width: standardWidthFix,
+                render: (total) => {
+                    return (total && total > 0) ? `${roundFixed(total, 0)}%` : '0%'
+                }
+            },
+            {
+                title: 'OS_19',
+                dataIndex: 'OS_TotalNew_NPLPercent',
+                className: `gridctrl_14 ${cls['bg_option3']} ttu tracked tc pointer`,
+                width: standardWidthFix,
+                sorter: (a, b) => compareByAmount(a.OS_TotalNew_NPLPercent, b.OS_TotalNew_NPLPercent),
+                onHeaderCell: () => {
+                    return {
+                        onClick: () => {
+                            let element = $('th.ant-table-column-has-filters.gridctrl_14').find('.ant-table-column-sorter > span')
+                            headAutoSort(element)                    
+                        }
+                    }
+                },
+                render: (per, rowData) => { 
+                    let total_app = (rowData.OS_TotalNew_NPLAcc && rowData.OS_TotalNew_NPLAcc > 0) ? rowData.OS_TotalNew_NPLAcc : 0
+                    let total_vol = (rowData.OS_TotalNew_NPLVol && rowData.OS_TotalNew_NPLVol > 0) ? rowData.OS_TotalNew_NPLVol : 0
+                    let total_per = (rowData.OS_TotalNew_NPLVol && rowData.OS_TotalNew_NPLPercent > 0) ? rowData.OS_TotalNew_NPLPercent : 0
+                    let total_vol2digit = (total_vol && total_vol > 0) ? (total_vol / 1000000) : 0
+
+                    const content = (
+                        <div>
+                        <div><b>Vol:</b> {`${roundFixed(total_vol2digit, 1)}Mb (${roundFixed(total_per, 1)}%)`}</div>
+                        <div><b>Cust:</b> {`${numberWithCommas(total_app)}`}</div>
+                        </div>
+                    )
+                    
+                    return (
+                        <Popover content={content}>
+                            <span className={`${cls['spanTootltip']}`}>{`${ (per) ? `${roundFixed(strFloat(per), 1)}%`:'0%' }`}</span>
+                        </Popover>
+                    ) 
                 }
             }
-        },
-        render: (per, rowData) => { 
-            let total_app = (rowData.OS_TotalNew_NPLAcc && rowData.OS_TotalNew_NPLAcc > 0) ? rowData.OS_TotalNew_NPLAcc : 0
-            let total_vol = (rowData.OS_TotalNew_NPLVol && rowData.OS_TotalNew_NPLVol > 0) ? rowData.OS_TotalNew_NPLVol : 0
-            let total_per = (rowData.OS_TotalNew_NPLVol && rowData.OS_TotalNew_NPLPercent > 0) ? rowData.OS_TotalNew_NPLPercent : 0
-            let total_vol2digit = (total_vol && total_vol > 0) ? (total_vol / 1000000) : 0
-
-            const content = (
-                <div>
-                  <div><b>Vol:</b> {`${roundFixed(total_vol2digit, 1)}Mb (${roundFixed(total_per, 1)}%)`}</div>
-                  <div><b>Cust:</b> {`${numberWithCommas(total_app)}`}</div>
-                </div>
-            )
-            
-            return (
-                <Popover content={content}>
-                    <span className={`${cls['spanTootltip']}`}>{`${ (per) ? `${roundFixed(strFloat(per), 1)}%`:'0%' }`}</span>
-                </Popover>
-            ) 
-        }
+        ]
     },
+    // {
+    //     title:  (<div>New<br/>NPL</div>),
+    //     dataIndex: 'OS_TotalNew_NPLPercent',
+    //     className: `gridctrl_14 ${cls['bg_option3']} ttu tracked tc pointer`,
+    //     width: standardWidthFix,
+    //     sorter: (a, b) => compareByAmount(a.OS_TotalNew_NPLPercent, b.OS_TotalNew_NPLPercent),
+    //     onHeaderCell: () => {
+    //         return {
+    //             onClick: () => {
+    //                 let element = $('th.ant-table-column-has-filters.gridctrl_14').find('.ant-table-column-sorter > span')
+    //                 headAutoSort(element)                    
+    //             }
+    //         }
+    //     },
+    //     render: (per, rowData) => { 
+    //         let total_app = (rowData.OS_TotalNew_NPLAcc && rowData.OS_TotalNew_NPLAcc > 0) ? rowData.OS_TotalNew_NPLAcc : 0
+    //         let total_vol = (rowData.OS_TotalNew_NPLVol && rowData.OS_TotalNew_NPLVol > 0) ? rowData.OS_TotalNew_NPLVol : 0
+    //         let total_per = (rowData.OS_TotalNew_NPLVol && rowData.OS_TotalNew_NPLPercent > 0) ? rowData.OS_TotalNew_NPLPercent : 0
+    //         let total_vol2digit = (total_vol && total_vol > 0) ? (total_vol / 1000000) : 0
+
+    //         const content = (
+    //             <div>
+    //               <div><b>Vol:</b> {`${roundFixed(total_vol2digit, 1)}Mb (${roundFixed(total_per, 1)}%)`}</div>
+    //               <div><b>Cust:</b> {`${numberWithCommas(total_app)}`}</div>
+    //             </div>
+    //         )
+            
+    //         return (
+    //             <Popover content={content}>
+    //                 <span className={`${cls['spanTootltip']}`}>{`${ (per) ? `${roundFixed(strFloat(per), 1)}%`:'0%' }`}</span>
+    //             </Popover>
+    //         ) 
+    //     }
+    // },
     {
         title: 'Portfolio Quality',
         dataIndex: 'PortfolioQuality',

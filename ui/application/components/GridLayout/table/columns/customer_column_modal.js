@@ -317,9 +317,9 @@ export const customer_column_modal = [
             {
                 title: 'ST',
                 dataIndex: 'StatusDigit',
-                className: `mktcol_modal_9 ${cls['mktcol_modal_8']} ttu tracked tc pointer`,
+                className: `mktcol_modal_9 ${cls['fix_scale']} ttu tracked tc pointer`,
                 sorter: (a, b) => compareByAlph(a.StatusDigit, b.StatusDigit),
-                widht: 30,
+                widht: 40,
                 onHeaderCell: () => {
                     return {
                         onClick: () => {
@@ -423,11 +423,17 @@ export const customer_column_modal = [
                 setup_period = dateDiff(setup_date)
             }
 
-            return (
-                <Popover placement="top" content={`${(setup_period) ? `Period ${setup_period}` : ''}`}>
-                    {`${(str_date && str_date !== '1900-01-01T00:00:00.000Z') ? moment(str_date, 'YYYY-MM-DD').format('DD/MM/YY') : null}`}
-                </Popover>
-            )
+            if(str_date && !_.isEmpty(str_date)) {
+                return (
+                    <Popover placement="top" content={`${(setup_period) ? `Period ${setup_period}` : ''}`}>
+                        {`${(str_date && str_date !== '1900-01-01T00:00:00.000Z') ? moment(str_date, 'YYYY-MM-DD').format('DD/MM/YY') : null}`}
+                    </Popover>
+                )
+            } else {
+                return null
+            }
+
+            
 
         }
     },
@@ -499,9 +505,9 @@ export const customer_column_modal = [
         children: [           
             {
                 title: 'Due',
-                dataIndex: 'MthCycleDueDay',
+                dataIndex: 'WkCycleDueNo',
                 className: 'mktcol_modal_15 ttu tracked tc pointer',
-                sorter: (a, b) => compareByAmount(a.MthCycleDueDay, b.MthCycleDueDay),
+                sorter: (a, b) => compareByAmount(a.WkCycleDueNo, b.WkCycleDueNo),
                 width: standardWidth,
                 onHeaderCell: () => {
                     return {

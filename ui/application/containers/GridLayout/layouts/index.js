@@ -2349,7 +2349,7 @@ class MarketLayout extends Component {
 
     // SET CUSTOMER STATUS TO ELEMENT CELL IN LAYOUTS, WILL BE USE HAVE STATUS CHANGE
     onChangeStateCell = (result) => {
-        const { bktFullNotRisks } = this.state.config
+        const { bktFullNotRisks, bucketFullRisks } = this.state.config
         
         if (result) {
             const current_bucket = (result.Cust_DPDBucketNow) ? result.Cust_DPDBucketNow : null
@@ -2362,10 +2362,17 @@ class MarketLayout extends Component {
 
             } else {
                 if (in_array(result.StatusDigit, ['A'])) {
-                    if (!in_array(current_bucket, bktFullNotRisks))
-                        return `${cls['cell_active']} ${cls['cell_overdue']}`
-                    else
+                    if (!in_array(current_bucket, bktFullNotRisks)) { 
+                        if(current_bucket == bucketFullRisks[0]) {
+                            return `${cls['cell_active']} ${cls['cell_overdue_xday']}`
+                        } else if(in_array(current_bucket, [bucketFullRisks[1], bucketFullRisks[2]])) {
+                            return `${cls['cell_active']} ${cls['cell_overdue_month']}`
+                        } else {
+                            return `${cls['cell_active']} ${cls['cell_overdue']}`
+                        }
+                    } else {
                         return cls['cell_active']
+                    }
 
                 } else if (in_array(result.StatusDigit, ['C', 'R'])) {
                     return `${cls['cell_active']} ${cls['cell_reject']}`

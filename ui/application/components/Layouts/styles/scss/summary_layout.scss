@@ -400,6 +400,17 @@ $fweight: 600;
     color: rgba(255, 255, 255, 1) !important;
 }
 
+.cell_overdue_xday {
+    background-color: #ff4500;
+    color: #FFF !important;
+}
+
+.cell_overdue_month {
+    background-color: #6d04ce;
+    color: #FFF !important;
+}
+
+
 .cell_onhand {
     background-color: #1b6eae;
     color: rgba(255, 255, 255, 1) !important;

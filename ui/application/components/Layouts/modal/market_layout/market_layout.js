@@ -44,14 +44,17 @@ class MarketLayoutCtrl extends Component {
         const cookieData = cookies.get('authen_info', { path: '/' })
 
         let qs_param = qs_parse(location.search)
-        this.state = {
+        this.state = {            
             authen: (!cookieData) ? { Session: [] } : cookieData,
             market_code: (qs_param && qs_param.marketcode) ? qs_param.marketcode : (props && props.mktcode) ? props.mktcode : null,
             fullscreen: (qs_param && parseBool(qs_param.fs)) ? parseBool(qs_param.fs) : (props && props.fullscreen) ? props.fullscreen : false,
             sidebar: (qs_param && parseBool(qs_param.sidebar)) ? parseBool(qs_param.sidebar) : (props && props.sidebar) ? props.sidebar : false,
             btnSaveImg: (qs_param && parseBool(qs_param.genImg)) ? parseBool(qs_param.genImg) : false,
             zoomDisable: (props && props.zoomDisable) ? props.zoomDisable : false,
-            isGetCell: (props && props.isGetCell) ? props.isGetCell : false
+            isGetCell: (props && props.isGetCell) ? props.isGetCell : false,
+            visible: {
+                cell_extension_tool: false
+            } 
         }
         
     }
@@ -868,6 +871,15 @@ class MarketLayout extends Component {
                     case `${cls['cell_active']} ${cls['cell_overdue']}`:
                         $(el).addClass(`${cls['cell_extended']} ${cls['overdue']}`)
                         break
+
+                    case `${cls['cell_active']} ${cls['cell_overdue_xday']}`:
+                        $(el).addClass(`${cls['cell_extended']} ${cls['cell_overdue_xday']}`)
+                    break
+
+                    case `${cls['cell_active']} ${cls['cell_overdue_month']}`:
+                        $(el).addClass(`${cls['cell_extended']} ${cls['cell_overdue_month']}`)
+                    break
+                    
                     case `${cls['cell_active']} ${cls['cell_reject']}`:
                         $(el).addClass(`${cls['cell_extended']} ${cls['reject']}`)
                         break
@@ -1460,6 +1472,72 @@ class MarketLayout extends Component {
 
     }
 
+    handleSetEventCellAddition = () => {
+        let cell_divide = document.querySelectorAll(`.${cls['inside_divide']}`)
+        if(cell_divide && cell_divide.length > 0) {            
+            _.forEach(cell_divide, (v) => {
+                if(v.getAttribute('data-event-dblclick') == 'false') {
+                    v.addEventListener("dblclick", (e) => {
+                        e.target.setAttribute('data-event-dblclick', 'true')
+                        this.handleProfileModal($(e.target))
+                    })
+                }
+
+                if(v.getAttribute('data-event-mouseover') == 'false') {
+                    v.addEventListener("mouseover", (e) => {
+                        const element_target = e.target
+                        element_target.setAttribute('data-event-mouseover', 'true')
+                        this.handleExtension(element_target, 'single')
+                    })
+                }
+            })
+        }
+
+        let cell_divide_bottom = document.querySelectorAll(`.${cls['cell_inside_bottom']}.${cls['divide']}`)
+        if(cell_divide_bottom && cell_divide_bottom.length > 0) {        
+            _.forEach(cell_divide_bottom, (v) => {
+                if(v.getAttribute('data-event-mouseover') == 'false') {
+                    v.addEventListener("mouseover", (e) => {
+                        e.target.setAttribute('data-event-mouseover', 'true')
+                        
+                        const element_target = e.target.parentElement
+                        this.handleExtension(element_target.querySelectorAll(`.${cls['inside_divide']}`), 'multi')
+                    })
+                }
+            })
+        }
+    }
+
+    
+    handleExtensionClose = (e) => {
+        this.setState({ visible: _.assignIn({}, this.state.visible, { cell_extension_tool: false }) })
+    }
+
+    handleExtension = (elements, extensionType) => {
+        let isMouseOver = true
+        let estimate_time = (extensionType == 'single') ? 100 : 500
+
+        _.delay(() => {
+            if(isMouseOver) {
+                this.setState({ 
+                    visible: _.assignIn({}, this.state.visible, { cell_extension_tool: true }),
+                    cellExtensionType: extensionType,
+                    cellExtension: elements
+                })
+                isMouseOver = false
+            }
+        }, estimate_time)
+                
+        if(extensionType == 'single') {
+            $(elements).mouseout(() => {
+                isMouseOver = false
+                this.handleExtensionClose()
+            })
+            .unbind(this)
+        }
+        
+    }
+
     // SET CUSTOMER STATUS TO ELEMENT CELL IN LAYOUTS
     checkCellOnhand = (findCustomer) => {
         const { bktFullNotRisks } = config
@@ -1559,10 +1637,9 @@ class MarketLayout extends Component {
         // })
     }
     
-
     // SET CUSTOMER STATUS TO ELEMENT CELL IN LAYOUTS, WILL BE USE HAVE STATUS CHANGE
     onChangeStateCell = (result) => {
-        const { bktFullNotRisks } = config
+        const { bucketFullRisks, bktFullNotRisks } = config
     
         if (result) {
             let current_bucket = (result.Cust_DPDBucketNow) ? result.Cust_DPDBucketNow : null
@@ -1573,12 +1650,19 @@ class MarketLayout extends Component {
             if (status == 'Approved' && acc_close == 'Y') {
                 return `${cls['cell_active']} ${cls['cell_closeacc']}`
 
-            } else {
+            } else {                
                 if (in_array(result.StatusDigit, ['A'])) {
-                    if (!in_array(current_bucket, bktFullNotRisks))
-                        return `${cls['cell_active']} ${cls['cell_overdue']}`
-                    else
+                    if (!in_array(current_bucket, bktFullNotRisks)) {
+                        if(current_bucket == bucketFullRisks[0]) {
+                            return `${cls['cell_active']} ${cls['cell_overdue_xday']}`
+                        } else if(in_array(current_bucket, [bucketFullRisks[1], bucketFullRisks[2]])) {
+                            return `${cls['cell_active']} ${cls['cell_overdue_month']}`
+                        } else {
+                            return `${cls['cell_active']} ${cls['cell_overdue']}`
+                        }
+                    } else {
                         return cls['cell_active']
+                    }
 
                 } else if (in_array(result.StatusDigit, ['C', 'R'])) {
                     return `${cls['cell_active']} ${cls['cell_reject']}`

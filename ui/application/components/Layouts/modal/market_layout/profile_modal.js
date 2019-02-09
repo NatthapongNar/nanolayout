@@ -237,21 +237,21 @@ class ProfileModal extends Component {
     setTitleHeader = () => {
         const { mktCustFilter } = this.props
 
-        let CIFNo = '', AppNo = ''
+        let CIFNo = '', AppNo = '', MarketName = ''
+        MarketName = (mktCustFilter.profile && mktCustFilter.profile.MarketName) ? mktCustFilter.profile.MarketName : '-'
         CIFNo = (mktCustFilter.profile && mktCustFilter.profile.CIFNO) ? mktCustFilter.profile.CIFNO : '-',
         AppNo = (mktCustFilter.profile && mktCustFilter.profile.ApplicationNo) ? mktCustFilter.profile.ApplicationNo : '-'
 
         return (
             <div className={cls['title_header']}>
-                {/* <i className="fa fa-caret-right" style={{ fontSize: '18px', position: 'absolute', top: '3px' }}></i> */}
+                <span>{ MarketName }</span> &nbsp;
                 <span className="pv1">{`CIF : ${CIFNo} (${AppNo})`}</span>
             </div>
         )
-    }
-    
+
+    }    
 
     render() {
-
         const { visible, preview, previewBigScale, mktCustFilter } = this.props
 
         const url_mrkImg = (mktCustFilter.images && mktCustFilter.images.ImageStatus == 'OK') ? mktCustFilter.images.Url : dummy
@@ -273,7 +273,8 @@ class ProfileModal extends Component {
         const limit = (mktCustFilter.profile && mktCustFilter.profile.Limit) ? numberWithCommas(mktCustFilter.profile.Limit):0
         const bucket_class = (mktCustFilter.profile &&  mktCustFilter.profile.Cust_DPDBucketNow) ? mktCustFilter.profile.Cust_DPDBucketNow : '-'
         const no_acc = (mktCustFilter.profile && mktCustFilter.profile.NoAccount) ? mktCustFilter.profile.NoAccount : 1
-        const os_amount = (mktCustFilter.profile && mktCustFilter.profile.Principle) ? numberWithCommas(mktCustFilter.profile.Principle) : 0
+        const os_amount_total = (mktCustFilter.profile && mktCustFilter.profile.Principle) ? numberWithCommas(mktCustFilter.profile.Principle) : 0
+        const os_amount = (mktCustFilter.profile && mktCustFilter.profile.OriginPrinciple) ? numberWithCommas(mktCustFilter.profile.OriginPrinciple) : 0
         const wkcycle_day = (mktCustFilter.profile && mktCustFilter.profile.WkCycleDue) ? mktCustFilter.profile.WkCycleDue : '-'
         const first_paid_date = (mktCustFilter.profile && mktCustFilter.profile.FirstPaymentDate) ? moment(mktCustFilter.profile.FirstPaymentDate).format('DD/MM/YYYY') : '-'
         const latest_paid_date = (mktCustFilter.profile && mktCustFilter.profile.LastPaymentDate) ? moment(mktCustFilter.profile.LastPaymentDate).format('DD/MM/YYYY') : '-'
@@ -287,7 +288,6 @@ class ProfileModal extends Component {
         const active_cell = (mktCustFilter.cellable) ? mktCustFilter.cellable[0].getAttribute('ref') : null
         const lockno_cell = (mktCustFilter.cellable) ? mktCustFilter.cellable[0].getAttribute('data-ref') : ''
         const tenor = (mktCustFilter.profile && mktCustFilter.profile.Tenor) ? numberWithCommas(mktCustFilter.profile.Tenor):0
-        const total_topup = '-'
         let reference_no = (active_cell) ? active_cell : lockno_cell
 
         const principle = (mktCustFilter.profile && mktCustFilter.profile.Principle) ? mktCustFilter.profile.Principle:null
@@ -332,7 +332,7 @@ class ProfileModal extends Component {
                             <Row type="flex" gutter={0} style={{ paddingTop: '2px' }}>
                                 <Col span={7} className={`${cls['grid_label']} ${cls['repad']} bb b--light-gray`}>Ref / Lock No</Col>
                                 <Col span={17} className={`${cls['grid_control']} ${cls['repad']} bb b--light-gray`}>
-                                    {`${reference_no}`} / 001                                    
+                                    {`${reference_no}`}                                 
                                     <div className={`${cls['noteContainer']} ${(parseBool(preview)) && cls['hidden']} ${parseBool(previewBigScale) && cls['hidden']}`}>
                                         <i className={`${cls['handleInputNote']} fa fa-comments-o fr`} onClick={this.handleUseNote}></i>
                                         <span className={`${cls['handleNoteArea']} ${(this.state.useNote) && cls['open']}`}>
@@ -355,7 +355,7 @@ class ProfileModal extends Component {
                             </Row>
                             <Row type="flex" gutter={0}>
                                 <Col span={7} className={`${cls['grid_label']} ${cls['repad']} bb b--light-gray`}>Total O/S</Col>
-                                <Col span={17} className={`${cls['grid_control']} ${cls['repad']} bb b--light-gray blue`}>{total_topup}</Col>
+                                <Col span={17} className={`${cls['grid_control']} ${cls['repad']} bb b--light-gray blue`}>{os_amount_total}</Col>
                             </Row>
                             <div className={`${cls['handleDetail']} tr`} onClick={this.handleDetail}>
                                 <i className={`${(!this.state.details) ? 'fa fa-caret-down' : 'fa fa-caret-up'}`}></i>&nbsp;

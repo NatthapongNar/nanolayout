@@ -5,6 +5,9 @@ $set-brd-normal: 1px solid;
 
 div[class^="ant-modal-mask"] + .handleProfileWrapper {
     z-index: 1000;
+    div[class^="ant-modal-header"] {
+        padding: 16px 8px;
+    }
 }
 
 div[class^="ant-select-dropdown"] {

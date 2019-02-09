@@ -95,7 +95,7 @@ class CustomerDashboard extends Component {
                 OverdueFrom: null,
                 OverdueTo: null,
                 Optional: null,
-                Isactive: 'Y'
+                Isactive: 'Active'
             },
             handleDPD: false,
             handleWDPD: false,
@@ -186,7 +186,7 @@ class CustomerDashboard extends Component {
                 OverdueFrom: null,
                 OverdueTo: null,
                 Optional: null,
-                Isactive: 'Y'
+                Isactive: 'Active'
             }),
             handleDPD: false,
             handleWDPD: false,
@@ -482,7 +482,7 @@ class CustomerDashboard extends Component {
             MonthOverdueTo: (this.state.handleMDPD) ? param.OverdueTo2 : null,         
             Topup: (topup_list && topup_list.length > 0) ? topup_list.join(',') : null,
             Product: (product_list && product_list.length > 0) ? product_list.join(',') : null,
-            Isactive: (param.CustomerStatus) ? param.CustomerStatus:'Y',
+            Isactive: (param.CustomerStatus) ? param.CustomerStatus:null,
             NPLFlag: (enable_checkDPD && select_new_npl && select_new_npl.length > 0) ? select_new_npl.join(','): null,
             Optional: (option_list && option_list.length > 0) ? option_list.join(',') : null,
             ModeType: (view_mode && view_mode.length > 0) ? view_mode.join(',') : null
@@ -603,6 +603,7 @@ class CustomerDashboard extends Component {
         const lang_field_filters = config.lang[locales.region_type].grid.customer.filters
 
         const wkCycleDay = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri']
+        
         let enable_checkDPD = in_array('Collect', form.getFieldValue('ViewType')) ? true : false
         const initial_mode_type = (modeType == 'Performance') ? ['Loan'] : ['Collect']
 
@@ -619,9 +620,9 @@ class CustomerDashboard extends Component {
                     { label: 'On Hand Oper', value: 'OP', key: 'OP' },
                     { label: 'Oper Return', value: 'OR', key: 'OR' },
                     { label: 'Approved', value: 'A', key: 'A' },
-                    { label: 'Cancel', value: 'C', key: 'C', disabled: true },
-                    { label: 'Reject', value: 'R', key: 'R', disabled: true },
-                    { label: 'Close Account', value: 'E', key: 'E', disabled: true }
+                    { label: 'Cancel', value: 'C', key: 'C' },
+                    { label: 'Reject', value: 'R', key: 'R' },
+                    { label: 'Close Account (E)', value: 'E', key: 'E' }
                 ]
             },
             {
@@ -749,12 +750,12 @@ class CustomerDashboard extends Component {
                                     <Col span={8}>
                                         <FormItem className={`${cls['form_item']} ${cls['fix_height']} ${cls['mb0']} ttu fw5`} colon={field_colon_label}>
                                             {
-                                                getFieldDecorator('CustomerStatus', { initialValue: 'Y' })
+                                                getFieldDecorator('CustomerStatus', { initialValue: 'Active' })
                                                 (
                                                     <RadioGroup>
-                                                        <Radio value="Y" className={`${cls['ph1']} ${cls['mh0']}`}>Active</Radio>
-                                                        <Radio value="N" className={`${cls['ph1']} ${cls['mh0']}`} disabled={true}>Inactive</Radio>
-                                                        <Radio value="A" className={`${cls['ph1']} ${cls['mh0']}`} disabled={true}>All</Radio>
+                                                        <Radio value="Active" className={`${cls['ph1']} ${cls['mh0']}`}>Active</Radio>
+                                                        <Radio value="Inactive" className={`${cls['ph1']} ${cls['mh0']}`}>Inactive</Radio>
+                                                        <Radio value="All" className={`${cls['ph1']} ${cls['mh0']}`}>All</Radio>
                                                     </RadioGroup>
                                                 )
                                             }

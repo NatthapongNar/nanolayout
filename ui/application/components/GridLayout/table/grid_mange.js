@@ -327,7 +327,7 @@ class GridMangement extends Component {
 
     /* FOOTER SUMMARY */
     handleFooterSummary = (currentPageData) => {
-        const { dataSoruce, filters, progress, mode } = this.state
+        const { dataSoruce, progress, mode } = this.state
 
         if (!progress && currentPageData) {
             _.delay(() => {
@@ -393,7 +393,7 @@ class GridMangement extends Component {
                         footer.total_os_vol = (sum_total_osvol && sum_total_osvol > 0) ? roundFixed(sum_total_osvol, 1) : 0
                         footer.total_os_cust = numValid(sum_total_osunit)
                         footer.total_micro = (os_avg_micro) ? `${roundFixed(os_avg_micro, 1)}%` : 0.0
-                        footer.total_topup = (os_avg_topup) ? `${roundFixed(os_avg_topup, 1)}%` : 0.0
+                        footer.total_topup = (os_avg_topup && mode == 'Performance') ? `${roundFixed(os_avg_topup, 1)}%` : '-'
 
                         // GRAND TOTAL
                         let sum_grandtotal_shop = _.sumBy(dataSoruce, 'MarketShop')
@@ -418,7 +418,7 @@ class GridMangement extends Component {
                         grand_footer.total_os_vol = (sum_grandtotal_osvol && sum_grandtotal_osvol > 0) ? roundFixed(sum_grandtotal_osvol, 1) : 0
                         grand_footer.total_os_cust = numValid(sum_grandtotal_osunit)
                         grand_footer.total_micro = (grand_os_avg_micro) ? `${roundFixed(grand_os_avg_micro, 1)}%` : 0.0
-                        grand_footer.total_topup = (grand_os_avg_topup) ? `${roundFixed(grand_os_avg_topup, 1)}%` : 0.0
+                        grand_footer.total_topup = (grand_os_avg_topup && mode == 'Performance') ? `${roundFixed(grand_os_avg_topup, 1)}%` : '-'
 
                         if (mode == 'Performance') {
 
@@ -540,7 +540,7 @@ class GridMangement extends Component {
                             grand_footer.total_mtd_topup_succ = (grand_mtd_avg_topup) ? `${roundFixed(grand_mtd_avg_topup, 1)}%` : '0.0%'
 
                         } else {
-
+                        
                             // TOTAL CURRENT PAGE
                             let sum_pmt_total = _.sumBy(currentPageData, 'OS_Total_Collect')
                             let sum_pmt_succ = _.sumBy(currentPageData, 'OS_Succ_Collect')
@@ -564,11 +564,13 @@ class GridMangement extends Component {
                             let os_mth_ach = (sum_mth_bal / sum_total_osvol) * 100
                             let os_npl_ach = (sum_npl_bal / sum_total_osvol) * 100
 
+                            // Move to new footer
                             footer.flow_rate_w0 = '-'
                             footer.flow_rate_w1 = '-'
                             footer.flow_rate_m1 = '-'
-                            footer.new_customer = '-'
+                            // footer.new_customer = '-'
                             footer.pmt_success = (os_pmt_succ && os_pmt_succ > 0) ? `${roundFixed(os_pmt_succ, 1)}%` : '0.0%'
+                            footer.nb_new_npl = `0.0%`
                             footer.ytd_new_npl = (os_newnpl_bal && os_newnpl_bal > 0) ? `${roundFixed(os_newnpl_bal, 1)}%` : '0.0%'
                             footer.bucket_w0 = (os_w0_ach) ? `${roundFixed(os_w0_ach, 1)}%` : '0.0%'
                             footer.bucket_week1 = (os_w1_ach) ? `${roundFixed(os_w1_ach, 1)}%` : '0.0%'
@@ -576,6 +578,7 @@ class GridMangement extends Component {
                             footer.bucket_xday = (os_xday_ach) ? `${roundFixed(os_xday_ach, 1)}%` : '0.0%'
                             footer.bucket_month = (os_mth_ach) ? `${roundFixed(os_mth_ach, 1)}%` : '0.0%'
                             footer.bucket_npl = (os_npl_ach) ? `${roundFixed(os_npl_ach, 1)}%` : '0.0%'
+
 
                             // GRAND TOTAL
                             let grand_sum_pmt_total = _.sumBy(dataSoruce, 'OS_Total_Collect')
@@ -603,8 +606,9 @@ class GridMangement extends Component {
                             grand_footer.flow_rate_w0 = '-'
                             grand_footer.flow_rate_w1 = '-'
                             grand_footer.flow_rate_m1 = '-'
-                            grand_footer.new_customer = '-'
+                            // grand_footer.new_customer = '-'
                             grand_footer.pmt_success = (grand_os_pmt_succ && grand_os_pmt_succ > 0) ? `${roundFixed(grand_os_pmt_succ, 1)}%` : '0.0%'
+                            grand_footer.nb_new_npl = `0.0%`
                             grand_footer.ytd_new_npl = (grand_os_newnpl_bal && grand_os_newnpl_bal > 0) ? `${roundFixed(grand_os_newnpl_bal, 1)}%` : '0.0%'
                             grand_footer.bucket_w0 = (grand_os_w0_ach) ? `${roundFixed(grand_os_w0_ach, 1)}%` : '0.0%'
                             grand_footer.bucket_week1 = (grand_os_w1_ach) ? `${roundFixed(grand_os_w1_ach, 1)}%` : '0.0%'
@@ -1522,7 +1526,7 @@ class GridMangement extends Component {
         if (has_zone) {
             if (has_branch) {
                 zone_summary.map((v) => {
-                    let data_child = _.filter(branch_summary, { ZoneValue: v.ZoneValue })
+                    let data_child = _.filter(_.uniqWith(branch_summary, _.isEqual), { ZoneValue: v.ZoneValue })
                     v.children = (data_child && data_child.length > 0) ? data_child : []
                 })
             }
@@ -1561,7 +1565,7 @@ class GridMangement extends Component {
         else if (!has_region && !has_area && !has_zone && !has_branch && has_ca) {
             data_grid = ca_summary
         }
-
+ 
         this.setState({
             dataSoruce: _.uniqWith(data_grid, _.isEqual),
             progress: false

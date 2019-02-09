@@ -194,18 +194,19 @@ class CustProfileModal extends Component {
     setTitleHeader = () => {
         const { mktCustFilter } = this.state
 
-        let CIFNo = '', AppNo = ''
+        let CIFNo = '', AppNo = '', MarketName = ''
+        MarketName = (mktCustFilter.profile && mktCustFilter.profile.MarketName) ? mktCustFilter.profile.MarketName : '-'
         CIFNo = (mktCustFilter && mktCustFilter.profile && mktCustFilter.profile.CIFNO) ? mktCustFilter.profile.CIFNO : '-',
         AppNo = (mktCustFilter && mktCustFilter.profile && mktCustFilter.profile.ApplicationNo) ? mktCustFilter.profile.ApplicationNo : '-'
 
         return (
             <div className={cls['title_header']}>
+                <span>{ MarketName }</span> &nbsp;
                 <span className="pv1">{`CIF : ${CIFNo} (${AppNo})`}</span>
             </div>
         )
     }
     
-
     render() {
         const { visible } = this.props
         const { mktCustFilter } = this.state
@@ -229,7 +230,8 @@ class CustProfileModal extends Component {
         const limit = (mktCustFilter && mktCustFilter.profile && mktCustFilter.profile.Limit) ? numberWithCommas(mktCustFilter.profile.Limit):0
         const bucket_class = (mktCustFilter && mktCustFilter.profile &&  mktCustFilter.profile.Cust_DPDBucketNow) ? mktCustFilter.profile.Cust_DPDBucketNow : '-'
         const no_acc = (mktCustFilter && mktCustFilter.profile && mktCustFilter.profile.NoAccount) ? mktCustFilter.profile.NoAccount : 1
-        const os_amount = (mktCustFilter && mktCustFilter.profile && mktCustFilter.profile.Principle) ? numberWithCommas(mktCustFilter.profile.Principle) : 0
+        const os_amount_total = (mktCustFilter.profile && mktCustFilter.profile.Principle) ? numberWithCommas(mktCustFilter.profile.Principle) : 0
+        const os_amount = (mktCustFilter && mktCustFilter.profile && mktCustFilter.profile.OriginPrinciple) ? numberWithCommas(mktCustFilter.profile.OriginPrinciple) : 0
         const wkcycle_day = (mktCustFilter && mktCustFilter.profile && mktCustFilter.profile.WkCycleDue) ? mktCustFilter.profile.WkCycleDue : '-'
         const first_paid_date = (mktCustFilter && mktCustFilter.profile && mktCustFilter.profile.FirstPaymentDate) ? moment(mktCustFilter.profile.FirstPaymentDate).format('DD/MM/YYYY') : '-'
         const latest_paid_date = (mktCustFilter && mktCustFilter.profile && mktCustFilter.profile.LastPaymentDate) ? moment(mktCustFilter.profile.LastPaymentDate).format('DD/MM/YYYY') : '-'
@@ -242,7 +244,7 @@ class CustProfileModal extends Component {
         const callreport = (mktCustFilter && mktCustFilter.profile && mktCustFilter.profile.Cause_Detail) ? mktCustFilter.profile.Cause_Detail : ''
         const active_cell = (mktCustFilter && mktCustFilter.profile && mktCustFilter.profile.ColumnCell) ? mktCustFilter.profile.ColumnCell : null
         const tenor = (mktCustFilter && mktCustFilter.profile && mktCustFilter.profile.Tenor) ? numberWithCommas(mktCustFilter.profile.Tenor):0
-        const total_topup = '-'
+
         let reference_no = (active_cell) ? active_cell : ''
 
         const principle = (mktCustFilter && mktCustFilter.profile && mktCustFilter.profile.Principle) ? mktCustFilter.profile.Principle:null
@@ -304,7 +306,7 @@ class CustProfileModal extends Component {
                             </Row>
                             <Row type="flex" gutter={0}>
                                 <Col span={7} className={`${cls['grid_label']} ${cls['repad']} bb b--light-gray`}>Total O/S</Col>
-                                <Col span={17} className={`${cls['grid_control']} ${cls['repad']} bb b--light-gray blue`}>{total_topup}</Col>
+                                <Col span={17} className={`${cls['grid_control']} ${cls['repad']} bb b--light-gray blue`}>{os_amount_total}</Col>
                             </Row>
                             <div className={`${cls['handleDetail']} tr`} onClick={this.handleDetail}>
                                 <i className={`${(!this.state.details) ? 'fa fa-caret-down' : 'fa fa-caret-up'}`}></i>&nbsp;

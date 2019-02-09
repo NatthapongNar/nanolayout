@@ -34,7 +34,7 @@ export const configAccessHeader = (req, res, next) => {
 // CONFIGURATION DEFINITION
 export const config = {
     database: {
-        
+        production: {}
     },
     cookies_config: {
         path: '/',

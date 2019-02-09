@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Component } from 'react'
 import moment from 'moment'
 import { Icon, Tooltip, Popover, notification } from 'antd'
 import { Cookies } from 'react-cookie'
@@ -204,9 +204,6 @@ export const customer_column_modal = [
                         }
                     }
                 }
-                // ,render: (strText) => {
-                //     return (in_array(strText, ['Nano', 'Micro'])) ? `${(strText == 'Nano') ? 'NN' : 'MF'}` : (strText && strText !== '') ? strText:''
-                // }
             }
         ]
     },
@@ -412,9 +409,9 @@ export const customer_column_modal = [
         children: [           
             {
                 title: 'Due',
-                dataIndex: 'MthCycleDueDay',
+                dataIndex: 'WkCycleDueNo',
                 className: 'warningcol_14 ttu tracked tc pointer',
-                sorter: (a, b) => compareByAmount(a.MthCycleDueDay, b.MthCycleDueDay),
+                sorter: (a, b) => compareByAmount(a.WkCycleDueNo, b.WkCycleDueNo),
                 width: standardWidth,
                 onHeaderCell: () => {
                     return {
@@ -668,23 +665,166 @@ export const customer_column_modal = [
                         }
                     }
                 },
-                render: (strText, data) => {
-                    const content = (
-                        <div style={{ fontSize: '1em' }}>
-                          { (!_.isEmpty(data.CauseDetail)) ? data.CauseDetail : '' }
-                        </div>
-                    )
-                    
-                    return (
-                        <Popover content={content} placement="left">
-                             <div style={{ width: '400px' }}>{`${(strText) ? strText : ''}`}</div>
-                        </Popover>
-                    )
+                render: (strText, record) => {
+                    let TMNote_Cause = (record.Cause) ? `${record.Cause}` : null
+                    let CANote_Cause = (record.CA_Cause) ? `${record.CA_Cause}` : null
+
+                    let note_check = (CANote_Cause && CANote_Cause !== '') ? CANote_Cause : TMNote_Cause
+
+                    return (<PopoverTabletHist latestNote={note_check} dataItems={record} />) 
+
                 }
             },
         ]
     }
 ]
+
+
+class PopoverTabletHist extends Component {
+
+    state = {
+        dataHist: [],
+        dataLoading: true
+    }
+
+    render() {
+        const { latestNote, dataItems } = this.props
+
+        return (            
+            <Popover 
+                trigger="click"             
+                mouseEnterDelay={3} 
+                placement="left" 
+                className="pointer"
+                onClick={this.handleTabletHist.bind(this, dataItems)} 
+                content={
+                    <div id={`TABLET_${dataItems.AccountNo}`} style={{ width: '300px', opacity: 0 }}>
+                        <List
+                            loading={this.state.dataLoading}
+                            size="small"
+                            dataSource={this.state.dataHist}
+                            renderItem={(item, i) => (
+                                <ListItem style={{ fontSize: '1em', lineHeight: '24px', padding: '0px 0px 2px 5px' }}> 
+                                    <span style={{ fontSize: '2em'}}>
+                                        {(i + 1)}. &nbsp;
+                                        <span onMouseOver={this.handleTabletEmpImg.bind(this, { items: dataItems, index: (i+1) })}>
+                                            <Popover 
+                                                shape="square"
+                                                placement="top"                                           
+                                                content={(
+                                                    <div id={`TABLET_IMG_${dataItems.AccountNo}_${(i+1)}`} style={{ opacity: 0 }}>
+                                                        <Avatar src={`http://172.17.9.94/newservices/LBServices.svc/employee/image/${(item && item.created_id) ? item.created_id : null}`} style={{ width: '75px', height: '75px', borderRadius: '0px' }} />
+                                                    </div>
+                                                )}                                             
+                                            >
+                                                <Avatar src={`http://172.17.9.94/newservices/LBServices.svc/employee/image/${(item && item.created_id) ? item.created_id : null}`} shape="square" size="small" style={{ borderRadius: '0px', cursor: 'pointer' }} />
+                                            </Popover>
+                                        </span>
+                                        <Tag color={this.handleLayerColorByPosit(item.created_position)} style={{ borderRadius: '0px', minHeight: '24px' }}>{`${(item && item.created_position) ? ` ${item.created_position} ` : ''} `}</Tag>
+                                        {`${(item && item.created_date) ? moment(item.created_date).format('DD/MM/YYYY') : ''} : `}
+                                        {`${(item && item.latest_note) ? item.latest_note: ''}`}
+                                    </span>
+                                </ListItem>
+                            )}
+                        />
+                    </div>
+                }
+            > 
+                <Tooltip placement="left" title="คลิก เพื่อดูประวัติย้อนหลัง">{latestNote}</Tooltip>
+            </Popover>
+        )
+    }
+
+    handleTabletHist = (data) => {
+        if(data && data.AccountNo) {
+            const request_set = new Request(`${config.hostapi}/tablethist/acc_code/${data.AccountNo}/tablet_note`, {
+                method: 'GET',
+                cache: 'no-cache',
+                header: new Headers({
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json; charset="UTF-8";'
+                })
+            })
+        
+            fetch(request_set)
+            .then(response => response.json())
+            .then(resp => { 
+                this.setState({ dataHist: (resp.status) ? resp.data : [], dataLoading: false  })  
+            })
+            .catch(err => { console.log(`fetch error ${err}`) })
+
+            _.delay(() => {
+                let e = `TABLET_${data.AccountNo}`    
+                _.delay(() => { 
+                    $(`#${e}`).css({ opacity: 1, border: '2px solid #D1D1D1' }) 
+                    $(`#${e}`).addClass('animated fadeIn')
+                }, 300)
+                let element = $(`#${e}`).parents()
+                if(element) {
+                    $(element[0]).css('padding', '0px')
+                    $(element[0]).addClass(`${cls['unset']}`)
+                    $(element[1]).css('background', '#FFF ')
+                    $(element[2]).addClass(cls['unset'])
+                    $(element[2]).addClass('animated bounceIn')
+        
+                    let el_arrow = $(element[3]).children()[0]            
+                    if(el_arrow) {
+                        $(el_arrow).addClass(cls['unset'])
+                    }
+                }
+                
+            }, 200)
+
+        }
+
+    }
+
+    handleTabletEmpImg = (data) => {
+        console.log(data)
+        _.delay(() => {
+            let e = `TABLET_IMG_${data.items.AccountNo}_${data.index}`    
+            _.delay(() => { 
+                $(`#${e}`).css({ opacity: 1 }) 
+                $(`#${e}`).addClass('animated fadeIn')
+            }, 300)
+            let element = $(`#${e}`).parents()
+            if(element) {
+                $(element[0]).css('padding', '0px')
+                $(element[0]).addClass(`${cls['unset']}`)
+                $(element[1]).css('background', '#FFF ')
+                $(element[2]).addClass(cls['unset'])
+                $(element[2]).addClass('animated bounceIn')
+    
+                let el_arrow = $(element[3]).children()[0]            
+                if(el_arrow) {
+                    $(el_arrow).addClass(cls['unset'])
+                }
+            }
+            
+        }, 200)
+
+    }
+
+    handleLayerColorByPosit = (position) => {
+        switch(position) {
+            case 'RD':
+                return 'green'
+            case 'AM':
+                return 'cyan'
+            case 'ZM':
+                return 'orange'
+            case 'TM':
+                return 'gold'
+            case 'FCR':
+                return 'yellowgreen'
+            case 'PCA':
+                return 'volcano'
+            default: 
+                return 'red'
+        }
+    }
+
+}
 
 const copyToClipboard = (appno) => {
     let $temp = $("<input>");

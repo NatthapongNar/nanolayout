@@ -191,7 +191,7 @@ class CellExtension extends Component {
 
     onChangeStateCell = (result) => {
         const { configData } = this.props
-        const { bktFullNotRisks } = configData
+        const { bktFullNotRisks, bucketFullRisks } = configData
 
         if(result) {
             const principle = (result.Principle) ? result.Principle:null
@@ -203,11 +203,19 @@ class CellExtension extends Component {
 
             } else {
                 if (in_array(result.StatusDigit, ['A'])) {
-                    if (!in_array(result.Cust_DPDBucketNow, bktFullNotRisks)) 
-                        return `${grid_cls['cell_active']} ${grid_cls['cell_overdue']}`
-                    else 
+
+                    if (!in_array(result.Cust_DPDBucketNow, bktFullNotRisks)) {
+                        if(result.Cust_DPDBucketNow == bucketFullRisks[0]) {
+                            return `${grid_cls['cell_active']} ${grid_cls['cell_overdue_xday']}`
+                        } else if(in_array(result.Cust_DPDBucketNow, [bucketFullRisks[1], bucketFullRisks[2]])) {
+                            return `${grid_cls['cell_active']} ${grid_cls['cell_overdue_month']}`
+                        } else {
+                            return `${grid_cls['cell_active']} ${grid_cls['cell_overdue']}`
+                        }
+                    } else {
                         return grid_cls['cell_active']
-    
+                    }
+     
                 } else if (in_array(result.StatusDigit, ['C', 'R'])) {
                     return `${grid_cls['cell_active']} ${grid_cls['cell_reject']}`
     

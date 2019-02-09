@@ -228,7 +228,18 @@ class Summary extends Component {
         if(customer_list && customer_list.length > 0) {            
             const app_onhand_amt = document.querySelectorAll(`td[data-bucket="${data}"]`).length 
  
-            let className = (in_array(data, configData.bktFullNotRisks)) ? cls['cell_approved'] : cls['cell_overdue']
+            let className = ''
+            if((in_array(data, configData.bktFullNotRisks))) {
+                className = cls['cell_approved']
+            } else {
+                if(data == configData.bucketFullRisks[0]) {
+                    className = `${cls['cell_overdue_xday']}`
+                } else if(in_array(data, [configData.bucketFullRisks[1], configData.bucketFullRisks[2]])) {
+                    className = `${cls['cell_overdue_month']}`
+                } else {
+                    className = `${cls['cell_overdue']}`
+                }
+            }
 
             return (
                 <Col className={`gutter-row ${cls['payment_bucket_items']}`} key={(index + 1)}>
