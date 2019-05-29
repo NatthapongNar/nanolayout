@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { Row, Col, Icon, Card, Progress, Popover  } from 'antd'
 import _ from 'lodash'
-import { in_array, roundFixed, numValid, parseNumberShort, isNodeList, parseBool } from '../../../containers/Layouts/function'
+import { in_array, roundFixed, numValid, parseNumberShortNew, isNodeList, parseBool } from '../../../containers/Layouts/function'
 
 import cls from '../styles/scss/summary_layout.scss'
 import options from '../../../utilities/_general.scss'
@@ -64,7 +64,7 @@ class Summary extends Component {
                     </div>
                 </div>   
                 <div className={cls['market_content']}>  
-                    <div className={`${cls['market_content_block']} ${cls['penetrate']}`}>{`${(market_data) ? parseNumberShort(market_data.OS_Vol_FullAmt) : 0}`}</div>
+                    <div className={`${cls['market_content_block']} ${cls['penetrate']}`}>{`${(market_data) ? parseNumberShortNew(market_data.OS_Vol_FullAmt) : 0}`}</div>
                     <div className={`${cls['divine']}`} />
                     <div className={`${cls['market_content_block']} ${cls['penetrate']}`}>{`${(market_data) ? market_data.OS_Unit : 0}`}</div>
                     <div className={`${cls['divine']}`} />
@@ -266,9 +266,9 @@ class Summary extends Component {
                         <span>{`${data.EmployeeName}`}</span>
                     </div>
                     <div>
-                        <span>{`${data.CA_OS_Vol}Kb`}</span>
-                        <span>{`${data.CA_OS_Unit}`}</span>
-                        <span>{`${roundFixed(data.MktPencentPort, 0)}%`}</span>
+                        <span>{`${(data && data.CA_OS_Vol_FullAmt > 0) ? parseNumberShortNew(data.CA_OS_Vol_FullAmt) : 0}`}</span>
+                        <span>{`${(data && data.CA_OS_Unit > 0) ? data.CA_OS_Unit : 0}`}</span>
+                        <span>{`${(data && data.MktPencentPort > 0) ? roundFixed(data.MktPencentPort, 1) : 0}%`}</span>
                     </div>
                 </div>
             </a>

@@ -48,7 +48,7 @@ class CustomerWarningDashboard extends Component {
                 OverdueFrom: null,
                 OverdueTo: null,
                 Optional: null,
-                Isactive: 'Y'
+                Isactive: 'Active'
             },
             handleDPD: false,
             handleWDPD: false,
@@ -250,7 +250,7 @@ class CustomerWarningDashboard extends Component {
             // MonthOverdueTo: (this.state.handleMDPD) ? param.OverdueTo2 : null,         
             // Topup: (topup_list && topup_list.length > 0) ? topup_list.join(',') : null,
             // Product: (product_list && product_list.length > 0) ? product_list.join(',') : null,
-            // Isactive: (param.CustomerStatus) ? param.CustomerStatus:'Y',
+            Isactive: 'Active',
             // NPLFlag: (enable_checkDPD && select_new_npl && select_new_npl.length > 0) ? select_new_npl.join(','): null,
             // Optional: (param.ModeType && param.ModeType !== '') ? param.ModeType : null,
             ModeType: 'Collect',

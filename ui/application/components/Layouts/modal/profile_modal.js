@@ -292,6 +292,10 @@ class ProfileModal extends Component {
         const tenor = (mktCustFilter.profile && mktCustFilter.profile.Tenor) ? numberWithCommas(mktCustFilter.profile.Tenor):0
         let reference_no = (active_cell) ? active_cell : lockno_cell
     
+        let is_topup = (mktCustFilter.profile && mktCustFilter.profile.IsTopup  == 'Y') ? 'Y' : 'N'      
+        let total_aprv = (mktCustFilter.profile && mktCustFilter.profile.TotalAprvAmount > 0) ? numberWithCommas(mktCustFilter.profile.TotalAprvAmount) : 0
+        let total_acccount = (mktCustFilter.profile && mktCustFilter.profile.TotalAprvApp > 0) ? mktCustFilter.profile.TotalAprvApp : 0
+        let topup_amount = (mktCustFilter.profile && mktCustFilter.profile.TopupVol > 0) ? numberWithCommas(mktCustFilter.profile.TopupVol) : 0
 
         const principle = (mktCustFilter.profile && mktCustFilter.profile.Principle) ? mktCustFilter.profile.Principle:null
         let acc_close = (principle && principle > 0) ? 'N':'Y'
@@ -392,7 +396,7 @@ class ProfileModal extends Component {
                             </Row>
                             <Row type="flex" className={`${(this.state.details) ? `${cls['grid_rows']} ${cls['open']}` : cls['grid_rows']}`}>
                                 <Col span={12} className={cls['grid_label']}>Loan Amount</Col>
-                                <Col span={12} className={cls['grid_control']}>{approved_loan}</Col>
+                                <Col span={12} className={cls['grid_control']}>{total_aprv}</Col>
                             </Row>
                             <Row type="flex" className={`${(this.state.details) ? `${cls['grid_rows']} ${cls['open']}` : cls['grid_rows']}`}>
                                 <Col span={12} className={cls['grid_label']}>Installment (Mth)</Col>
@@ -417,7 +421,7 @@ class ProfileModal extends Component {
                             <Row type="flex" className={`${(this.state.details) ? `${cls['grid_rows']} ${cls['open']}` : cls['grid_rows']}`}>
                                 <Col span={12} className={cls['grid_label']}>Loan Top-up</Col>
                                 <Col span={12} className={cls['grid_control']}>
-                                    {`${limit}`}
+                                    {`${(is_topup && is_topup == 'Y') ? topup_amount : '0'}`}
                                     {/* 50,000 (10/09) */}
                                     {/* use after offer: Accept/None */}
                                 </Col>
@@ -440,7 +444,7 @@ class ProfileModal extends Component {
                             <Row type="flex" className={`${(this.state.details) ? `${cls['grid_rows']} ${cls['open']}` : cls['grid_rows']} ${cls['border_l_none']}`}>
                                 <Col span={12} className={cls['grid_label']}>
                                     Balance Amt.
-                                    <span className={`${cls['fg-teal']} pl1`}>({`${no_acc}`})</span>
+                                    <span className={`${cls['fg-teal']} pl1`}>({`${total_acccount}`})</span>
                                 </Col>
                                 <Col span={12} className={`${cls['grid_control']}`}>{`${os_amount}`}</Col>
                             </Row>

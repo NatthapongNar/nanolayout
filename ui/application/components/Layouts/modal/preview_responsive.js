@@ -404,7 +404,7 @@ class PreviewResponsive extends Component {
 
     onChangeStateCell = (result) => {
         const { configData } = this.props
-        const { bktFullNotRisks } = configData
+        const { bktFullNotRisks, bucketFullRisks  } = configData
 
         if(result) {
             const principle = (result.Principle) ? result.Principle:null

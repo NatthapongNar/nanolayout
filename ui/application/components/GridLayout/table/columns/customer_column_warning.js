@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import moment from 'moment'
-import { Icon, Tooltip, Popover, notification } from 'antd'
+import { List, Icon, Tooltip, Popover, notification } from 'antd'
 import { Cookies } from 'react-cookie'
 import { in_array, str_replace, compareByAlph, compareByDate, compareByAmount, roundFixed, numberWithCommas } from '../../../../containers/Layouts/function'
 import { config } from '../../../../containers/GridLayout/config'
@@ -24,6 +24,8 @@ const iconGreenColor = { color: '#5cab6f' }
 
 const onHandAmtGreaterThen = 'green'
 const onHandAmtLessThen = 'red'
+
+const ListItem = List.Item
 
 const status_content = (
     <div className={cls['popHandle']}>

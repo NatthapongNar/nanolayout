@@ -47,4 +47,5 @@ export const BRNACH_SUMMARY_URL = `${NANOLAYOUT_API}/summary/branch`
 export const KIOSK_SUMMARY_URL = `${NANOLAYOUT_API}/summary/kiosk`
 export const MARKET_SUMMARY_URL = `${NANOLAYOUT_API}/summary/market`
 export const CA_SUMMARY_URL = `${NANOLAYOUT_API}/summary/ca`
+export const MARKETCA_SUMMARY_URL = `${NANOLAYOUT_API}/summary/marketca`
 export const MARKET_CAINFO_URL = `${NANOLAYOUT_API}/market/cadetails`

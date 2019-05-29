@@ -4,7 +4,7 @@ import moment from 'moment'
 import { withCookies } from 'react-cookie'
 import { Table, Icon, Form, Row, Col, Tooltip, TreeSelect, Select, Radio, Checkbox, Button, Collapse, Popover, Modal, notification } from 'antd'
 import { createElement, localStorageRead, numValid, roundFixed, parseTotalAccount, in_array } from '../../../containers/Layouts/function'
-import { performance_columns, collection_columns } from './columns/overview_column'
+import { performance_columns, collection_columns, port_assign_columns, flow_columns } from './columns/overview_column'
 import {
     gridRegionSummaryAPI,
     gridAreaSummaryAPI,
@@ -13,6 +13,7 @@ import {
     gridKioskSummaryAPI,
     gridMarketSummaryAPI,
     gridCASummaryAPI,
+    gridMarketCASummaryAPI,
     getSaleSummaryDashboardAPI, 
     getPortfolioSummaryDashboardAPI
 
@@ -138,6 +139,7 @@ class GridMangement extends Component {
                 dataItems: null
             },
             dataSoruce: [],
+            dataAssignPort: [],
             progress: false,
             loadAuto: (Auth && in_array(Auth.PositionCode.toUpperCase(), ['AM', 'ZM', 'TM', 'CA', 'PCA'])) ? true : false,
             handle_field: {
@@ -212,16 +214,20 @@ class GridMangement extends Component {
     }
 
     componentDidMount() {
-        if(moment().format('YYYY-MM-DD HH:mm') >= moment().format('YYYY-MM-DD 10:00') && moment().format('YYYY-MM-DD HH:mm') <= moment().format('YYYY-MM-DD 10:30')) {
-            if(moment().format('YYYY-MM-DD HH:mm') <= moment().format('YYYY-MM-DD 10:30')) {
+        if(moment().format('YYYY-MM-DD HH:mm') >= moment().format('YYYY-MM-DD 09:30') && moment().format('YYYY-MM-DD HH:mm') <= moment().format('YYYY-MM-DD 10:00')) {
+            if(moment().format('YYYY-MM-DD HH:mm') <= moment().format('YYYY-MM-DD 10:00')) {
                 notification.info({
                     message: 'แจ้งเตือนจากระบบ',
-                    description: 'ช่วงเวลาตั้งแค่ 10:00 - 10:30 น. ระบบ Nano Management Dashboard จะอยู่ระหว่างการอัพเดทข้อมูล ซึ่งอาจจะมีผลทำให้ข้อมูลแสดงผลไม่ครบถ้วน กรุณารอสักครู่...',
+                    description: 'ช่วงเวลาตั้งแค่ 09:30 - 10:00 น. ระบบ Nano Management Dashboard จะอยู่ระหว่างการอัพเดทข้อมูล ซึ่งอาจจะมีผลทำให้ข้อมูลแสดงผลไม่ครบถ้วน กรุณารอสักครู่...',
                     duration: 10
                 })
             }
         }
 
+        const root_table = document.querySelector(`.${cls['grid_nano_dashboard']}`)
+        if(root_table) {
+            root_table.querySelector('table').setAttribute('id', 'grid_nano_table')
+        }
     }
 
     shouldComponentUpdate(nextProps, nextState) {
@@ -232,6 +238,7 @@ class GridMangement extends Component {
             this.state.search !== nextState.search ||
             this.state.searchContent !== nextState.searchContent ||
             this.state.dataSoruce !== nextState.dataSoruce ||
+            this.state.dataAssignPort !== nextState.dataAssignPort ||
             this.state.progress !== nextState.progress ||
             this.state.filters !== nextState.filters ||
             this.state.handleBaseAPI !== nextState.handleBaseAPI ||
@@ -247,12 +254,29 @@ class GridMangement extends Component {
             this.props.form !== nextProps.form
     }
 
+    handleColumns = (vmode) => {
+        switch(vmode) {
+            case 'Performance':
+                return performance_columns
+            case 'Collection':
+                return collection_columns
+            case 'Assigned':
+                return port_assign_columns
+            case 'Flow':
+                return flow_columns
+            default:
+                return []
+        }
+    }
+
     render() {
-        const { mode, modal, handle_field, dataSoruce, pagination } = this.state
+        const { mode, modal, handle_field, dataSoruce, dataAssignPort, pagination } = this.state
         const { locales, config, latest_import } = this.props
 
+        let data_mode = (mode !== 'Assigned') ? dataSoruce : dataAssignPort 
+
         return (
-            <div className={`${cls['grid_container']} ${cls['unset']} ${mode == 'Performance' ? cls['grid_topup'] : ''} ${mode == 'Collection' ? cls['grid_collection'] : ''}`}>
+            <div className={`${cls['grid_container']} ${cls['unset']} ${mode == 'Performance' ? cls['grid_topup'] : ''} ${in_array(mode, ['Collection', 'Assigned']) ? cls['grid_collection'] : ''} ${in_array(mode, ['Flow']) ? cls['grid_flow'] : ''}`}>
                 <div className={cls['version']}>
                     <Popover placement="rightTop" content={update_feature}>
                         <div className={cls['label']}>{`${config.version.name} version: ${config.version.code}`}</div>
@@ -264,16 +288,17 @@ class GridMangement extends Component {
                 </h3>
 
                 { this.handleHeadFilter(config.lang[locales.region_type].grid.default) }
-
+                
                 <Table
-                    rowKey={this.handleRowKey}
+                    rowKey="RowsKey"
                     className={`${cls['grid_nano_dashboard']}`}
-                    columns={(mode == 'Performance') ? performance_columns : collection_columns}
-                    dataSource={dataSoruce}
+                    columns={this.handleColumns(mode)}
+                    dataSource={data_mode}
                     loading={this.state.progress}
                     expandedRowKeys={this.state.expandedRowKeys}
                     onExpandedRowsChange={this.handleExpendRow}
                     pagination={{ ...pagination }}
+                    scroll={(in_array(mode, ['Flow'])) ? { x: 'max-content' } : {}}
                     footer={this.handleFooterSummary}
                     bordered
                 />
@@ -322,8 +347,8 @@ class GridMangement extends Component {
         )
     }
 
-    handleExpendRow = (expandedRows) => {
-        this.setState({ expandedRowKeys: expandedRows }) 
+    handleExpendRow = (expandedRows) => {    
+        this.setState({ expandedRowKeys: expandedRows })
     }
 
     handleExpendRowCloseAll = () => {
@@ -379,8 +404,21 @@ class GridMangement extends Component {
                         let sum_total_shop = _.sumBy(currentPageData, 'MarketShop')
                         let sum_total_cust = _.sumBy(currentPageData, 'TotalCust')
                         let sum_total_pot = _.sumBy(currentPageData, 'TotalPotential')
+
                         let sum_total_osunit = _.sumBy(currentPageData, 'OS_Unit')
                         let sum_total_osvol = _.sumBy(currentPageData, 'OS_Vol')
+
+                        // ADD NEW ON 19 MAR 2019
+                        let sum_total_osunit_cutnpl = _.sumBy(currentPageData, 'TotalOS_Current_WithXDay_Acc')
+                        let sum_total_osvol_cutnpl = _.sumBy(currentPageData, 'TotalOS_Current_WithXDay_Bal')
+
+                        let sum_total_oscurrent_acc = _.sumBy(currentPageData, 'TotalOS_Current_Acc')
+                        let sum_total_oscurrent_bal = _.sumBy(currentPageData, 'TotalOS_Current_Bal')
+
+                        let sum_total_osacc_exclude_npl = _.sumBy(currentPageData, 'TotalOS_ExcludeNPL_Acc')
+                        let sum_total_osbal_exclude_npl = _.sumBy(currentPageData, 'TotalOS_ExcludeNPL_Bal')
+                        // END NEW ON 19 MAR 2019
+
                         let sum_total_osmicro = _.sumBy(currentPageData, 'OS_MF_Limit')
                         let sum_total_topupapp = _.sumBy(currentPageData, 'OS_TopupApp')
                         let sum_total_topupvol = _.sumBy(currentPageData, 'OS_TopupVol')
@@ -389,23 +427,65 @@ class GridMangement extends Component {
                         let sum_total_topup_full = _.sumBy(currentPageData, 'OS_TopupVol_FullAmt')
                         let sum_total_osmf_full = _.sumBy(currentPageData, 'OS_MF_Limit_FullAmt')
 
+                        // ADD NEW ON 20 MAR 2019
+                        let sum_total_base_current = _.sumBy(currentPageData, 'Base_0MDPD')
+                        let sum_total_base_xday = _.sumBy(currentPageData, 'Base_1_30MDPD')
+                        let sum_total_base_month = _.sumBy(currentPageData, 'Base_31_60MDPD')
+
+                        let sum_total_flow_current = _.sumBy(currentPageData, 'Flow_0MDPD')
+                        let sum_total_flow_xday = _.sumBy(currentPageData, 'Flow_1_30MDPD')
+                        let sum_total_flow_month = _.sumBy(currentPageData, 'Flow_31_60MDPD')
+
+                        let sum_total_problem_current = _.sumBy(currentPageData, 'Problem_0MDPD')
+                        let sum_total_problem_xday = _.sumBy(currentPageData, 'Problem_1_30MDPD')
+                        let sum_total_problem_month = _.sumBy(currentPageData, 'Problem_31_60MDPD')
+
+                        let sum_total_new_amount = _.sumBy(currentPageData, 'TotalCust_NewAmt')
+                        let sum_total_allnew_amount = _.sumBy(currentPageData, 'TotalCust_NewAllAmt')
+                        
+                        let flow_rate_current = (sum_total_flow_current / sum_total_base_current) * 100
+                        let flow_rate_xday = (sum_total_flow_xday / sum_total_base_xday) * 100
+                        let flow_rate_month = (sum_total_flow_month / sum_total_base_month) * 100
+
+                        let forcast_current = (sum_total_problem_current / sum_total_base_current) * 100
+                        let forcast_xday = (sum_total_problem_xday / sum_total_base_xday) * 100
+                        let forcast_month = (sum_total_problem_month / sum_total_base_month) * 100
+
+                        let sum_new_account = (numValid(sum_total_new_amount) / numValid(sum_total_allnew_amount)) * 100
+                        // END NEW ON 20 MAR 2019
+
                         let os_avg_potential = (numValid(sum_total_pot) / numValid(sum_total_shop)) * 100
                         let os_avg_micro = (sum_total_osmf_full / sum_total_osvol_full) * 100
                         let os_avg_topup = (sum_total_topup_full / sum_total_osvol_full) * 100
 
                         footer.total_shop = parseTotalAccount(numValid(sum_total_shop))
                         footer.total_pot = (os_avg_potential) ? `${roundFixed(os_avg_potential, 1)}%` : 0.0
-                        footer.total_os_vol = (sum_total_osvol && sum_total_osvol > 0) ? roundFixed(sum_total_osvol, 1) : 0
-                        footer.total_os_cust = numValid(sum_total_osunit)
+                        footer.total_os_vol = (sum_total_oscurrent_bal && sum_total_oscurrent_bal > 0) ? roundFixed(sum_total_oscurrent_bal, 1) : 0
+                        footer.total_os_cust = numValid(sum_total_oscurrent_acc)
                         footer.total_micro = (os_avg_micro) ? `${roundFixed(os_avg_micro, 1)}%` : 0.0
-                        footer.total_topup = (os_avg_topup && mode == 'Performance') ? `${roundFixed(os_avg_topup, 1)}%` : '-'
+
+                        // PERFORMANCE IS TOP UP / PORT QUALITY IS FLOW RATE W0MDPD
+                        footer.total_topup = (os_avg_topup && mode == 'Performance') ? `${roundFixed(os_avg_topup, 1)}%` : (flow_rate_current && flow_rate_current > 0.00) ? `${roundFixed(flow_rate_current, 1)}%` : '0.0%'
 
                         // GRAND TOTAL
                         let sum_grandtotal_shop = _.sumBy(dataSoruce, 'MarketShop')
                         let sum_grandtotal_cust = _.sumBy(dataSoruce, 'TotalCust')
                         let sum_grandtotal_pot = _.sumBy(dataSoruce, 'TotalPotential')
+
                         let sum_grandtotal_osunit = _.sumBy(dataSoruce, 'OS_Unit')
                         let sum_grandtotal_osvol = _.sumBy(dataSoruce, 'OS_Vol')
+               
+                        // ADD NEW ON 19 MAR 2019
+                        let sum_grandtotal_osunit_cutnpl = _.sumBy(dataSoruce, 'TotalOS_Current_WithXDay_Acc')
+                        let sum_grandtotal_cutnpl = _.sumBy(dataSoruce, 'TotalOS_Current_WithXDay_Bal')
+
+                        let sum_grandtotal_oscurrent_acc = _.sumBy(dataSoruce, 'TotalOS_Current_Acc')
+                        let sum_grandtotal_oscurrent_bal = _.sumBy(dataSoruce, 'TotalOS_Current_Bal')
+
+                        let sum_grandtotal_osacc_exclude_npl = _.sumBy(dataSoruce, 'TotalOS_ExcludeNPL_Acc')
+                        let sum_grandtotal_osbal_exclude_npl = _.sumBy(dataSoruce, 'TotalOS_ExcludeNPL_Bal')
+                        // END NEW ON 19 MAR 2019
+
                         let sum_grandtotal_osmicro = _.sumBy(dataSoruce, 'OS_MF_Limit')
                         let sum_grandtotal_topupapp = _.sumBy(dataSoruce, 'OS_TopupApp')
                         let sum_grandtotal_topupvol = _.sumBy(dataSoruce, 'OS_TopupVol')
@@ -414,16 +494,48 @@ class GridMangement extends Component {
                         let sum_grandtotal_topup_full = _.sumBy(dataSoruce, 'OS_TopupVol_FullAmt')
                         let sum_grandtotal_osmf_full = _.sumBy(dataSoruce, 'OS_MF_Limit_FullAmt')
 
+                        // ADD NEW ON 20 MAR 2019
+                        let sum_grandtotal_base_current = _.sumBy(dataSoruce, 'Base_0MDPD')
+                        let sum_grandtotal_base_xday = _.sumBy(dataSoruce, 'Base_1_30MDPD')
+                        let sum_grandtotal_base_month = _.sumBy(dataSoruce, 'Base_31_60MDPD')
+
+                        let sum_grandtotal_flow_current = _.sumBy(dataSoruce, 'Flow_0MDPD')
+                        let sum_grandtotal_flow_xday = _.sumBy(dataSoruce, 'Flow_1_30MDPD')
+                        let sum_grandtotal_flow_month = _.sumBy(dataSoruce, 'Flow_31_60MDPD')
+
+                        let sum_grandtotal_problem_current = _.sumBy(dataSoruce, 'Problem_0MDPD')
+                        let sum_grandtotal_problem_xday = _.sumBy(dataSoruce, 'Problem_1_30MDPD')
+                        let sum_grandtotal_problem_month = _.sumBy(dataSoruce, 'Problem_31_60MDPD')
+
+                        let sum_grandtotal_new_amount = _.sumBy(dataSoruce, 'TotalCust_NewAmt')
+                        let sum_grandtotal_allnew_amount = _.sumBy(dataSoruce, 'TotalCust_NewAllAmt')
+
+                        let grand_flow_rate_current = (sum_total_flow_current / sum_total_base_current) * 100
+                        let grand_flow_rate_xday = (sum_total_flow_xday / sum_total_base_xday) * 100
+                        let grand_flow_rate_month = (sum_total_flow_month / sum_total_base_month) * 100
+
+                        let grand_forcast_current = (sum_total_problem_current / sum_total_base_current) * 100
+                        let grand_forcast_xday = (sum_total_problem_xday / sum_total_base_xday) * 100
+                        let grand_forcast_month = (sum_total_problem_month / sum_total_base_month) * 100
+
+                        let grand_sum_new_account = (numValid(sum_grandtotal_new_amount) / numValid(sum_grandtotal_allnew_amount)) * 100
+                        // END NEW ON 20 MAR 2019
+
                         let grand_os_avg_potential = (numValid(sum_grandtotal_pot) / numValid(sum_grandtotal_shop)) * 100
                         let grand_os_avg_micro = (sum_grandtotal_osmf_full / sum_grandtotal_osvol_full) * 100
                         let grand_os_avg_topup = (sum_grandtotal_topup_full / sum_grandtotal_osvol_full) * 100
 
                         grand_footer.total_shop = parseTotalAccount(numValid(sum_grandtotal_shop))
                         grand_footer.total_pot = (grand_os_avg_potential) ? `${roundFixed(grand_os_avg_potential, 1)}%` : 0.0
-                        grand_footer.total_os_vol = (sum_grandtotal_osvol && sum_grandtotal_osvol > 0) ? roundFixed(sum_grandtotal_osvol, 1) : 0
-                        grand_footer.total_os_cust = numValid(sum_grandtotal_osunit)
+                        // grand_footer.total_os_vol = (sum_grandtotal_osvol && sum_grandtotal_osvol > 0) ? roundFixed(sum_grandtotal_osvol, 1) : 0
+                        // grand_footer.total_os_cust = numValid(sum_grandtotal_osunit)
+                        grand_footer.total_os_vol = (sum_grandtotal_oscurrent_bal && sum_grandtotal_oscurrent_bal > 0) ? roundFixed(sum_grandtotal_oscurrent_bal, 1) : 0
+                        grand_footer.total_os_cust = numValid(sum_grandtotal_oscurrent_acc)
+
                         grand_footer.total_micro = (grand_os_avg_micro) ? `${roundFixed(grand_os_avg_micro, 1)}%` : 0.0
-                        grand_footer.total_topup = (grand_os_avg_topup && mode == 'Performance') ? `${roundFixed(grand_os_avg_topup, 1)}%` : '-'
+
+                        // PERFORMANCE IS TOP UP / PORT QUALITY IS FLOW RATE W0MDPD
+                        grand_footer.total_topup = (grand_os_avg_topup && mode == 'Performance') ? `${roundFixed(grand_os_avg_topup, 1)}%` : (grand_flow_rate_current && grand_flow_rate_current > 0.00) ? `${roundFixed(grand_flow_rate_current, 1)}%` : '0.0%'
 
                         if (mode == 'Performance') {
 
@@ -451,7 +563,6 @@ class GridMangement extends Component {
                             let sum_mtd_topup_svol = _.sumBy(currentPageData, 'MTD_TotalTopupSetupVol')
                             let sum_mtd_topup_fvol = _.sumBy(currentPageData, 'MTD_TotalTopupVol_FullAmt')
                             let sum_mtd_topup_setup = _.sumBy(currentPageData, 'MTD_TotalTopupSetupVol_FullAmt')
-
 
                             let ytd_avg_ach = (sum_ytd_vol / sum_ytd_target) * 100
                             let ytd_avg_apv = (numValid(sum_ytd_approved) / numValid(sum_ytd_total_final)) * 100
@@ -576,12 +687,12 @@ class GridMangement extends Component {
                             let npl_newbooking = (sum_new_booking_npl_vol / sum_new_booking_vol) * 100
 
                             // Move to new footer
-                            footer.flow_rate_w0 = '-'
-                            footer.flow_rate_w1 = '-'
-                            footer.flow_rate_m1 = '-'
-                            // footer.new_customer = '-'
+                            footer.flow_rate_xday = (flow_rate_xday && flow_rate_xday > 0.00) ? `${roundFixed(flow_rate_xday, 1)}%` : '0.0%'
+                            footer.flow_rate_month = (flow_rate_month && flow_rate_month > 0.00) ? `${roundFixed(flow_rate_month, 1)}%` : '0.0%'
+                            footer.new_customer = (sum_new_account && sum_new_account > 0.00) ? `${roundFixed(sum_new_account, 1)}%` : '0.0%'
+                            
                             footer.pmt_success = (os_pmt_succ && os_pmt_succ > 0) ? `${roundFixed(os_pmt_succ, 1)}%` : '0.0%'
-                            footer.nb_new_npl = (npl_newbooking && npl_newbooking > 0) ? `${roundFixed(npl_newbooking, 2)}%` : '0.0%'
+                            footer.nb_new_npl = (npl_newbooking && npl_newbooking > 0) ? `${roundFixed(npl_newbooking, 1)}%` : '0.0%'
                             footer.ytd_new_npl = (os_newnpl_bal && os_newnpl_bal > 0) ? `${roundFixed(os_newnpl_bal, 1)}%` : '0.0%'
                             footer.bucket_w0 = (os_w0_ach) ? `${roundFixed(os_w0_ach, 1)}%` : '0.0%'
                             footer.bucket_week1 = (os_w1_ach) ? `${roundFixed(os_w1_ach, 1)}%` : '0.0%'
@@ -589,7 +700,6 @@ class GridMangement extends Component {
                             footer.bucket_xday = (os_xday_ach) ? `${roundFixed(os_xday_ach, 1)}%` : '0.0%'
                             footer.bucket_month = (os_mth_ach) ? `${roundFixed(os_mth_ach, 1)}%` : '0.0%'
                             footer.bucket_npl = (os_npl_ach) ? `${roundFixed(os_npl_ach, 1)}%` : '0.0%'
-
 
                             // GRAND TOTAL
                             let grand_sum_pmt_total = _.sumBy(dataSoruce, 'OS_Total_Collect')
@@ -619,12 +729,12 @@ class GridMangement extends Component {
                             let grand_os_npl_ach = (grand_sum_npl_bal / sum_grandtotal_osvol) * 100
                             let grand_npl_newbooking = (grand_sum_new_booking_npl_vol / grand_sum_new_booking_vol) * 100
 
-                            grand_footer.flow_rate_w0 = '-'
-                            grand_footer.flow_rate_w1 = '-'
-                            grand_footer.flow_rate_m1 = '-'
-                            // grand_footer.new_customer = '-'
+                            grand_footer.flow_rate_xday = (grand_flow_rate_xday && grand_flow_rate_xday > 0.00) ? `${roundFixed(grand_flow_rate_xday, 1)}%` : '0.0%'
+                            grand_footer.flow_rate_month = (grand_flow_rate_month && grand_flow_rate_month > 0.00) ? `${roundFixed(grand_flow_rate_month, 1)}%` : '0.0%'
+                            grand_footer.new_customer = (grand_sum_new_account && grand_sum_new_account > 0.00) ? `${roundFixed(grand_sum_new_account, 1)}%` : '0.0%'
+                            
                             grand_footer.pmt_success = (grand_os_pmt_succ && grand_os_pmt_succ > 0) ? `${roundFixed(grand_os_pmt_succ, 1)}%` : '0.0%'
-                            grand_footer.nb_new_npl = (grand_npl_newbooking && grand_npl_newbooking > 0) ? `${roundFixed(grand_npl_newbooking, 2)}%` : '0.0%'
+                            grand_footer.nb_new_npl = (grand_npl_newbooking && grand_npl_newbooking > 0) ? `${roundFixed(grand_npl_newbooking, 1)}%` : '0.0%'
                             grand_footer.ytd_new_npl = (grand_os_newnpl_bal && grand_os_newnpl_bal > 0) ? `${roundFixed(grand_os_newnpl_bal, 1)}%` : '0.0%'
                             grand_footer.bucket_w0 = (grand_os_w0_ach) ? `${roundFixed(grand_os_w0_ach, 1)}%` : '0.0%'
                             grand_footer.bucket_week1 = (grand_os_w1_ach) ? `${roundFixed(grand_os_w1_ach, 1)}%` : '0.0%'
@@ -673,6 +783,7 @@ class GridMangement extends Component {
                                         addWidth = 1
                                     break;
                                 }
+
                             } else {
                                 if (i >= 11 && i <= 16) {
                                     footerColor = `${cls['bg_option3']}`
@@ -683,7 +794,7 @@ class GridMangement extends Component {
                             }
 
                             footer_partition.append(createElement('div', { 'class': `${cls['item_footer']} ${footerColor} mktft_${(i + 1)} ${(i == 0) ? 'tl' : 'tc'}`, 'style': `width: ${(size + addWidth)}px; ${(i == 0) ? 'font-weight: 600;' : ''}` }, data_footer[i]))
-                           
+       
                             if(dataSoruce && dataSoruce.length > 20) {
                                 grand_footer_partition.append(createElement('div', { 'class': `${cls['grand_item_footer']} ${footerColor} mktft_${(i + 1)} ${(i == 0) ? 'tl' : 'tc'}`, 'style': `width: ${(size + addWidth)}px; ${(i == 0) ? 'font-weight: 600;' : ''}` }, data_grand_footer[i]))
                             }
@@ -706,27 +817,6 @@ class GridMangement extends Component {
     // CHANGE MODE OF COLUMNS
     handleGridMode = (e) => {
         this.setState({ mode: e.target.value })
-    }
-
-    // SET HASH KEY OF RECORD FOR UNIQUE ROWS
-    handleRowKey = (records, i) => {
-        let randomstring = this.handleRandomString()
-        let randomnumber = Math.floor(Math.random() * (1000 - 10 + 1)) + (i + 1)
-
-        let rowType = ''
-        if (records.GroupData && records.GroupData == 'Region') rowType = `_${records.RegionID}`
-        if (records.GroupData && records.GroupData == 'Area') rowType = `_${records.AreaID}`
-        if (records.GroupData && records.GroupData == 'Zone') rowType = `_${records.ZoneValue}, ${records.EmployeeCode}`
-        if (records.GroupData && records.GroupData == 'Branch') rowType = `_${records.BranchCode}, ${records.EmployeeCode}`
-        if (records.GroupData && records.GroupData == 'Kiosk') rowType = `_${records.BranchFullDigit}`
-        if (records.GroupData && records.GroupData == 'CA') rowType = `_${records.EmployeeCode}`
-        if (records.GroupData && records.GroupData == 'Market') rowType = `_${records.EmployeeCode}`
-
-        if(in_array(records.GroupData, ['Region', 'Area', 'Zone', 'Branch'])) {
-            return `${rowType}`
-        } else {
-            return `${records.GroupData}_${rowType}_${randomstring}_${randomnumber}_${(i + 1)}_${moment().format('mmss')}`
-        }
     }
 
     handleRandomString() {
@@ -761,7 +851,7 @@ class GridMangement extends Component {
         const { form: { validateFields } } = this.props
         validateFields((err, objField) => {
             if(!err) {
-                this.setState({ progress: true })
+                this.setState({ progress: true, dataSoruce: [] })
                 this.handleOverviewSummary(objField, true)
             }
             
@@ -771,6 +861,8 @@ class GridMangement extends Component {
     // FILTER RESET ALL HANDLER
     handleReset = () => {
         this.props.form.resetFields()
+        this.setState({ expandedRowKeys: [] })
+        
     }
 
     /** FILTER CRITERIA HANDLER **/
@@ -827,22 +919,43 @@ class GridMangement extends Component {
 
                         <div className={`${cls['tools_icon']} ${cls['unset']}`}>                           
                             <RadioGroup defaultValue={mode} size="default" onChange={this.handleGridMode}>
+                                <RadioButton value="Performance"><i className="fa fa-bar-chart" aria-hidden="true" style={{ color: '#40a9ff' }}></i> Performance</RadioButton>
+                                <RadioButton value="Collection"><Icon type="pie-chart" style={{ color: '#ff7f50' }} /> Port Quality</RadioButton>
+                                <RadioButton value="Assigned"><i className="fa fa-users" aria-hidden="true" style={{ color: '#708090' }}></i> Port Assigned</RadioButton>
+                                <RadioButton value="Flow" disabled={true}><i className="fa fa-universal-access" aria-hidden="true" style={{ color: '#1b6eae' }}></i> DPD Flow</RadioButton>
+                            </RadioGroup>
+                        </div>
+
+                        {/*        
+                        <div className={`${cls['tools_icon']} ${cls['unset']}`}>                           
+                            <RadioGroup defaultValue={mode} size="default" onChange={this.handleGridMode}>
+
                                 <RadioButton value="Performance">
                                     <div className={`${cls['mode_container']}`}>                                        
                                         <div className={`${cls['mode_item']}`}><Icon type="line-chart" /></div>
                                         <div className={`${cls['mode_item']}`}>Performance</div>
                                     </div>
                                 </RadioButton>
+
                                 <RadioButton value="Collection">
                                     <div className={`${cls['mode_container']}`}>
                                         <div className={`${cls['mode_item']}`}><Icon type="dashboard" /></div>
                                         <div className={`${cls['mode_item']}`}>Port Quality</div>
                                     </div>
                                 </RadioButton>
+
                             </RadioGroup>
                         </div>
-                    </div>
 
+                        
+                        <div className={`${cls['tools_icon']} ${cls['switch']}`}>
+                            <Switch size="small"/> 
+                            <span className={cls['title']}>assigned</span>
+                        </div>  
+                        */}                        
+
+                    </div>
+                    
                     <div className={`${cls['panel_container']} ${cls['open']} ${cls['collapse_container']}`}>
                         <Collapse defaultActiveKey={[]} className={`${cls['collapse_filter']}`}>
                             <Panel header={<header><Icon type="search" /> FILTER CRITERIA</header>} key="1">
@@ -1406,16 +1519,20 @@ class GridMangement extends Component {
         }
 
         let baseSummaryAPI = null
+        let baseSubSummaryAPI = null
         switch(handleBaseAPI) {
             case 'Kiosk':
                 baseSummaryAPI = gridKioskSummaryAPI
+                baseSubSummaryAPI = []
                 break
             case 'Market':
                 baseSummaryAPI = gridMarketSummaryAPI
+                baseSubSummaryAPI = gridMarketCASummaryAPI
                 break
             case 'CA':
             default:
                 baseSummaryAPI = gridCASummaryAPI
+                baseSubSummaryAPI = gridMarketCASummaryAPI
                 break
         }
 
@@ -1428,7 +1545,8 @@ class GridMangement extends Component {
                     [],
                     [],
                     [],
-                    baseSummaryAPI(requestData).then(resp => resp.data)
+                    baseSummaryAPI(requestData).then(resp => resp.data),
+                    Array.isArray(baseSubSummaryAPI) ? [] : baseSubSummaryAPI(requestData).then(resp => resp.data)
                 ]
 
             } else {
@@ -1440,7 +1558,8 @@ class GridMangement extends Component {
                             gridZoneSummaryAPI(requestData).then(resp => resp.data),
                             gridBranchSummaryAPI(requestData).then(resp => resp.data),
                             [],
-                            baseSummaryAPI(requestData).then(resp => resp.data)
+                            baseSummaryAPI(requestData).then(resp => resp.data),
+                            Array.isArray(baseSubSummaryAPI) ? [] : baseSubSummaryAPI(requestData).then(resp => resp.data)
                         ]
                         break
                     case 3:
@@ -1450,7 +1569,8 @@ class GridMangement extends Component {
                             gridZoneSummaryAPI(requestData).then(resp => resp.data),
                             gridBranchSummaryAPI(requestData).then(resp => resp.data),
                             [],
-                            baseSummaryAPI(requestData).then(resp => resp.data)
+                            baseSummaryAPI(requestData).then(resp => resp.data),
+                            Array.isArray(baseSubSummaryAPI) ? [] : baseSubSummaryAPI(requestData).then(resp => resp.data)
                         ]
                         break
                     case 2:
@@ -1460,7 +1580,8 @@ class GridMangement extends Component {
                             gridZoneSummaryAPI(requestData).then(resp => resp.data),
                             gridBranchSummaryAPI(requestData).then(resp => resp.data),
                             [],
-                            baseSummaryAPI(requestData).then(resp => resp.data)
+                            baseSummaryAPI(requestData).then(resp => resp.data),
+                            Array.isArray(baseSubSummaryAPI) ? [] : baseSubSummaryAPI(requestData).then(resp => resp.data)
                         ]
                         break
                     case 1:
@@ -1470,7 +1591,8 @@ class GridMangement extends Component {
                             [],
                             gridBranchSummaryAPI(requestData).then(resp => resp.data),
                             [],
-                            baseSummaryAPI(requestData).then(resp => resp.data)
+                            baseSummaryAPI(requestData).then(resp => resp.data),
+                            Array.isArray(baseSubSummaryAPI) ? [] : baseSubSummaryAPI(requestData).then(resp => resp.data)
                         ]
                         break
                     case 0:
@@ -1481,7 +1603,8 @@ class GridMangement extends Component {
                             [],
                             [],
                             [],
-                            baseSummaryAPI(requestData).then(resp => resp.data)
+                            baseSummaryAPI(requestData).then(resp => resp.data),
+                            Array.isArray(baseSubSummaryAPI) ? [] : baseSubSummaryAPI(requestData).then(resp => resp.data)
                         ]
                         break
                 }
@@ -1494,47 +1617,92 @@ class GridMangement extends Component {
                 (handle_field.zone) ? [] : gridZoneSummaryAPI(requestData).then(resp => resp.data),
                 (handle_field.branch) ? [] : gridBranchSummaryAPI(requestData).then(resp => resp.data),
                 [],
-                baseSummaryAPI(requestData).then(resp => resp.data)
+                baseSummaryAPI(requestData).then(resp => resp.data),
+                Array.isArray(baseSubSummaryAPI) ? [] : baseSubSummaryAPI(requestData).then(resp => resp.data)
             ]
         }
 
-        bluebird.all(api_fetch).spread((region, area, zone, branch, kiosk, ca) => {
+        bluebird.all(api_fetch).spread((region, area, zone, branch, kiosk, ca, subca) => {
+
+            let data_temp =  {
+                val: [
+                    _.uniqBy(region, 'RowsKey'), 
+                    _.uniqBy(area, 'RowsKey'), 
+                    _.uniqBy(zone, 'RowsKey'), 
+                    _.uniqBy(branch, 'RowsKey'), 
+                    _.uniqBy(ca, 'RowsKey'), 
+                    [], //_.uniqBy(subca, 'RowsKey'),
+                    handleBaseAPI
+                ]
+            }
+
+            this.handleGridAssignPort(JSON.stringify(data_temp))
+
             this.handleGridTransection(
-                region, 
-                area, 
-                zone, 
-                branch, 
-                kiosk, 
-                !in_array(handleBaseAPI, ['Market', 'Kiosk']) ?  _.uniqBy(ca, 'EmployeeCode') : ca, 
-                search
+                _.uniqBy(region, 'RowsKey'), 
+                _.uniqBy(area, 'RowsKey'), 
+                _.uniqBy(zone, 'RowsKey'), 
+                _.uniqBy(branch, 'RowsKey'), 
+                _.uniqBy(kiosk, 'RowsKey'), 
+                _.uniqBy(ca, 'RowsKey'), 
+                _.uniqBy(subca, 'RowsKey'),
+                search,
+                handleBaseAPI
             )
+         
+           
+
         })
 
     }
 
-    handleGridTransection = (region, area, zone, branch, kiosk, ca, search = false) => {
+    handleGridTransection = (region, area, zone, branch, kiosk, ca, subca, search = false, rootBase) => {
         let data_grid = []
 
+        let has_subca = (subca && subca.length > 0) ? true : false
         let has_ca = (ca && ca.length > 0) ? true : false
-        let has_kiosk = (kiosk && kiosk.length > 0) ? true : false
         let has_branch = (branch && branch.length > 0) ? true : false
         let has_zone = (zone && zone.length > 0) ? true : false
         let has_area = (area && area.length > 0) ? true : false
         let has_region = (region && region.length > 0) ? true : false
 
+        let subca_summary = (has_subca) ? this.handleInstallOpenModal(subca) : []
         let ca_summary = (has_ca) ? this.handleInstallOpenModal(ca) : []
         let branch_summary = (has_branch) ? this.handleInstallOpenModal(branch) : []
         let zone_summary = (has_zone) ? this.handleInstallOpenModal(zone) : []
         let area_summary = (has_area) ? this.handleInstallOpenModal(area) : []
         let region_summary = (has_region) ? this.handleInstallOpenModal(region) : []
+
+        let data_exclude_fcr = _.reject(ca_summary, (v) => { return v.ZoneDigit == 'FCR'})
+
+        if (has_subca) {
+            subca_summary.map((v) => { v.rootBaseFilter = rootBase })
+        }
+
+        if(has_ca) {
+            if (has_subca) {
+                data_exclude_fcr.map((v) => {  
+                    v.rootBaseFilter = rootBase
+
+                    let data_child = in_array(rootBase, ['Market'])  ? _.filter(subca_summary, { EmployeeCode: v.EmployeeCode }) : _.filter(subca_summary, { OptionCode: v.EmployeeCode })
+  
+                    if (!_.isEmpty(data_child)) {
+                        v.children = _.uniqWith(data_child, _.isEqual)
+                    }
+                })
+            } 
+        }
     
         if (has_branch) {
             if (has_ca) {
                 branch_summary.map((v) => {
-                    let data_child = _.filter(ca_summary, { BranchCode: v.BranchCode })
+                    v.rootBaseFilter = rootBase
+
+                    let data_child = _.filter(data_exclude_fcr, { BranchCode: v.BranchCode })
                     if (!_.isEmpty(data_child)) {
                         v.children = data_child
                     }
+
                 })
             }
         }
@@ -1542,6 +1710,8 @@ class GridMangement extends Component {
         if (has_zone) {
             if (has_branch) {
                 zone_summary.map((v) => {
+                    v.rootBaseFilter = rootBase
+
                     let data_child = _.filter(_.uniqWith(branch_summary, _.isEqual), { ZoneValue: v.ZoneValue })
                     v.children = (data_child && data_child.length > 0) ? data_child : []
                 })
@@ -1551,6 +1721,8 @@ class GridMangement extends Component {
         if (has_area) {
             if (has_zone) {
                 area_summary.map((v) => {
+                    v.rootBaseFilter = rootBase
+
                     let data_child = _.filter(zone_summary, { AreaID: v.AreaID })
                     v.children = (data_child && data_child.length > 0) ? data_child : []
                 })
@@ -1560,6 +1732,8 @@ class GridMangement extends Component {
         if (has_region) {
             if (has_area) {
                 region_summary.map((v) => {
+                    v.rootBaseFilter = rootBase
+
                     let data_child = _.filter(area_summary, { RegionID: v.RegionID })
                     v.children = (data_child && data_child.length > 0) ? data_child : []
                 })
@@ -1579,15 +1753,133 @@ class GridMangement extends Component {
             data_grid = branch_summary
         }
         else if (!has_region && !has_area && !has_zone && !has_branch && has_ca) {
-            data_grid = ca_summary
+            data_grid = _.reject(data_exclude_fcr, { ZoneDigit: 'FCR' })
         }
- 
-        this.setState({
-            dataSoruce: _.uniqWith(data_grid, _.isEqual),
-            progress: false
-        })
+        
+        this.setState({ dataSoruce: _.uniqWith(data_grid, _.isEqual), progress: false })
 
     }
+
+    // _region, _area, _zone, _branch, _ca, _subca, _rootBase
+    handleGridAssignPort = (params) => {        
+        let data_parser = JSON.parse(params)
+        let data = (data_parser && data_parser.val) ? data_parser.val : null
+
+        let _region = data[0]
+        let _area = data[1]
+        let _zone = data[2]
+        let _branch = data[3]
+        let _ca = data[4]
+        let _subca = data[5]
+        let _rootBase = data[6]
+       
+        let _data_grid = []
+
+        // let has_subca = (subca && subca.length > 0) ? true : false
+        let _has_ca = (_ca && _ca.length > 0) ? true : false
+        let _has_branch = (_branch && _branch.length > 0) ? true : false
+        let _has_zone = (_zone && _zone.length > 0) ? true : false
+        let _has_area = (_area && _area.length > 0) ? true : false
+        let _has_region = (_region && _region.length > 0) ? true : false
+
+        //let subca_summary = (has_subca) ? this.handleInstallOpenModal(subca) : []
+        let _ca_summary = (_has_ca) ? this.handleInstallOpenModal(_ca) : []
+        let _branch_summary = (_has_branch) ? this.handleInstallOpenModal(_branch) : []
+        let _zone_summary = (_has_zone) ? this.handleInstallOpenModal(_zone) : []
+        let _area_summary = (_has_area) ? this.handleInstallOpenModal(_area) : []
+        let _region_summary = (_has_region) ? this.handleInstallOpenModal(_region) : []
+
+        // if (_has_subca) { _subca_summary.map((v) => { v.rootBaseFilter = rootBase }) }
+
+        // if(_has_ca) {
+        //     if (_has_subca) {
+        //         _ca_summary.map((v) => {  
+        //             v.rootBaseFilter = _rootBase
+
+        //             let data_child = in_array(_rootBase, ['Market'])  ? _.filter(_subca_summary, { EmployeeCode: v.EmployeeCode }) : _.filter(_subca_summary, { OptionCode: v.EmployeeCode })
+  
+        //             if (!_.isEmpty(data_child)) {
+        //                 v.children = _.uniqWith(data_child, _.isEqual)
+        //             }
+        //         })
+        //     }
+        // }
+    
+        if (_has_branch) {
+            if (_has_ca) {
+                _branch_summary.map((v) => {
+                    v.rootBaseFilter = _rootBase
+
+                    let data_child = _.filter(_ca_summary, { BranchCode: v.BranchCode })
+                    if (!_.isEmpty(data_child)) {
+                        v.children = data_child
+                    }
+                })
+            }
+        }
+
+        if (_has_zone) {
+            if (_has_branch) {
+                _zone_summary.map((v) => {
+                    v.rootBaseFilter = _rootBase
+
+                    let data_child = _.filter(_.uniqWith(_branch_summary, _.isEqual), { ZoneValue: v.ZoneValue })
+                    v.children = (data_child && data_child.length > 0) ? data_child : []
+                })
+            }
+        }
+
+        if (_has_area) {
+            if (_has_zone) {
+                _area_summary.map((v) => {
+                    v.rootBaseFilter = _rootBase
+
+                    let data_child = _.filter(_zone_summary, { AreaID: v.AreaID })
+                    v.children = (data_child && data_child.length > 0) ? data_child : []
+                })
+            }
+        }
+
+        if (_has_region) {
+            if (_has_area) {
+                _region_summary.map((v) => {
+                    v.rootBaseFilter = _rootBase
+
+                    let data_child = _.filter(_area_summary, { RegionID: v.RegionID })
+                    v.children = (data_child && data_child.length > 0) ? data_child : []
+                })
+            }
+        }
+
+        if (_has_region) {
+            _data_grid = _region_summary
+        }
+        else if (!_has_region && _has_area && !_has_zone || !_has_region && _has_area && _has_zone) {
+            _data_grid = _area_summary
+        }
+        else if (!_has_region && !_has_area && _has_zone) {
+            _data_grid = _zone_summary
+        }
+        else if (!_has_region && !_has_area && !_has_zone && _has_branch) {
+            _data_grid = _branch_summary
+        }
+        else if (!_has_region && !_has_area && !_has_zone && !_has_branch && _has_ca) {
+            _data_grid = _ca_summary
+        }
+
+        this.setState({ dataAssignPort: _.uniqWith(_data_grid, _.isEqual) })
+        
+    }
+
+    clone = (obj) => {
+        if (null == obj || "object" != typeof obj) return obj;
+        var copy = obj.constructor();
+        for (var attr in obj) {
+            if (obj.hasOwnProperty(attr)) copy[attr] = obj[attr];
+        }
+        return copy;
+    }
+    
 
     handleOpenCustomerModal = (empcode) => {
         this.setState({ modal: _.assignIn({}, this.state.modal, { auth: empcode, customer: true }) })
@@ -1604,6 +1896,13 @@ class GridMangement extends Component {
         if(in_array(items.GroupData, ['Branch'])) {
             authen = `${items.EmployeeCode},${items.BranchCode}`
         } 
+        else if (in_array(items.GroupData, ['MarketCA'])) { 
+            if(in_array(handleBaseAPI, ['CA', 'Market'])) {
+                authen = `Market,${Auth.EmployeeCode},${v.EmployeeCode}`
+            } else {
+                authen = `${v.EmployeeCode}`
+            }
+        }
         else if(in_array(items.GroupData, ['Kiosk', 'Market'])) { 
             if(items.GroupData == 'Kiosk') {
                 if(items.GroupData == 'Kiosk' && items.BranchFullDigit.length == 3) {
@@ -1708,27 +2007,38 @@ class GridMangement extends Component {
     }
 
     handleInstallOpenModal = (dataList) => {
+        const { handleBaseAPI } = this.state
         const { Auth } = this.props.authen
         
         if (!_.isEmpty(dataList)) {
             return dataList.map((v, i) => {
+                
                 let authen = null
-                if(in_array(v.GroupData, ['Branch'])) {
+                let group_type = (v.GroupData) ? v.GroupData : 'Non-type'
+                
+                if(in_array(group_type, ['Branch'])) {
                     authen = `${(v.EmployeeCode) ? v.EmployeeCode : Auth.EmployeeCode},${v.BranchCode}`
                 } 
-                else if(in_array(v.GroupData, ['Kiosk', 'Market'])) { 
-                    if(v.GroupData == 'Kiosk') {
-                        if(v.GroupData == 'Kiosk' && v.BranchFullDigit.length == 3) {
+                else if (in_array(group_type, ['MarketCA'])) { 
+                    if(in_array(handleBaseAPI, ['CA', 'Market'])) {
+                        authen = `Market,${Auth.EmployeeCode},${v.EmployeeCode}`
+                    } else {
+                        authen = `${v.EmployeeCode}`
+                    }
+                    
+                }
+                else if(in_array(group_type, ['Kiosk', 'Market'])) { 
+                    if(group_type == 'Kiosk') {
+                        if(group_type == 'Kiosk' && v.BranchFullDigit.length == 3) {
                             authen = `${(v.EmployeeCode) ? v.EmployeeCode : Auth.EmployeeCode}`
                         } else {
-                            authen = `${v.GroupData},${(v.EmployeeCode) ? v.EmployeeCode : Auth.EmployeeCode},${v.BranchFullDigit}`
+                            authen = `${group_type},${(v.EmployeeCode) ? v.EmployeeCode : Auth.EmployeeCode},${v.BranchFullDigit}`
                         }
                     }
-                    if(v.GroupData == 'Market') {
-                        
-                        authen = `${v.GroupData},${Auth.EmployeeCode},${v.EmployeeCode}`
+                    if(group_type == 'Market') {
+                        authen = `${group_type},${Auth.EmployeeCode},${v.EmployeeCode}`
                     }
-                }
+                }              
                 else {
                     authen = (v.EmployeeCode) ? v.EmployeeCode : Auth.EmployeeCode
                 }
@@ -1757,6 +2067,102 @@ class GridMangement extends Component {
             })
         } else {
             return []
+        }
+    }
+
+    handleExportFile = (id, e) => {
+        this.exportToExcel(e.target, id)
+    }
+
+    exportToExcel = (that, id, hasHeader, removeLinks, removeImages, removeInputParams) => {
+        if (that == null || typeof that === 'undefined') {
+            console.log('Sender is required');
+            return false;
+        }
+        
+        if (!(that instanceof HTMLAnchorElement)) {
+            console.log('Sender must be an anchor element');
+            return false;
+        }
+        
+        if (id == null || typeof id === 'undefined') {
+            console.log('Table id is required');
+            return false;
+        }
+        if (hasHeader == null || typeof hasHeader === 'undefined') {
+            hasHeader = true;
+        }
+        if (removeLinks == null || typeof removeLinks === 'undefined') {
+            removeLinks = true;
+        }
+        if (removeImages == null || typeof removeImages === 'undefined') {
+            removeImages = false;
+        }
+        if (removeInputParams == null || typeof removeInputParams === 'undefined') {
+            removeInputParams = true;
+        }
+        
+        var tab_text = "<table border='2px'>";
+        var textRange;
+        
+        tab = $(id).get(0);
+        
+        if (tab == null || typeof tab === 'undefined') {
+            console.log('Table not found');
+            return;
+        }
+        
+        var j = 0;
+        
+        if (hasHeader && tab.rows.length > 0) {
+            var row = tab.rows[0];
+            tab_text += "<tr bgcolor='#87AFC6'>";
+            for (var l = 0; l < row.cells.length; l++) {
+                if ($(tab.rows[0].cells[l]).is(':visible')) {//export visible cols only
+                    tab_text += "<td>" + row.cells[l].innerHTML + "</td>";
+                }
+            }
+            tab_text += "</tr>";
+            j++;
+        }
+        
+        for (; j < tab.rows.length; j++) {
+            var row = tab.rows[j];
+            tab_text += "<tr>";
+            for (var l = 0; l < row.cells.length; l++) {
+                if ($(tab.rows[j].cells[l]).is(':visible')) {//export visible cols only
+                    tab_text += "<td>" + row.cells[l].innerHTML + "</td>";
+                }
+            }
+            tab_text += "</tr>";
+        }
+        
+        tab_text = tab_text + "</table>";
+        if (removeLinks)
+            tab_text = tab_text.replace(/<A[^>]*>|<\/A>/g, "");
+        if (removeImages)
+            tab_text = tab_text.replace(/<img[^>]*>/gi, ""); 
+        if (removeInputParams)
+            tab_text = tab_text.replace(/<input[^>]*>|<\/input>/gi, "");
+        
+        var ua = window.navigator.userAgent;
+        var msie = ua.indexOf("MSIE ");
+        
+        if (msie > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./))      // If Internet Explorer
+        {
+            myIframe.document.open("txt/html", "replace");
+            myIframe.document.write(tab_text);
+            myIframe.document.close();
+            myIframe.focus();
+            sa = myIframe.document.execCommand("SaveAs", true, document.title + ".xls");
+            return true;
+        }
+        else {
+            //other browser tested on IE 11
+            var result = "data:application/vnd.ms-excel," + encodeURIComponent(tab_text);
+            that.href = result;
+            that.download = document.title + ".xls";
+            return true;
         }
     }
 
@@ -2065,6 +2471,7 @@ class PortfolioDashboard extends Component {
             })  
         })
     }
+
 
 }
 

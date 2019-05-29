@@ -376,9 +376,9 @@ class MarketLayout extends Component {
         .then(resp => {
             this.setState({ customers: (resp && parseBool(resp.status)) ? resp.data : [] })
 
-            if(this.state.customers && this.state.customers.length > 0){
+            // if(this.state.customers && this.state.customers.length > 0){
                 this.handleGetLayout(params.MarketCode)
-            }
+            // }
             
         })
 

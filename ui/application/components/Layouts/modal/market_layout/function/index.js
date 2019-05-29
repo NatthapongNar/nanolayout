@@ -169,6 +169,56 @@ export const parseNumberShort = (num) => {
     }
 }
 
+export const parseNumberShortNew = (num) => {
+    const numDef = '1'
+    if(num && num > 0) {        
+        
+        let total = 0
+        let result = ''
+        let principle = (num && num > 0) ? roundFixed(parseFloat(num), 0):0
+
+        const str_length = principle.toString().length
+        switch(parseInt(str_length)) {
+            case 9: 
+                total = (principle / 100000000) * 100
+                result = `${roundFixed(total, numDef)}M`
+            break
+            case 8: 
+                total = (principle / 100000000) * 100
+                result = `${roundFixed(total, numDef)}M`
+            break
+            case 7:
+                total = (principle / 100000000) * 100
+                result = `${roundFixed(total, numDef)}M`
+            break
+            case 6:
+                total = (principle / 1000000) * 100                
+                result = `${roundFixed(total, numDef)}K`
+            break
+            case 5:
+                total = (principle / 100000) * 100
+                result = `${roundFixed(total, numDef)}K`
+            break
+            case 4:
+                total = (principle / 10000) * 100
+                result = `${roundFixed(total, numDef)}K`
+            break
+            case 3:
+                total = (principle / 1000) * 100
+                result = `${ (total && total > 0) ? _.padStart(roundFixed(total, numDef), 2, '0') : 0 }K`
+            break
+            default:
+                result = num
+            break
+        }
+
+        return result
+
+    } else {
+        return 0
+    }
+}
+
 export const numValid = (num) => {
     if(num && num > 0 && !isNaN(num)) {
         return parseInt(num)

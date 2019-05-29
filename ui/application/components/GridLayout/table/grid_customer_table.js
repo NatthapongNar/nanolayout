@@ -150,7 +150,7 @@ class GridCustInquiry extends Component {
                 MonthOverdueTo: mdpd_end,         
                 Topup: 'Y,N',
                 Product: 'Nano,Micro',
-                Isactive: 'Y',
+                Isactive: 'Active',
                 NPLFlag: npl,
                 Optional: optional,
                 ModeType: 'Collect'

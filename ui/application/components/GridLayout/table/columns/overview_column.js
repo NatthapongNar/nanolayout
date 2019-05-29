@@ -18,6 +18,7 @@ const standardNameFix = 170
 const tooltip_placement = 'right'
 
 const icon_style = { fontSize: '13px' }
+
 const warning_content = (
     <div>
         อยู่ระหว่างปรับปรุงเนื้อหาใหม่
@@ -59,9 +60,16 @@ export const performance_columns = [
         },  
         width: standardNameFix,
         render: (strText, record) => { 
-
             let strname = null
-            let empname = (in_array(record.GroupData, ['Branch'])) ? record.BranchName : strText
+            let empname = null
+
+            //let empname = (in_array(record.GroupData, ['Branch'])) ? record.BranchName : strText
+            if(in_array(record.GroupData, ['Branch'])) empname = record.BranchName
+            if((in_array(record.GroupData, ['MarketCA']))) {
+                if(record.rootBaseFilter == 'Market') empname = record.OptionName
+                else empname = strText
+            }
+            if(!in_array(record.GroupData, ['Branch', 'MarketCA'])) empname = strText
 
             if(record && in_array(record.GroupData, ['Branch', 'CA', 'Market', 'Kiosk'])) {
                 if(!_.isEmpty(empname) && empname.length >= 18) {
@@ -74,7 +82,7 @@ export const performance_columns = [
             }
 
             let period = (record && record.WorkingPeriod) ? record.WorkingPeriod : null
-            if(in_array(record.GroupData, ['Market'])) {
+            if(in_array(record.GroupData, ['Market']) || (in_array(record.GroupData, ['MarketCA']) && record.rootBaseFilter == 'CA')) {
                 return (<Tooltip placement={tooltip_placement} title={`${empname} ${(period) ? `(${period})`: ''}`}>{`${strname}`}</Tooltip>)
             } else {
 
@@ -184,6 +192,36 @@ export const performance_columns = [
                                             <Col span={24}>
                                                 <Col span={7} className="ttu">มือถือ</Col>
                                                 <Col span={17}>{`${(record.EmployeeMobile && !_.isEmpty(record.EmployeeMobile)) ? `${handleMobilePattern(record.EmployeeMobile)}`:''}`}</Col>
+                                            </Col>
+                                        </Row>
+                                    </Col>
+                                </Row>
+                            </div>
+                        )
+                    break
+                    case 'MarketCA':
+                        layout = (
+                            <div id={`${record.GroupData}_${record.EmployeeCode}`} style={{ width: '250px' }}>
+                                <Row gutter={10}>
+                                    <Col span={6}>
+                                        <Avatar src={`http://172.17.9.94/newservices/LBServices.svc/employee/image/${record.OptionCode}`} shape="square" style={{ width: '55px', height: '55px' }} />
+                                    </Col>
+                                    <Col span={18} style={{ fontSize: '1.5em' }}>
+                                        <Row gutter={8}>
+                                            <Col span={24} className="ttu">
+                                                {`${record.BranchName} ${(record.BranchEstimateOpen && !_.isEmpty(record.BranchEstimateOpen)) ? `( ${record.BranchEstimateOpen} )`:''}`}
+                                            </Col>
+                                            <Col span={24}>
+                                                <Col span={7} className="ttu">ชื่อ-นามสกุล</Col>
+                                                <Col span={17}>{`${record.OptionName} ${(record.OptionPeriod && !_.isEmpty(record.OptionPeriod)) ? `( ${record.OptionPeriod} )`:''}`}</Col>
+                                            </Col>
+                                            <Col span={24}>
+                                                <Col span={7} className="ttu">ตำแหน่ง</Col>
+                                                <Col span={17}>{`${(record.ZoneDigit) ? `${(in_array(record.ZoneDigit, ['BKK', 'UPC'])) ? `RD-${record.ZoneDigit}`:record.ZoneDigit}`:''}`}</Col>
+                                            </Col>
+                                            <Col span={24}>
+                                                <Col span={7} className="ttu">มือถือ</Col>
+                                                <Col span={17}>{`${(record.OptionMobile && !_.isEmpty(record.OptionMobile)) ? `${handleMobilePattern(record.OptionMobile)}`:''}`}</Col>
                                             </Col>
                                         </Row>
                                     </Col>
@@ -469,40 +507,6 @@ export const performance_columns = [
                 }, 
                 render: (str, record) => {
                     return str
-                    // if(record.CycleDue && !_.isEmpty(record.CycleDue)) {
-                    //     let cycle = record.CycleDue.split(',')
-                    //     return (
-                    //         <Popover content={`Cycle Due Day: ${str}`}>
-                    //             <div className={cls['ctrlCycleDue']}>
-                    //                 {
-                    //                     _.map(cycle, (v, i) => {
-                    //                         let color = null
-                    //                         switch(v) {                                            
-                    //                             case '1':
-                    //                                 color = cls['mon']
-                    //                             break
-                    //                             case '2':
-                    //                                 color = cls['tue']
-                    //                             break
-                    //                             case '3':
-                    //                                 color = cls['wed']
-                    //                             break
-                    //                             case '4':
-                    //                                 color = cls['thu']
-                    //                                 break
-                    //                             case '5':
-                    //                                 color = cls['fri']
-                    //                             break
-                    //                         }
-                    //                         return (<div key={`cycle_${record.EmployeeCode}_${(i+1)}`} className={`${color}`}></div>)
-                    //                     })
-                    //                 }
-                    //             </div>
-                    //         </Popover>
-                    //     )
-                    // } else {
-                    //     return null
-                    // }
                 }
             },
             {
@@ -520,7 +524,7 @@ export const performance_columns = [
                     }
                 },  
                 render: (shop, rowData) => {
-                    if(rowData.GroupData == 'CA') return '-'
+                    if(in_array(rowData.GroupData, ['CA', 'MarketCA'])) return '-'
                     else return shop
                 }
             },
@@ -539,7 +543,7 @@ export const performance_columns = [
                     }
                 }, 
                 render: (per, rowData) => { 
-                    if(rowData.GroupData == 'CA') return '-'
+                    if(in_array(rowData.GroupData, ['CA', 'MarketCA'])) return '-'
                     else return (per && per > 0) ? `${roundFixed(strFloat(per), 1)}%`:'0%'  
                 }
             }
@@ -553,10 +557,10 @@ export const performance_columns = [
         children: [
             {
                 title: 'Vol',
-                dataIndex: 'OS_Vol',
+                dataIndex: 'TotalOS_Current_Bal',
                 className: `gridctrl_8 ${cls['bg_option1']} ttu tracked tc pointer`,
                 width: standardWidthFix,
-                sorter: (a, b) => compareByAmount(a.OS_Vol, b.OS_Vol),
+                orter: (a, b) => compareByAmount(a.TotalOS_Current_Bal, b.TotalOS_Current_Bal),
                 onHeaderCell: () => {
                     return {
                         onClick: () => {
@@ -565,20 +569,68 @@ export const performance_columns = [
                         }
                     }
                 }, 
-                render: (vol, data) => {                    
-                    let os_bal = null
-                    let digit = (in_array(data.GroupData, ['Branch', 'Kiosk', 'CA', 'Market'])) ? 2 : 1
-                    if(data.OS_Vol_FullAmt >= 1000000) os_bal = `${roundFixed((data.OS_Vol_FullAmt / 1000000), digit)}`
-                    else os_bal = `${roundFixed((data.OS_Vol_FullAmt / 100000) * 100, 0)}Kb`                          
-                    return (os_bal) ? `${os_bal}`:0 
+                render: (vol, data) => {
+                    const digit = (in_array(data.GroupData, ['Kiosk', 'CA', 'Market'])) ? 2 : 1
+                    const digit_label = (in_array(data.GroupData, ['MarketCA'])) ? 1 : 0
+
+                    let total_os = (data && data.OS_Vol > 0) ? data.OS_Vol : 0
+                    let total_os_current = (data && data.TotalOS_Current_Bal > 0) ? data.TotalOS_Current_Bal : 0
+                    let total_os_currxday = (data && data.TotalOS_Current_WithXDay_Bal > 0) ? data.TotalOS_Current_WithXDay_Bal : 0
+                    let total_os_exclude_npl = (data && data.TotalOS_ExcludeNPL_Bal > 0) ? data.TotalOS_ExcludeNPL_Bal : 0
+
+                    let total_os_full = (data && data.OS_Vol_FullAmt > 0) ? data.OS_Vol_FullAmt : 0
+                    let total_os_current_full = (data && data.TotalOS_Current_Bal_FullAmt > 0) ? data.TotalOS_Current_Bal_FullAmt : 0
+                    let total_os_currxday_full = (data && data.TotalOS_Current_WithXDay_Bal_FullAmt > 0) ? data.TotalOS_Current_WithXDay_Bal_FullAmt : 0
+                    let total_os_exclude_npl_full = (data && data.TotalOS_ExcludeNPL_Bal_FullAmt > 0) ? data.TotalOS_ExcludeNPL_Bal_FullAmt : 0
+
+                    const td_amount = (in_array(data.GroupData, ['Branch', 'Kiosk', 'CA', 'Market'])) ? '35px':'55px'
+
+                    const content = (
+                        <table className={cls['grid_toolip_os']}>
+                            <tbody>
+                                <tr style={{ backgroundColor: '#a52a2a', color: '#FFF' }}>
+                                    <td className="tr">Current (W0-4) =</td>
+                                    <td className="tc" style={{ minWidth: td_amount }}>{`${handleMoney(total_os_current, total_os_current_full, digit)}`}</td>
+                                </tr>
+                                <tr>
+                                    <td className="tr">Current + XDay =</td>
+                                    <td className="tc" style={{ minWidth: td_amount }}>{`${handleMoney(total_os_currxday, total_os_currxday_full, digit)}`}</td>
+                                </tr>
+                               
+                                <tr>
+                                    <td className="tr">Total OS - NPL =</td>
+                                    <td className="tc" style={{ minWidth: td_amount }}>{`${handleMoney(total_os_exclude_npl, total_os_exclude_npl_full, digit)}`}</td>
+                                </tr>
+                                <tr>
+                                    <td className="tr">Total OS (All) =</td>
+                                    <td className="tc" style={{ minWidth: td_amount }}>{`${handleMoney(total_os, total_os_full, digit)}`}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    )
+
+                    return (
+                        <Popover content={content}>
+                            <span className={`${cls['spanTootltip']}`}>{`${ (total_os_current && total_os_current > 0) ? roundFixed(total_os_current, digit) : 0 }`}</span>
+                        </Popover>
+                    )
+
+                    // let os_bal = null
+                    // let digit = (in_array(data.GroupData, ['Branch', 'Kiosk', 'CA', 'Market'])) ? 2 : 1
+                    // if(data.OS_Vol_FullAmt >= 1000000) os_bal = `${roundFixed((data.OS_Vol_FullAmt / 1000000), digit)}`
+                    // else os_bal = `${roundFixed((data.OS_Vol_FullAmt / 100000) * 100, 0)}Kb`                          
+                    // return (os_bal) ? `${os_bal}`:0 
+
                 }
             },
             {
                 title: 'CUST',
-                dataIndex: 'OS_Unit',
+                dataIndex: 'TotalOS_Current_Acc',
+                // dataIndex: 'OS_Unit',
                 className: `gridctrl_9 ${cls['bg_option1']} ttu tracked tc pointer`,
                 width: standardWidthFix,
-                sorter: (a, b) => compareByAmount(a.OS_Unit, b.OS_Unit),
+                // sorter: (a, b) => compareByAmount(a.OS_Unit, b.OS_Unit),
+                 sorter: (a, b) => compareByAmount(a.TotalOS_Current_Acc, b.TotalOS_Current_Acc),
                 onHeaderCell: () => {
                     return {
                         onClick: () => {
@@ -587,8 +639,43 @@ export const performance_columns = [
                         }
                     }
                 }, 
-                render: (total) => { 
-                    return (total && total > 0) ? `${total}`:0 
+                render: (total, data) => {                     
+                    let total_os = (data && data.OS_Unit > 0) ? data.OS_Unit : 0
+                    let total_os_current = (data && data.TotalOS_Current_Acc > 0) ? data.TotalOS_Current_Acc : 0
+                    let total_os_currxday = (data && data.TotalOS_Current_WithXDay_Acc > 0) ? data.TotalOS_Current_WithXDay_Acc : 0
+                    let total_os_exclude_npl = (data && data.TotalOS_ExcludeNPL_Acc > 0) ? data.TotalOS_ExcludeNPL_Acc : 0
+                    
+                    const td_width = (in_array(data.GroupData, ['Branch', 'Kiosk', 'CA', 'Market'])) ? '25px':'55px'
+                                       
+                    const content = (
+                        <table className={cls['grid_toolip_os']}>
+                            <tbody>
+                                <tr style={{ backgroundColor: '#a52a2a', color: '#FFF' }}>
+                                    <td className="tr">Current (W0-4) =</td>
+                                    <td className="tc" style={{ minWidth: td_width }}>{`${numberWithCommas(total_os_current)}`}</td>
+                                </tr>
+                                <tr>
+                                    <td className="tr">Current + XDay =</td>
+                                    <td className="tc" style={{ minWidth: td_width }}>{`${numberWithCommas(total_os_currxday)}`}</td>
+                                </tr>                               
+                                <tr>
+                                    <td className="tr">Total OS - NPL =</td>
+                                    <td className="tc" style={{ minWidth: td_width }}>{`${numberWithCommas(total_os_exclude_npl)}`}</td>
+                                </tr>
+                                <tr>
+                                    <td className="tr">Total OS (All) =</td>
+                                    <td className="tc" style={{ minWidth: td_width }}>{`${numberWithCommas(total_os)}`}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    )
+
+                    return (
+                        <Popover content={content}>
+                            <span className={`${cls['spanTootltip']}`}>{`${ (total_os_current && total_os_current > 0) ? total_os_current : 0 }`}</span>
+                        </Popover>
+                    )
+
                 }
             },
             {
@@ -613,8 +700,8 @@ export const performance_columns = [
 
                     const content = (
                         <div>
-                          <div><b>Vol:</b> {`${os_micro_vol}Mb (${roundFixed(strFloat(per), 1)}%)`}</div>
-                          <div><b>Cust:</b> {`${numberWithCommas(os_micro_unit)} (${roundFixed(strFloat(os_micro_cust_share), 1)}%)`}</div>
+                          <div><b>Vol :</b> {`${os_micro_vol}Mb (${roundFixed(strFloat(per), 1)}%)`}</div>
+                          <div><b>Cust :</b> {`${numberWithCommas(os_micro_unit)} (${roundFixed(strFloat(os_micro_cust_share), 1)}%)`}</div>
                         </div>
                     )
                     return (
@@ -651,6 +738,7 @@ export const performance_columns = [
                           <div><b>Cust:</b> {`${numberWithCommas(os_topup_unit)} (${roundFixed(strFloat(os_topup_cust_share), 1)}%)`}</div>
                         </div>
                     )
+                    
                     return (
                         <Popover content={content}>
                             <span className={`${cls['spanTootltip']}`}>{`${(per && per > 0) ? `${roundFixed(strFloat(per), 1)}%`:'0%'}`}</span>
@@ -1097,12 +1185,12 @@ export const performance_columns = [
 
 const flowrate_arr = ['_0MDPD', '_1_30MDPD', '_31_60MDPD']
 const flowrate_label = ['0MDPD', '1-30', '31-60']
-const flowrate_target = ['< 1.5%', '< 40%', '< 70%']
+const flowrate_target = ['< 1.5%', '< 30%', '< 70%']
 
 const collection_arr = ['TotalPercent_W0', 'TotalPercent_W1_2', 'TotalPercent_W3_4', 'TotalPercent_XDay', 'TotalPercent_M1_2', 'TotalPercent_NPL']
+const collection_arr_now = ['TotalPercent_W0_Now', 'TotalPercent_W1_2_Now', 'TotalPercent_W3_4_Now', 'TotalPercent_XDay_Now', 'TotalPercent_M1_2_Now', 'TotalPercent_NPL_Now']
 const collection_label = ['W0', 'W1-2', 'W3-4', 'XDAY', 'M1-2', 'NPL']
-const collection_target = ['> 90% (W0-W2)', '< 2%', '< 1%', '< 3%', '< 2%', '< 4%']
-
+const collection_target = ['> 87%', '< 3%', '< 1%', '< 1%', '< 2%', '< 6%']
 
 export const collection_columns = [
     {
@@ -1122,7 +1210,15 @@ export const collection_columns = [
         render: (strText, record) => { 
 
             let strname = null
-            let empname = (in_array(record.GroupData, ['Branch'])) ? record.BranchName : strText
+            let empname = null
+
+            //let empname = (in_array(record.GroupData, ['Branch'])) ? record.BranchName : strText
+            if(in_array(record.GroupData, ['Branch'])) empname = record.BranchName
+            if((in_array(record.GroupData, ['MarketCA']))) {
+                if(record.rootBaseFilter == 'Market') empname = record.OptionName
+                else empname = strText
+            }
+            if(!in_array(record.GroupData, ['Branch', 'MarketCA'])) empname = strText
 
             if(record && in_array(record.GroupData, ['Branch', 'CA', 'Market', 'Kiosk'])) {
                 if(!_.isEmpty(empname) && empname.length >= 18) {
@@ -1244,6 +1340,36 @@ export const collection_columns = [
                                             <Col span={24}>
                                                 <Col span={7} className="ttu">มือถือ</Col>
                                                 <Col span={17}>{`${(record.EmployeeMobile && !_.isEmpty(record.EmployeeMobile)) ? `${handleMobilePattern(record.EmployeeMobile)}`:''}`}</Col>
+                                            </Col>
+                                        </Row>
+                                    </Col>
+                                </Row>
+                            </div>
+                        )
+                    break
+                    case 'MarketCA':
+                        layout = (
+                            <div id={`${record.GroupData}_${record.EmployeeCode}`} style={{ width: '250px' }}>
+                                <Row gutter={10}>
+                                    <Col span={6}>
+                                        <Avatar src={`http://172.17.9.94/newservices/LBServices.svc/employee/image/${record.OptionCode}`} shape="square" style={{ width: '55px', height: '55px' }} />
+                                    </Col>
+                                    <Col span={18} style={{ fontSize: '1.5em' }}>
+                                        <Row gutter={8}>
+                                            <Col span={24} className="ttu">
+                                                {`${record.BranchName} ${(record.BranchEstimateOpen && !_.isEmpty(record.BranchEstimateOpen)) ? `( ${record.BranchEstimateOpen} )`:''}`}
+                                            </Col>
+                                            <Col span={24}>
+                                                <Col span={7} className="ttu">ชื่อ-นามสกุล</Col>
+                                                <Col span={17}>{`${record.OptionName} ${(record.OptionPeriod && !_.isEmpty(record.OptionPeriod)) ? `( ${record.OptionPeriod} )`:''}`}</Col>
+                                            </Col>
+                                            <Col span={24}>
+                                                <Col span={7} className="ttu">ตำแหน่ง</Col>
+                                                <Col span={17}>{`${(record.ZoneDigit) ? `${(in_array(record.ZoneDigit, ['BKK', 'UPC'])) ? `RD-${record.ZoneDigit}`:record.ZoneDigit}`:''}`}</Col>
+                                            </Col>
+                                            <Col span={24}>
+                                                <Col span={7} className="ttu">มือถือ</Col>
+                                                <Col span={17}>{`${(record.OptionMobile && !_.isEmpty(record.OptionMobile)) ? `${handleMobilePattern(record.OptionMobile)}`:''}`}</Col>
                                             </Col>
                                         </Row>
                                     </Col>
@@ -1529,43 +1655,7 @@ export const collection_columns = [
                         }
                     }
                 },  
-                render: (str, record) => { 
-                    return str
-                    // if(record.CycleDue && !_.isEmpty(record.CycleDue)) {
-                    //     let cycle = record.CycleDue.split(',')
-                    //     return (
-                    //         <Popover content={`Cycle Due Day: ${str}`}>
-                    //             <div className={cls['ctrlCycleDue']}>
-                    //                 {
-                    //                     _.map(cycle, (v, i) => {
-                    //                         let color = null
-                    //                         switch(v) {                                            
-                    //                             case '1':
-                    //                                 color = cls['mon']
-                    //                             break
-                    //                             case '2':
-                    //                                 color = cls['tue']
-                    //                             break
-                    //                             case '3':
-                    //                                 color = cls['wed']
-                    //                             break
-                    //                             case '4':
-                    //                                 color = cls['thu']
-                    //                                 break
-                    //                             case '5':
-                    //                                 color = cls['fri']
-                    //                             break
-                    //                         }
-                    //                         return (<div key={`cycle_${record.EmployeeCode}_${(i+1)}`} className={`${color}`}></div>)
-                    //                     })
-                    //                 }
-                    //             </div>
-                    //         </Popover>
-                    //     )
-                    // } else {
-                    //     return null
-                    // } 
-                }
+                render: (str, record) => { return str }
             },
             {
                 title: 'Shop',
@@ -1582,7 +1672,7 @@ export const collection_columns = [
                     }
                 },  
                 render: (shop, rowData) => {
-                    if(rowData.GroupData == 'CA') return '-'
+                    if(in_array(rowData.GroupData, ['CA', 'MarketCA'])) return '-'
                     else return shop
                 }
             },
@@ -1601,7 +1691,7 @@ export const collection_columns = [
                     }
                 }, 
                 render: (per, rowData) => { 
-                    if(rowData.GroupData == 'CA') return '-'
+                    if(in_array(rowData.GroupData, ['CA', 'MarketCA'])) return '-'
                     else return (per && per > 0) ? `${roundFixed(strFloat(per), 1)}%`:'0%'  
                 }
             }            
@@ -1614,10 +1704,12 @@ export const collection_columns = [
         children: [
             {
                 title: 'Vol',
-                dataIndex: 'OS_Vol',
+                dataIndex: 'TotalOS_Current_Bal',
+                // dataIndex: 'OS_Vol',
                 className: `gridctrl_8 ${cls['bg_option1']} ttu tracked tc pointer`,
                 width: standardWidthFix,
-                sorter: (a, b) => compareByAmount(a.OS_Vol, b.OS_Vol),
+                sorter: (a, b) => compareByAmount(a.TotalOS_Current_Bal, b.TotalOS_Current_Bal),
+                // sorter: (a, b) => compareByAmount(a.OS_Vol, b.OS_Vol),
                 onHeaderCell: () => {
                     return {
                         onClick: () => {
@@ -1626,20 +1718,61 @@ export const collection_columns = [
                         }
                     }
                 }, 
-                render: (vol, data) => {                
-                    let os_bal = null
-                    let digit = (in_array(data.GroupData, ['Branch', 'Kiosk', 'CA', 'Market'])) ? 2 : 1
-                    if(data.OS_Vol_FullAmt >= 1000000) os_bal = `${roundFixed((data.OS_Vol_FullAmt / 1000000), digit)}`
-                    else os_bal = `${roundFixed((data.OS_Vol_FullAmt / 100000) * 100, 0)}Kb`                          
-                    return (vol) ? `${os_bal}`:0
+                render: (vol, data) => {        
+                    const digit_label = (in_array(data.GroupData, ['MarketCA'])) ? 1 : 0
+                    const digit = (in_array(data.GroupData, ['Kiosk', 'CA', 'Market'])) ? 2 : 1
+
+                    let total_os = (data && data.OS_Vol > 0) ? data.OS_Vol : 0
+                    let total_os_current = (data && data.TotalOS_Current_Bal > 0) ? data.TotalOS_Current_Bal : 0
+                    let total_os_currxday = (data && data.TotalOS_Current_WithXDay_Bal > 0) ? data.TotalOS_Current_WithXDay_Bal : 0
+                    let total_os_exclude_npl = (data && data.TotalOS_ExcludeNPL_Bal > 0) ? data.TotalOS_ExcludeNPL_Bal : 0
+
+                    let total_os_full = (data && data.OS_Vol_FullAmt > 0) ? data.OS_Vol_FullAmt : 0
+                    let total_os_current_full = (data && data.TotalOS_Current_Bal_FullAmt > 0) ? data.TotalOS_Current_Bal_FullAmt : 0
+                    let total_os_currxday_full = (data && data.TotalOS_Current_WithXDay_Bal_FullAmt > 0) ? data.TotalOS_Current_WithXDay_Bal_FullAmt : 0
+                    let total_os_exclude_npl_full = (data && data.TotalOS_ExcludeNPL_Bal_FullAmt > 0) ? data.TotalOS_ExcludeNPL_Bal_FullAmt : 0
+                    
+                    const td_amount = (in_array(data.GroupData, ['Branch', 'Kiosk', 'CA', 'Market'])) ? '35px':'55px'
+
+                    const content = (
+                        <table className={cls['grid_toolip_os']}>
+                            <tbody>
+                                <tr>
+                                    <td className="tr">Current (W0-4) =</td>
+                                    <td className="tc" style={{ minWidth: td_amount }}>{`${handleMoney(total_os_current, total_os_current_full, digit)}`}</td>
+                                </tr>
+                                <tr>
+                                    <td className="tr">Current + XDay =</td>
+                                    <td className="tc" style={{ minWidth: td_amount }}>{`${handleMoney(total_os_currxday, total_os_currxday_full, digit)}`}</td>
+                                </tr>                                
+                                <tr>
+                                    <td className="tr">Total OS - NPL =</td>
+                                    <td className="tc" style={{ minWidth: td_amount }}>{`${handleMoney(total_os_exclude_npl, total_os_exclude_npl_full, digit)}`}</td>
+                                </tr>
+                                <tr style={{ backgroundColor: '#a52a2a', color: '#FFF' }}>
+                                    <td className="tr">Total OS (All) =</td>
+                                    <td className="tc" style={{ minWidth: td_amount }}>{`${handleMoney(total_os, total_os_full, digit)}`}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    )
+
+                    return (
+                        <Popover content={content}>
+                            <span className={`${cls['spanTootltip']}`}>{`${ (total_os && total_os > 0) ? roundFixed(total_os, digit) : 0 }`}</span>
+                        </Popover>
+                    )
+
                 }
             },
             {
                 title: 'CUST',
-                dataIndex: 'OS_Unit',
+                dataIndex: 'TotalOS_Current_Acc',
+                // dataIndex: 'OS_Unit',
                 className: `gridctrl_9 ${cls['bg_option1']} ttu tracked tc pointer`,
                 width: standardWidthFix,
-                sorter: (a, b) => compareByAmount(a.OS_Unit, b.OS_Unit),
+                sorter: (a, b) => compareByAmount(a.TotalOS_Current_Acc, b.TotalOS_Current_Acc),
+                // sorter: (a, b) => compareByAmount(a.OS_Unit, b.OS_Unit),
                 onHeaderCell: () => {
                     return {
                         onClick: () => {
@@ -1648,8 +1781,42 @@ export const collection_columns = [
                         }
                     }
                 },
-                render: (total) => {  
-                    return (total && total > 0) ? `${total}`:0 
+                render: (total, data) => {  
+                    let total_os = (data && data.OS_Unit > 0) ? data.OS_Unit : 0
+                    let total_os_current = (data && data.TotalOS_Current_Acc > 0) ? data.TotalOS_Current_Acc : 0
+                    let total_os_currxday = (data && data.TotalOS_Current_WithXDay_Acc > 0) ? data.TotalOS_Current_WithXDay_Acc : 0
+                    let total_os_exclude_npl = (data && data.TotalOS_ExcludeNPL_Acc > 0) ? data.TotalOS_ExcludeNPL_Acc : 0
+                    
+                    const td_width = (in_array(data.GroupData, ['Branch', 'Kiosk', 'CA', 'Market'])) ? '25px':'55px'
+
+                    const content = (
+                        <table className={cls['grid_toolip_os']}>
+                            <tbody>
+                                <tr>
+                                    <td className="tr">Current (W0-4) =</td>
+                                    <td className="tc" style={{ minWidth: td_width }}>{`${numberWithCommas(total_os_current)}`}</td>
+                                </tr>
+                                <tr>
+                                    <td className="tr">Current + XDay =</td>
+                                    <td className="tc" style={{ minWidth: td_width }}>{`${numberWithCommas(total_os_currxday)}`}</td>
+                                </tr>                                
+                                <tr>
+                                    <td className="tr">Total OS - NPL =</td>
+                                    <td className="tc" style={{ minWidth: td_width }}>{`${numberWithCommas(total_os_exclude_npl)}`}</td>
+                                </tr>
+                                <tr style={{ backgroundColor: '#a52a2a', color: '#FFF' }}>
+                                    <td className="tr">Total OS (All) =</td>
+                                    <td className="tc" style={{ minWidth: td_width }}>{`${numberWithCommas(total_os)}`}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    )
+
+                    return (
+                        <Popover content={content}>
+                            <span className={`${cls['spanTootltip']}`}>{`${ (total_os && total_os > 0) ? total_os : 0 }`}</span>
+                        </Popover>
+                    )
                 }
             },
             {
@@ -1685,41 +1852,7 @@ export const collection_columns = [
                     )
                    
                 }
-            }
-            // {
-            //     title: '%TOP',
-            //     dataIndex: 'OS_TopupPercent',
-            //     className: `gridctrl_11 ${cls['bg_option1']} ttu tracked tc pointer`,
-            //     width: standardWidthFix,
-            //     sorter: (a, b) => compareByAmount(a.OS_TopupPercent, b.OS_TopupPercent),
-            //     onHeaderCell: () => {
-            //         return {
-            //             onClick: () => {
-            //                 let element = $('th.ant-table-column-has-filters.gridctrl_11').find('.ant-table-column-sorter > span')
-            //                 headAutoSort(element)                    
-            //             }
-            //         }
-            //     },
-            //     render: (per, rowData) => {
-            //         let os_unit = (rowData && rowData.OS_Unit > 0) ? rowData.OS_Unit : 0
-            //         let os_topup_unit = (rowData && rowData.OS_TopupApp > 0) ? rowData.OS_TopupApp : 0
-            //         let os_topup_vol = (rowData && rowData.OS_TopupVol > 0) ? rowData.OS_TopupVol : 0   
-            //         let os_topup_cust_share = (numValid(os_topup_unit) / numValid(os_unit)) * 100
-
-            //         const content = (
-            //             <div>
-            //               <div><b>Vol:</b> {`${os_topup_vol}Mb (${roundFixed(strFloat(per), 1)}%)`}</div>
-            //               <div><b>Cust:</b> {`${numberWithCommas(os_topup_unit)} (${roundFixed(strFloat(os_topup_cust_share), 1)}%)`}</div>
-            //             </div>
-            //         )
-            //         return (
-            //             <Popover content={content}>
-            //                 <span className={`${cls['spanTootltip']}`}>{`${(per && per > 0) ? `${roundFixed(strFloat(per), 1)}%`:'0%'}`}</span>
-            //             </Popover>
-            //         )
-                   
-            //     }
-            // }                      
+            }                    
         ]
     },
     {
@@ -1827,12 +1960,12 @@ export const collection_columns = [
         }
     },
     {
-        title: `New NPL`, // ${moment().format('YYYY')}
+        title: `New NPL`,
         dataIndex: 'NewNPLColomns',
         className: `${cls['bg_option3']} ttu tracked tc`,
         children: [
             {
-                title: (<Tooltip title="New booking">NB_18</Tooltip>),
+                title: (<Tooltip title="New booking">Book</Tooltip>),
                 dataIndex: 'OS_TotalNewBooking_NPLPercent',
                 className: `${cls['bg_option3']} ttu tracked tc pointer`,
                 width: standardWidthFix,
@@ -1841,7 +1974,7 @@ export const collection_columns = [
                 }
             },
             {
-                title: 'OS_19',
+                title: 'OS',
                 dataIndex: 'OS_TotalNew_NPLPercent',
                 className: `gridctrl_14 ${cls['bg_option3']} ttu tracked tc pointer`,
                 width: standardWidthFix,
@@ -1862,54 +1995,20 @@ export const collection_columns = [
 
                     const content = (
                         <div>
-                        <div><b>Vol:</b> {`${roundFixed(total_vol2digit, 1)}Mb (${roundFixed(total_per, 1)}%)`}</div>
+                        <div><b>Vol:</b> {`${roundFixed(total_vol2digit, 1)}Mb (${roundFixed(total_per, 2)}%)`}</div>
                         <div><b>Cust:</b> {`${numberWithCommas(total_app)}`}</div>
                         </div>
                     )
                     
                     return (
                         <Popover content={content}>
-                            <span className={`${cls['spanTootltip']}`}>{`${ (per) ? `${roundFixed(strFloat(per), 1)}%`:'0%' }`}</span>
+                            <span className={`${cls['spanTootltip']}`}>{`${ (per) ? `${roundFixed(strFloat(per), 2)}%`:'0%' }`}</span>
                         </Popover>
                     ) 
                 }
             }
         ]
     },
-    // {
-    //     title:  (<div>New<br/>NPL</div>),
-    //     dataIndex: 'OS_TotalNew_NPLPercent',
-    //     className: `gridctrl_14 ${cls['bg_option3']} ttu tracked tc pointer`,
-    //     width: standardWidthFix,
-    //     sorter: (a, b) => compareByAmount(a.OS_TotalNew_NPLPercent, b.OS_TotalNew_NPLPercent),
-    //     onHeaderCell: () => {
-    //         return {
-    //             onClick: () => {
-    //                 let element = $('th.ant-table-column-has-filters.gridctrl_14').find('.ant-table-column-sorter > span')
-    //                 headAutoSort(element)                    
-    //             }
-    //         }
-    //     },
-    //     render: (per, rowData) => { 
-    //         let total_app = (rowData.OS_TotalNew_NPLAcc && rowData.OS_TotalNew_NPLAcc > 0) ? rowData.OS_TotalNew_NPLAcc : 0
-    //         let total_vol = (rowData.OS_TotalNew_NPLVol && rowData.OS_TotalNew_NPLVol > 0) ? rowData.OS_TotalNew_NPLVol : 0
-    //         let total_per = (rowData.OS_TotalNew_NPLVol && rowData.OS_TotalNew_NPLPercent > 0) ? rowData.OS_TotalNew_NPLPercent : 0
-    //         let total_vol2digit = (total_vol && total_vol > 0) ? (total_vol / 1000000) : 0
-
-    //         const content = (
-    //             <div>
-    //               <div><b>Vol:</b> {`${roundFixed(total_vol2digit, 1)}Mb (${roundFixed(total_per, 1)}%)`}</div>
-    //               <div><b>Cust:</b> {`${numberWithCommas(total_app)}`}</div>
-    //             </div>
-    //         )
-            
-    //         return (
-    //             <Popover content={content}>
-    //                 <span className={`${cls['spanTootltip']}`}>{`${ (per) ? `${roundFixed(strFloat(per), 1)}%`:'0%' }`}</span>
-    //             </Popover>
-    //         ) 
-    //     }
-    // },
     {
         title: 'Portfolio Quality',
         dataIndex: 'PortfolioQuality',
@@ -1982,13 +2081,6 @@ export const collection_columns = [
                         break;
                     }
 
-                    // const content = (
-                    //     <div>
-                    //       <div><b>Vol:</b> {`${total_vol}Mb (${roundFixed(strFloat(total_per), 1)}%)`}</div>
-                    //       <div><b>Cust:</b> {`${total_app}`}</div>
-                    //     </div>
-                    // )
-
                     const content = (
                         <div>
                             <div><b>Vol:</b> {`${total_vol}Mb (${roundFixed(strFloat(total_per), 1)}%)`}</div>
@@ -2010,14 +2102,1328 @@ export const collection_columns = [
         dataIndex: 'linkPortfolio',
         className: 'ttu tracked tc',
         width: 50
-        // render: (data, rowData) => {
-        //     return (
-        //         <div className={cls['ctrlColumns']}>
-        //             <div className={cls['ctrlColumnsItem']}><i className={`${cls['icon']} fa fa-user`} /></div>
-        //             <div className={cls['ctrlColumnsItem']}><i className={`${cls['icon']} fa fa-dollar`} /></div>
-        //         </div>
-        //     )
-        // }
+    }
+]
+
+const flowrate_arr_portassign = ['_0MDPD_Now', '_1_30MDPD_Now', '_31_60MDPD_Now']
+export const port_assign_columns = [
+    collection_columns[0],
+    collection_columns[1],
+    collection_columns[2],
+    {
+        title: 'O/S Balance',
+        dataIndex: 'OSBalance',
+        className: `${cls['bg_option1']} ttu tracked`,
+        children: [
+            {
+                title: 'Vol',
+                dataIndex: 'TotalOS_Current_Bal_Now',
+                className: `gridctrl_8 ${cls['bg_option1']} ttu tracked tc pointer`,
+                width: standardWidthFix,
+                sorter: (a, b) => compareByAmount(a.TotalOS_Current_Bal_Now, b.TotalOS_Current_Bal_Now),
+                onHeaderCell: () => {
+                    return {
+                        onClick: () => {
+                            let element = $('th.ant-table-column-has-filters.gridctrl_8').find('.ant-table-column-sorter > span')
+                            headAutoSort(element)                    
+                        }
+                    }
+                }, 
+                render: (vol, data) => {        
+                    const digit = (in_array(data.GroupData, ['Kiosk', 'CA', 'Market'])) ? 2 : 1
+                    const digit_label = (in_array(data.GroupData, ['MarketCA'])) ? 1 : 0
+
+                    let total_os = (data && data.OS_Vol_Now > 0) ? data.OS_Vol_Now : 0
+                    let total_os_current = (data && data.TotalOS_Current_Bal_Now > 0) ? data.TotalOS_Current_Bal_Now : 0
+                    let total_os_currxday = (data && data.TotalOS_Current_WithXDay_Bal_Now > 0) ? data.TotalOS_Current_WithXDay_Bal_Now : 0
+                    let total_os_exclude_npl = (data && data.TotalOS_ExcludeNPL_Bal_Now > 0) ? data.TotalOS_ExcludeNPL_Bal_Now : 0
+
+                    let total_os_full = (data && data.OS_Vol_FullAmt_Now > 0) ? data.OS_Vol_FullAmt_Now : 0
+                    let total_os_current_full = (data && data.TotalOS_Current_Bal_FullAmt_Now > 0) ? data.TotalOS_Current_Bal_FullAmt_Now : 0
+                    let total_os_currxday_full = (data && data.TotalOS_Current_WithXDay_Bal_FullAmt_Now > 0) ? data.TotalOS_Current_WithXDay_Bal_FullAmt_Now : 0
+                    let total_os_exclude_npl_full = (data && data.TotalOS_ExcludeNPL_Bal_FullAmt_Now > 0) ? data.TotalOS_ExcludeNPL_Bal_FullAmt_Now : 0
+                    
+                    const td_amount = (in_array(data.GroupData, ['Branch', 'Kiosk', 'CA', 'Market'])) ? '35px':'55px'
+
+                    const content = (
+                        <table className={cls['grid_toolip_os']}>
+                            <tbody>
+                                <tr >
+                                    <td className="tr">Current (W0-4) =</td>
+                                    <td className="tc" style={{ minWidth: td_amount }}>{`${handleMoney(total_os_current, total_os_current_full, digit)}`}</td>
+                                </tr>
+                                <tr style={{ backgroundColor: '#a52a2a', color: '#FFF' }}>
+                                    <td className="tr">Current + XDay =</td>
+                                    <td className="tc" style={{ minWidth: td_amount }}>{`${handleMoney(total_os_currxday, total_os_currxday_full, digit)}`}</td>
+                                </tr>      
+                                {/*
+                                <tr>
+                                    <td className="tr">Total OS - NPL =</td>
+                                    <td className="tc" style={{ minWidth: td_amount }}>{`${handleMoney(total_os_exclude_npl, total_os_exclude_npl_full, digit)}`}</td>
+                                </tr>
+                                <tr>
+                                    <td className="tr">Total OS (All) =</td>
+                                    <td className="tc" style={{ minWidth: td_amount }}>{`${handleMoney(total_os, total_os_full, digit)}`}</td>
+                                </tr>
+                                */}
+                            </tbody>
+                        </table>
+                    )
+
+                    return (
+                        <Popover content={content}>
+                            <span className={`${cls['spanTootltip']}`}>{`${ (total_os_currxday && total_os_currxday > 0) ? roundFixed(total_os_currxday, digit) : 0 }`}</span>
+                            {/* <span className={`${cls['spanTootltip']}`}>{`${ (total_os_current && total_os_current > 0) ? roundFixed(total_os_current, digit_label) : 0 }`}</span> */}
+                        </Popover>
+                    )
+
+                }
+            },
+            {
+                title: 'CUST',
+                dataIndex: 'TotalOS_Current_Acc_Now',
+                className: `gridctrl_9 ${cls['bg_option1']} ttu tracked tc pointer`,
+                width: standardWidthFix,
+                sorter: (a, b) => compareByAmount(a.TotalOS_Current_Acc_Now, b.TotalOS_Current_Acc_Now),
+                onHeaderCell: () => {
+                    return {
+                        onClick: () => {
+                            let element = $('th.ant-table-column-has-filters.gridctrl_9').find('.ant-table-column-sorter > span')
+                            headAutoSort(element)                    
+                        }
+                    }
+                },
+                render: (total, data) => {  
+                    let total_os = (data && data.OS_Unit_Now > 0) ? data.OS_Unit_Now : 0
+                    let total_os_current = (data && data.TotalOS_Current_Acc_Now > 0) ? data.TotalOS_Current_Acc_Now : 0
+                    let total_os_currxday = (data && data.TotalOS_Current_WithXDay_Acc_Now > 0) ? data.TotalOS_Current_WithXDay_Acc_Now : 0
+                    let total_os_exclude_npl = (data && data.TotalOS_ExcludeNPL_Acc_Now > 0) ? data.TotalOS_ExcludeNPL_Acc_Now : 0
+                    
+                    const td_width = (in_array(data.GroupData, ['Branch', 'Kiosk', 'CA', 'Market'])) ? '25px':'55px'
+
+                    const content = (
+                        <table className={cls['grid_toolip_os']}>
+                            <tbody>
+                                <tr style={{ backgroundColor: '#a52a2a', color: '#FFF' }}>
+                                    <td className="tr">Current (W0-4) =</td>
+                                    <td className="tc" style={{ minWidth: td_width }}>{`${numberWithCommas(total_os_current)}`}</td>
+                                </tr>
+                                <tr>
+                                    <td className="tr">Current + XDay =</td>
+                                    <td className="tc" style={{ minWidth: td_width }}>{`${numberWithCommas(total_os_currxday)}`}</td>
+                                </tr>   
+                                {/* 
+                                <tr>
+                                    <td className="tr">Total OS - NPL =</td>
+                                    <td className="tc" style={{ minWidth: td_width }}>{`${numberWithCommas(total_os_exclude_npl)}`}</td>
+                                </tr>
+                                <tr>
+                                    <td className="tr">Total OS (All) =</td>
+                                    <td className="tc" style={{ minWidth: td_width }}>{`${numberWithCommas(total_os)}`}</td>
+                                </tr>
+                                */}
+                            </tbody>
+                        </table>
+                    )
+
+                    return (
+                        <Popover content={content}>
+                            <span className={`${cls['spanTootltip']}`}>{`${ (total_os_current && total_os_current > 0) ? total_os_current : 0 }`}</span>
+                        </Popover>
+                    )
+                }
+            }                    
+        ]
+    },
+    {
+        title: `Transfer FCR`,
+        dataIndex: 'TransferFCR',
+        className: `${cls['bg_option5']} ttu tracked tc`,
+        children: [
+            {
+                title: '%Transf',
+                dataIndex: 'Transfer_Per',
+                className: `${cls['bg_option5']} ttu tracked tc pointer`,
+                width: standardWidthFix,
+                render: (total) => {
+                    return (total && total > 0) ? `${roundFixed(total, 0)}%` : '0%'
+                }
+            },
+            {
+                title: 'Vol',
+                dataIndex: 'Transfer_Vol',
+                className: `${cls['bg_option5']} ttu tracked tc pointer`,
+                width: standardWidthFix
+            },
+            {
+                title: 'Cust',
+                dataIndex: 'Transfer_Cust',
+                className: `${cls['bg_option5']} ttu tracked tc pointer`,
+                width: standardWidthFix
+            }
+        ]
+    },
+    {
+        title: '%Flow Rate (MDPD)',
+        dataIndex: 'Flow',
+        className: `${cls['bg_option3']} ttu tracked tc`,
+        width: standardWidthFix,
+        children: _.map(flowrate_arr_portassign, (bucket, i) => {     
+            return {
+                title: <Tooltip placement="right" title={`Target : ${flowrate_target[i]}`}>{`${flowrate_label[i]}`}</Tooltip>,
+                dataIndex: `${flowrate_label[i]}`,
+                className: `flowrate_${i} ${cls['bg_option3']} ttu tracked tc pointer`,
+                width: standardWidthFix,
+                sorter: (a, b) => {
+                    if(i == 0) {
+                        return compareByAmount(a._0MDPD_Now, b._0MDPD_Now)
+                    } else if(i == 1) {
+                        return compareByAmount(a._1_30MDPD_Now, b._1_30MDPD_Now)
+                    } else if(i == 2) {
+                        return compareByAmount(a._31_60MDPD_Now, b._31_60MDPD_Now)
+                    }
+                },
+                onHeaderCell: () => {
+                    return {
+                        onClick: () => {
+                            let element = $(`th.ant-table-column-has-filters.flowrate_${i}`).find('.ant-table-column-sorter > span')
+                            headAutoSort(element)                    
+                        }
+                    }
+                },
+                render: (flowtype, data) => {
+                    let flowrate = 0
+                    let forcast = 0
+           
+                    switch (flowrate_label[i]) {
+                        case '0MDPD':
+                            flowrate = (data._0MDPD_Now) ? data._0MDPD_Now:0
+                            forcast = (data.F_0MDPD_Now) ? data.F_0MDPD_Now:0
+                        break;
+                        case '1-30':
+                            flowrate = (data._1_30MDPD_Now) ? data._1_30MDPD_Now:0
+                            forcast = (data.F_1_30MDPD_Now) ? data.F_1_30MDPD_Now:0
+                        break;
+                        case '31-60':
+                            flowrate = (data._31_60MDPD_Now) ? data._31_60MDPD_Now:0
+                            forcast = (data.F_31_60MDPD_Now) ? data.F_31_60MDPD_Now:0
+                        break;
+                    }
+
+                    return (<Popover content={`Forcast ${forcast}%`}>{`${(flowrate && flowrate > 0) ? roundFixed(flowrate, 1) : 0 }%`}</Popover>)
+                }
+            }
+           
+        })
+    }, 
+    collection_columns[6],
+    collection_columns[7],
+    collection_columns[8],
+    {
+        title: 'Portfolio Quality',
+        dataIndex: 'PortfolioQuality',
+        className: `${cls['bg_option4']} ttu tracked tc`,
+        children: _.map(collection_arr_now, (bucket, i) => {
+            return {
+                title: <Tooltip placement="right" title={`Target : ${collection_target[i]}`}>{`${collection_label[i]}`}</Tooltip>,
+                dataIndex: `${collection_label[i]}`,
+                className: `collection_${i} ${cls['bg_option4']} ttu tracked tc pointer`,
+                width: standardWidthFix,
+                sorter: (a, b) => {
+                    if(i == 0) {
+                        return compareByAmount(a.TotalPercent_W0_Now, b.TotalPercent_W0_Now)
+                    } else if(i == 1) {
+                        return compareByAmount(a.TotalPercent_W1_2_Now, b.TotalPercent_W1_2_Now)
+                    } else if(i == 2) {
+                        return compareByAmount(a.TotalPercent_W3_4_Now, b.TotalPercent_W3_4_Now)
+                    } else if(i == 3) {
+                        return compareByAmount(a.TotalPercent_XDay_Now, b.TotalPercent_XDay_Now)
+                    } else if(i == 4) {
+                        return compareByAmount(a.TotalPercent_M1_2_Now, b.TotalPercent_M1_2_Now)
+                    } else if(i == 5) {
+                        return compareByAmount(a.TotalPercent_NPL_Now, b.TotalPercent_NPL_Now)
+                    } 
+                },
+                onHeaderCell: () => {
+                    return {
+                        onClick: () => {
+                            let element = $(`th.ant-table-column-has-filters.collection_${i}`).find('.ant-table-column-sorter > span')
+                            headAutoSort(element)                    
+                        }
+                    }
+                },
+                render: (vol, data) => {
+                
+                    let total_app = 0
+                    let total_vol = 0
+                    let total_per = 0
+
+                    switch (collection_label[i]) {
+                        case 'W0':
+                            total_app = (data.Total_W0_Now) ? data.Total_W0_Now:0
+                            total_vol = (data.TotalBal_W0_Now) ? data.TotalBal_W0_Now:0
+                            total_per = (data.TotalPercent_W0_Now) ? data.TotalPercent_W0_Now:0
+                        break;
+                        case 'W1-2':
+                            total_app = (data.Total_W1_2_Now) ? data.Total_W1_2_Now:0
+                            total_vol = (data.TotalBal_W1_2_Now) ? data.TotalBal_W1_2_Now:0
+                            total_per = (data.TotalPercent_W1_2_Now) ? data.TotalPercent_W1_2_Now:0
+                        break;
+                        case 'W3-4':
+                            total_app = (data.Total_W3_4_Now) ? data.Total_W3_4_Now:0
+                            total_vol = (data.TotalBal_W3_4_Now) ? data.TotalBal_W3_4_Now:0
+                            total_per = (data.TotalPercent_W3_4_Now) ? data.TotalPercent_W3_4_Now:0
+                        break;
+                        case 'XDAY':
+                            total_app = (data.Total_XDay_Now) ? data.Total_XDay_Now:0
+                            total_vol = (data.TotalBal_XDay_Now) ? data.TotalBal_XDay_Now:0
+                            total_per = (data.TotalPercent_XDay_Now) ? data.TotalPercent_XDay_Now:0
+                        break;
+                        case 'M1-2':
+                            total_app = (data.Total_M1_2_Now) ? data.Total_M1_2_Now:0
+                            total_vol = (data.TotalBal_M1_2_Now) ? data.TotalBal_M1_2_Now:0
+                            total_per = (data.TotalPercent_M1_2_Now) ? data.TotalPercent_M1_2_Now:0
+                        break;
+                        case 'NPL':
+                            total_app = (data.Total_NPL_Now) ? data.Total_NPL_Now:0
+                            total_vol = (data.TotalBal_NPL_Now) ? data.TotalBal_NPL_Now:0
+                            total_per = (data.TotalPercent_NPL_Now) ? data.TotalPercent_NPL_Now:0
+                        break;
+                    }
+
+                    const content = (
+                        <div>
+                            <div><b>Vol:</b> {`${total_vol}Mb (${roundFixed(strFloat(total_per), 1)}%)`}</div>
+                            <div><b>Cust:</b> {`${numberWithCommas(total_app)}`}</div>
+                        </div>
+                    )
+
+                    return (
+                        <Popover content={content}>
+                            <span className={`${cls['spanTootltip']}`}>{`${ (total_per && total_per > 0) ? roundFixed(total_per, 1) : 0 }%`}</span>
+                        </Popover>
+                    )   
+                }
+            }
+        })
+    }, 
+    collection_columns[10]
+]
+
+export const flow_columns = [
+    {
+        title: 'Employee Name',
+        dataIndex: 'EmployeeName',
+        className: `gridctrl_1 ttu tracked tl pointer`,
+        width: standardNameFix,
+        sorter: (a, b) => compareByAlph(a.EmployeeName, b.EmployeeName),
+        fixed: 'left',
+        onHeaderCell: () => {
+            return {
+                onClick: () => {
+                    let element = $('th.ant-table-column-has-filters.gridctrl_1').find('.ant-table-column-sorter > span')
+                    headAutoSort(element)                    
+                }
+            }
+        },  
+        render: (strText, record) => { 
+            let strname = null
+            let empname = null
+
+            if(in_array(record.GroupData, ['Branch'])) empname = record.BranchName
+            if((in_array(record.GroupData, ['MarketCA']))) {
+                if(record.rootBaseFilter == 'Market') empname = record.OptionName
+                else empname = strText
+            }
+            if(!in_array(record.GroupData, ['Branch', 'MarketCA'])) empname = strText
+
+            if(record && in_array(record.GroupData, ['Branch', 'CA', 'Market', 'Kiosk'])) {
+                if(!_.isEmpty(empname) && empname.length >= 18) {
+                    strname = ((in_array(record.GroupData, ['Branch'])))  ? `${empname.substring(0, 30)}...` : `${empname.substring(0, 15)}...`
+                } else {
+                    strname = empname
+                }
+            } else {
+                strname = empname
+            }
+
+            let period = (record && record.WorkingPeriod) ? record.WorkingPeriod : null
+            if(in_array(record.GroupData, ['Market'])) {
+                return (<Tooltip placement={tooltip_placement} title={`${empname} ${(period) ? `(${period})`: ''}`}>{`${strname}`}</Tooltip>)
+            } else {
+                
+                let layout = null
+                switch (record.GroupData) {                   
+                    case 'Branch':
+                        layout = (
+                            <div id={`${record.GroupData}_${record.EmployeeCode}`} style={{ width: '250px' }}>
+                                <Row gutter={10}>
+                                    <Col span={6}>
+                                        <Avatar src={`http://172.17.9.94/newservices/LBServices.svc/employee/image/${record.EmployeeCode}`} shape="square" style={{ width: '55px', height: '55px' }} />
+                                    </Col>
+                                    <Col span={18} style={{ fontSize: '1.5em' }}>
+                                        <Row gutter={8}>
+                                            {
+                                                (record.GroupData && record.GroupData == 'Branch') && (
+                                                    <Col span={24} className="ttu">
+                                                        {`${record.BranchName} ${(record.BranchEstimateOpen && !_.isEmpty(record.BranchEstimateOpen)) ? `( ${record.BranchEstimateOpen} )`:''}`}
+                                                    </Col>
+                                                )
+                                            }
+                                            <Col span={24}>
+                                                <Col span={7} className="ttu">ชื่อ-นามสกุล</Col>
+                                                <Col span={17}>{`${record.EmployeeName} ${(record.WorkingPeriod && !_.isEmpty(record.WorkingPeriod)) ? `( ${record.WorkingPeriod} )`:''}`}</Col>
+                                            </Col>
+                                            <Col span={24}>
+                                                <Col span={7} className="ttu">ตำแหน่ง</Col>
+                                                <Col span={17}>{`${(record.ZoneDigit) ? `${(in_array(record.ZoneDigit, ['BKK', 'UPC'])) ? `RD-${record.ZoneDigit}`:record.ZoneDigit}`:''}`}</Col>
+                                            </Col>
+                                            <Col span={24}>
+                                                <Col span={7} className="ttu">มือถือ</Col>
+                                                <Col span={17}>{`${(record.EmployeeMobile && !_.isEmpty(record.EmployeeMobile)) ? `${handleMobilePattern(record.EmployeeMobile)}`:''}`}</Col>
+                                            </Col>
+                                        </Row>
+                                    </Col>
+                                </Row>
+                            </div>
+                        )
+                    break
+                    case 'Kiosk':
+                        layout = (
+                            <div id={`${record.GroupData}_${record.EmployeeCode}`} style={(record && record.BranchFullDigit.length == 6) ? { width: '270px' } : { width: '250px' }}>
+                                <Row gutter={10}>
+                                    <Col span={6}>
+                                        <Avatar src={`http://172.17.9.94/newservices/LBServices.svc/employee/image/${record.EmployeeCode}`} shape="square" style={(record && record.BranchFullDigit.length == 6) ? { width: '64px', height: '64px' } : { width: '55px', height: '55px' }} />
+                                    </Col>
+                                    <Col span={18} style={{ fontSize: '1.5em' }}>
+                                        <Row gutter={8}>
+                                            {
+                                                (record && record.BranchFullDigit.length == 3) && (
+                                                    <Col span={24} className="ttu">
+                                                        {`${record.BranchHeadQuarter} ${(record.BranchEstimateOpen && !_.isEmpty(record.BranchEstimateOpen)) ? `( ${record.BranchEstimateOpen} )`:''}`}
+                                                    </Col>
+                                                )
+                                            }
+                                              {
+                                                (record && record.BranchFullDigit.length == 6) && (
+                                                    <Row>
+                                                        <Col span={24} className="ttu">
+                                                            {`${record.BranchName} ${(record.KisokEstimateOpen && !_.isEmpty(record.KisokEstimateOpen)) ? `( ${record.KisokEstimateOpen} )`:''}`}
+                                                        </Col>
+                                                        <Col span={24} className="ttu">
+                                                            {`${record.BranchHeadQuarter} ${(record.BranchEstimateOpen && !_.isEmpty(record.BranchEstimateOpen)) ? `( ${record.BranchEstimateOpen} )`:''}`}
+                                                        </Col>
+                                                    </Row>
+                                                )
+                                            }
+                                            <Col span={24}>
+                                                <Col span={7} className="ttu">ชื่อ-นามสกุล</Col>
+                                                <Col span={17}>{`${record.EmployeeFullName} ${(record.WorkingPeriod && !_.isEmpty(record.WorkingPeriod)) ? `( ${record.WorkingPeriod} )`:''}`}</Col>
+                                            </Col>
+                                            <Col span={24}>
+                                                <Col span={7} className="ttu">ตำแหน่ง</Col>
+                                                <Col span={17}>{`${(record.ZoneDigit) ? `${(in_array(record.ZoneDigit, ['BKK', 'UPC'])) ? `RD-${record.ZoneDigit}`:record.ZoneDigit}`:''}`}</Col>
+                                            </Col>
+                                            <Col span={24}>
+                                                <Col span={7} className="ttu">มือถือ</Col>
+                                                <Col span={17}>{`${(record.EmployeeMobile && !_.isEmpty(record.EmployeeMobile)) ? `${handleMobilePattern(record.EmployeeMobile)}`:''}`}</Col>
+                                            </Col>
+                                        </Row>
+                                    </Col>
+                                </Row>
+                            </div>
+                        )
+                    break
+                    case 'CA':
+                        layout = (
+                            <div id={`${record.GroupData}_${record.EmployeeCode}`} style={{ width: '250px' }}>
+                                <Row gutter={10}>
+                                    <Col span={6}>
+                                        <Avatar src={`http://172.17.9.94/newservices/LBServices.svc/employee/image/${record.EmployeeCode}`} shape="square" style={{ width: '55px', height: '55px' }} />
+                                    </Col>
+                                    <Col span={18} style={{ fontSize: '1.5em' }}>
+                                        <Row gutter={8}>
+                                            <Col span={24} className="ttu">
+                                                {`${record.BranchName} ${(record.BranchEstimateOpen && !_.isEmpty(record.BranchEstimateOpen)) ? `( ${record.BranchEstimateOpen} )`:''}`}
+                                            </Col>
+                                            <Col span={24}>
+                                                <Col span={7} className="ttu">ชื่อ-นามสกุล</Col>
+                                                <Col span={17}>{`${record.EmployeeName} ${(record.WorkingPeriod && !_.isEmpty(record.WorkingPeriod)) ? `( ${record.WorkingPeriod} )`:''}`}</Col>
+                                            </Col>
+                                            <Col span={24}>
+                                                <Col span={7} className="ttu">ตำแหน่ง</Col>
+                                                <Col span={17}>{`${(record.ZoneDigit) ? `${(in_array(record.ZoneDigit, ['BKK', 'UPC'])) ? `RD-${record.ZoneDigit}`:record.ZoneDigit}`:''}`}</Col>
+                                            </Col>
+                                            <Col span={24}>
+                                                <Col span={7} className="ttu">มือถือ</Col>
+                                                <Col span={17}>{`${(record.EmployeeMobile && !_.isEmpty(record.EmployeeMobile)) ? `${handleMobilePattern(record.EmployeeMobile)}`:''}`}</Col>
+                                            </Col>
+                                        </Row>
+                                    </Col>
+                                </Row>
+                            </div>
+                        )
+                    break
+                    case 'MarketCA':
+                        layout = (
+                            <div id={`${record.GroupData}_${record.EmployeeCode}`} style={{ width: '250px' }}>
+                                <Row gutter={10}>
+                                    <Col span={6}>
+                                        <Avatar src={`http://172.17.9.94/newservices/LBServices.svc/employee/image/${record.OptionCode}`} shape="square" style={{ width: '55px', height: '55px' }} />
+                                    </Col>
+                                    <Col span={18} style={{ fontSize: '1.5em' }}>
+                                        <Row gutter={8}>
+                                            <Col span={24} className="ttu">
+                                                {`${record.BranchName} ${(record.BranchEstimateOpen && !_.isEmpty(record.BranchEstimateOpen)) ? `( ${record.BranchEstimateOpen} )`:''}`}
+                                            </Col>
+                                            <Col span={24}>
+                                                <Col span={7} className="ttu">ชื่อ-นามสกุล</Col>
+                                                <Col span={17}>{`${record.OptionName} ${(record.OptionPeriod && !_.isEmpty(record.OptionPeriod)) ? `( ${record.OptionPeriod} )`:''}`}</Col>
+                                            </Col>
+                                            <Col span={24}>
+                                                <Col span={7} className="ttu">ตำแหน่ง</Col>
+                                                <Col span={17}>{`${(record.ZoneDigit) ? `${(in_array(record.ZoneDigit, ['BKK', 'UPC'])) ? `RD-${record.ZoneDigit}`:record.ZoneDigit}`:''}`}</Col>
+                                            </Col>
+                                            <Col span={24}>
+                                                <Col span={7} className="ttu">มือถือ</Col>
+                                                <Col span={17}>{`${(record.OptionMobile && !_.isEmpty(record.OptionMobile)) ? `${handleMobilePattern(record.OptionMobile)}`:''}`}</Col>
+                                            </Col>
+                                        </Row>
+                                    </Col>
+                                </Row>
+                            </div>
+                        )
+                    break
+                    default:
+                        layout = (
+                            <div id={`${record.GroupData}_${record.EmployeeCode}`} style={{ width: '250px' }}>
+                                <Row gutter={10}>
+                                    <Col span={5}>
+                                        <Avatar src={`http://172.17.9.94/newservices/LBServices.svc/employee/image/${record.EmployeeCode}`} shape="square" style={{ width: '40px', height: '40px' }} />
+                                    </Col>
+                                    <Col span={19} style={{ fontSize: '1.5em' }}>
+                                        <Row gutter={8}>
+                                            <Col span={24}>
+                                                <Col span={7} className="ttu">ชื่อ-นามสกุล</Col>
+                                                <Col span={17}>{`${record.EmployeeName} ${(record.WorkingPeriod && !_.isEmpty(record.WorkingPeriod)) ? `( ${record.WorkingPeriod} )`:''}`}</Col>
+                                            </Col>
+                                            <Col span={24}>
+                                                <Col span={7} className="ttu">ตำแหน่ง</Col>
+                                                <Col span={17}>{`${(record.ZoneDigit) ? `${(in_array(record.ZoneDigit, ['BKK', 'UPC'])) ? `RD-${record.ZoneDigit}`:record.ZoneDigit}`:''}`}</Col>
+                                            </Col>
+                                            <Col span={24}>
+                                                <Col span={7} className="ttu">มือถือ</Col>
+                                                <Col span={17}>{`${(record.EmployeeMobile && !_.isEmpty(record.EmployeeMobile)) ? `${handleMobilePattern(record.EmployeeMobile)}`:''}`}</Col>
+                                            </Col>
+                                        </Row>
+                                    </Col>
+                                </Row>
+                            </div>
+                        )
+                    break
+                }
+    
+                return (<Popover placement="right" content={layout}><span onMouseOver={handleProfile.bind(this, `${record.GroupData}_${record.EmployeeCode}`)}>{`${strname}`}</span></Popover>) 
+            }
+        }
+    },
+    {
+        title: 'Location',
+        dataIndex: 'LocationCol',
+        className: `ttu tracked tc`,
+        fixed: 'left',
+        children: [
+            {
+                title: 'Area',
+                dataIndex: 'ZoneDigit',
+                className: `gridctrl_3 ttu tracked tc pointer`,
+                width: standardWidthFix,
+                sorter: (a, b) => compareByAlph(a.ZoneDigit, b.ZoneDigit),
+                onHeaderCell: () => {
+                    return {
+                        onClick: () => {
+                            let element = $('th.ant-table-column-has-filters.gridctrl_3').find('.ant-table-column-sorter > span')
+                            headAutoSort(element)                    
+                        }
+                    }
+                },  
+                render: (scope_area, data) => {                   
+                    if(in_array(data.GroupData, ['Branch'])) {
+                        return (
+                            <Popover content={`(${scope_area}) ${data.EmployeeName}`}>
+                                <span style={{ borderBottom: '1px dashed #D1D1D1' }}>{scope_area}</span>
+                            </Popover>
+                        )
+                    } 
+                    else if(in_array(data.GroupData, ['Market'])) {                        
+                        return (
+                            <Popover content={<div id={`market_calist_${data.EmployeeCode}`}><Spin id="market_calist_preload" size="small" /></div>} 
+                                trigger="hover"
+                                placement="right"
+                                arrowPointAtCenter
+                            >
+                                <span style={{ borderBottom: '1px dashed #D1D1D1' }} onMouseOver={getCAListInMarket.bind(this, data.EmployeeCode)}>{scope_area}</span>
+                            </Popover>
+                        )
+                    }
+                    else {
+                        return scope_area
+                    }                           
+                }
+            },   
+            {
+                title: 'BR',
+                dataIndex: 'BranchCode',
+                className: `gridctrl_4 ttu tracked tc pointer`,
+                sorter: (a, b) => compareByAlph(a.BranchCode, b.BranchCode),
+                onHeaderCell: () => {
+                    return {
+                        onClick: () => {
+                            let element = $('th.ant-table-column-has-filters.gridctrl_4').find('.ant-table-column-sorter > span')
+                            headAutoSort(element)                    
+                        }
+                    }
+                },  
+                width: 35,
+                render: (str, data) => {
+                    return (<Popover content={`${(data && data.BranchName) ? data.BranchName:''}`}>{ str }</Popover>)
+                }
+            }
+        ] 
+    },
+    {
+        title: `Begining`,
+        dataIndex: 'Begining',
+        className: `${cls['bg_option5']} ttu tracked tc`,
+        children: [
+            {
+                title: 'Total',
+                dataIndex: 'Begining_Total',
+                className: `${cls['bg_option5']} ttu tracked tc pointer`,
+                children: [
+                    {
+                        title: 'Vol',
+                        dataIndex: 'Begining_TotalVol',
+                        className: `${cls['bg_option5']} ttu tracked tc pointer`,
+                        width: standardWidthFix
+                    },
+                    {
+                        title: 'Cust',
+                        dataIndex: 'Begining_TotalCust',
+                        className: `${cls['bg_option5']} ttu tracked tc pointer`,
+                        width: standardWidthFix
+                    }
+                ]
+            },
+            {
+                title: 'Current',
+                dataIndex: 'Begining_TotalCurrent',
+                className: `${cls['bg_option5']} ttu tracked tc pointer`,
+                children: [
+                    {
+                        title: 'Vol',
+                        dataIndex: 'Begining_TotalCurrent_Vol',
+                        className: `${cls['bg_option5']} ttu tracked tc pointer`,
+                        width: standardWidthFix
+                    },
+                    {
+                        title: 'Cust',
+                        dataIndex: 'Begining_TotalCurrent_Cust',
+                        className: `${cls['bg_option5']} ttu tracked tc pointer`,
+                        width: standardWidthFix
+                    }
+                ]
+            },
+            {
+                title: 'Bad Rate',
+                dataIndex: 'Begining_TotalBadRate',
+                className: `${cls['bg_option5']} ttu tracked tc pointer`,
+                children: [
+                    {
+                        title: 'Vol',
+                        dataIndex: 'Begining_TotalBadRate_Vol',
+                        className: `${cls['bg_option5']} ttu tracked tc pointer`,
+                        width: standardWidthFix
+                    },
+                    {
+                        title: 'Cust',
+                        dataIndex: 'Begining_TotalBadRate_Cust',
+                        className: `${cls['bg_option5']} ttu tracked tc pointer`,
+                        width: standardWidthFix
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        title: `Today`,
+        dataIndex: 'Today',
+        className: `${cls['bg_lemon']} ttu tracked tc`,
+        children: [
+            {
+                title: 'Total',
+                dataIndex: 'Today_Total',
+                className: `${cls['bg_lemon']} ttu tracked tc pointer`,
+                children: [
+                    {
+                        title: 'Vol',
+                        dataIndex: 'Today_TotalVol',
+                        className: `${cls['bg_lemon']} ttu tracked tc pointer`,
+                        width: standardWidthFix
+                    },
+                    {
+                        title: 'Cust',
+                        dataIndex: 'Today_TotalCust',
+                        className: `${cls['bg_lemon']} ttu tracked tc pointer`,
+                        width: standardWidthFix
+                    },
+                ]
+            },
+            {
+                title: 'Current',
+                dataIndex: 'Today_TotalCurrent',
+                className: `${cls['bg_lemon']} ttu tracked tc pointer`,
+                children: [
+                    {
+                        title: 'Vol',
+                        dataIndex: 'Today_TotalCurrent_Vol',
+                        className: `${cls['bg_lemon']} ttu tracked tc pointer`,
+                        width: standardWidthFix
+                    },
+                    {
+                        title: 'Cust',
+                        dataIndex: 'Today_TotalCurrent_Cust',
+                        className: `${cls['bg_lemon']} ttu tracked tc pointer`,
+                        width: standardWidthFix
+                    },
+                    {
+                        title: '%',
+                        dataIndex: 'Today_TotalCurrent_Per',
+                        className: `${cls['bg_lemon']} ttu tracked tc pointer`,
+                        width: standardWidthFix
+                    }
+                ]
+            },
+            {
+                title: 'XDay',
+                dataIndex: 'Today_TotalXDay',
+                className: `${cls['bg_lemon']} ttu tracked tc pointer`,
+                children: [
+                    {
+                        title: 'Vol',
+                        dataIndex: 'Today_TotalXDay_Vol',
+                        className: `${cls['bg_lemon']} ttu tracked tc pointer`,
+                        width: standardWidthFix
+                    },
+                    {
+                        title: 'Cust',
+                        dataIndex: 'Today_TotalXDay_Cust',
+                        className: `${cls['bg_lemon']} ttu tracked tc pointer`,
+                        width: standardWidthFix
+                    },
+                    {
+                        title: '%',
+                        dataIndex: 'Today_TotalXDay_Per',
+                        className: `${cls['bg_lemon']} ttu tracked tc pointer`,
+                        width: standardWidthFix
+                    }
+                ]
+            },
+            {
+                title: 'Bad Rate',
+                dataIndex: 'Today_TotalBadRate',
+                className: `${cls['bg_lemon']} ttu tracked tc pointer`,
+                children: [
+                    {
+                        title: 'Vol',
+                        dataIndex: 'Today_TotalBadRate_Vol',
+                        className: `${cls['bg_lemon']} ttu tracked tc pointer`,
+                        width: standardWidthFix
+                    },
+                    {
+                        title: 'Cust',
+                        dataIndex: 'Today_TotalBadRate_Cust',
+                        className: `${cls['bg_lemon']} ttu tracked tc pointer`,
+                        width: standardWidthFix
+                    },
+                    {
+                        title: '%',
+                        dataIndex: 'Today_TotalBadRate_Per',
+                        className: `${cls['bg_lemon']} ttu tracked tc pointer`,
+                        width: standardWidthFix
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        title: `Close Account`,
+        dataIndex: 'CloseAcc',
+        className: `${cls['bg_option6']} ttu tracked tc`,
+        children: [
+            {
+                title: 'Total',
+                dataIndex: 'CloseAcc_Total',
+                className: `${cls['bg_option6']} ttu tracked tc pointer`,
+                children: [
+                    {
+                        title: 'Vol',
+                        dataIndex: 'CloseAcc_TotalVol',
+                        className: `${cls['bg_option6']} ttu tracked tc pointer`,
+                        width: standardWidthFix
+                    },
+                    {
+                        title: 'Cust',
+                        dataIndex: 'CloseAcc_TotalCust',
+                        className: `${cls['bg_option6']} ttu tracked tc pointer`,
+                        width: standardWidthFix
+                    },
+                ]
+            },
+            {
+                title: 'Current',
+                dataIndex: 'CloseAcc_TotalCurrent',
+                className: `${cls['bg_option6']} ttu tracked tc pointer`,
+                children: [
+                    {
+                        title: 'Vol',
+                        dataIndex: 'CloseAcc_TotalCurrent_Vol',
+                        className: `${cls['bg_option6']} ttu tracked tc pointer`,
+                        width: standardWidthFix
+                    },
+                    {
+                        title: 'Cust',
+                        dataIndex: 'CloseAcc_TotalCurrent_Cust',
+                        className: `${cls['bg_option6']} ttu tracked tc pointer`,
+                        width: standardWidthFix
+                    },
+                    {
+                        title: '%',
+                        dataIndex: 'CloseAcc_TotalCurrent_Per',
+                        className: `${cls['bg_option6']} ttu tracked tc pointer`,
+                        width: standardWidthFix
+                    }
+                ]
+            },
+            {
+                title: 'XDay',
+                dataIndex: 'CloseAcc_TotalXDay',
+                className: `${cls['bg_option6']} ttu tracked tc pointer`,
+                children: [
+                    {
+                        title: 'Vol',
+                        dataIndex: 'CloseAcc_TotalXDay_Vol',
+                        className: `${cls['bg_option6']} ttu tracked tc pointer`,
+                        width: standardWidthFix
+                    },
+                    {
+                        title: 'Cust',
+                        dataIndex: 'CloseAcc_TotalXDay_Cust',
+                        className: `${cls['bg_option6']} ttu tracked tc pointer`,
+                        width: standardWidthFix
+                    },
+                    {
+                        title: '%',
+                        dataIndex: 'CloseAcc_TotalXDay_Per',
+                        className: `${cls['bg_option6']} ttu tracked tc pointer`,
+                        width: standardWidthFix
+                    }
+                ]
+            },
+            {
+                title: 'Bad Rate',
+                dataIndex: 'CloseAcc_TotalBadRate',
+                className: `${cls['bg_option6']} ttu tracked tc pointer`,
+                children: [
+                    {
+                        title: 'Vol',
+                        dataIndex: 'CloseAcc_TotalBadRate_Vol',
+                        className: `${cls['bg_option6']} ttu tracked tc pointer`,
+                        width: standardWidthFix
+                    },
+                    {
+                        title: 'Cust',
+                        dataIndex: 'CloseAcc_TotalBadRate_Cust',
+                        className: `${cls['bg_option6']} ttu tracked tc pointer`,
+                        width: standardWidthFix
+                    },
+                    {
+                        title: '%',
+                        dataIndex: 'CloseAcc_TotalBadRate_Per',
+                        className: `${cls['bg_option6']} ttu tracked tc pointer`,
+                        width: standardWidthFix
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        title: `W0`,
+        dataIndex: 'W0',
+        className: `ttu tracked tc`,
+        children: [
+            {
+                title: 'Begin',
+                dataIndex: 'W0_Begin_Total',
+                className: `ttu tracked tc pointer`,
+                children: [
+                    {
+                        title: 'Vol',
+                        dataIndex: 'W0_Begin_TotalVol',
+                        className: `ttu tracked tc pointer`,
+                        width: standardWidthFix
+                    },
+                    {
+                        title: 'CIF',
+                        dataIndex: 'W0_Begin_TotalCust',
+                        className: `ttu tracked tc pointer`,
+                        width: standardWidthFix
+                    },
+                ]
+            },
+            {
+                title: 'Close',
+                dataIndex: 'W0_Close_Total',
+                className: `ttu tracked tc pointer`,
+                children: [
+                    {
+                        title: '%',
+                        dataIndex: 'W0_Close_TotalPer',
+                        className: `ttu tracked tc pointer`,
+                        width: standardWidthFix
+                    }
+                ]
+            },
+            {
+                title: 'ST',
+                dataIndex: 'W0_Stable_Total',
+                className: `ttu tracked tc pointer`,
+                children: [
+                    {
+                        title: '%',
+                        dataIndex: 'W0_Stable_TotalPer',
+                        className: `ttu tracked tc pointer`,
+                        width: standardWidthFix
+                    }
+                ]
+            },
+            {
+                title: 'FW',
+                dataIndex: 'W0_Flow_Total',
+                className: `ttu tracked tc pointer`,
+                children: [
+                    {
+                        title: '%',
+                        dataIndex: 'W0_Flow_TotalPer',
+                        className: `ttu tracked tc pointer`,
+                        width: standardWidthFix
+                    }
+                ]
+            },
+            {
+                title: 'RB',
+                dataIndex: 'W0_Rollback_Total',
+                className: `ttu tracked tc pointer`,
+                children: [
+                    {
+                        title: '%',
+                        dataIndex: 'W0_Rollback_TotalPer',
+                        className: `ttu tracked tc pointer`,
+                        width: standardWidthFix
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        title: `W1-4`,
+        dataIndex: 'W1_4',
+        className: `ttu tracked tc`,
+        children: [
+            {
+                title: 'Begin',
+                dataIndex: 'W1_4_Begin_Total',
+                className: `ttu tracked tc pointer`,
+                children: [
+                    {
+                        title: 'Vol',
+                        dataIndex: 'W1_4_Begin_TotalVol',
+                        className: `ttu tracked tc pointer`,
+                        width: standardWidthFix
+                    },
+                    {
+                        title: 'CIF',
+                        dataIndex: 'W1_4_Begin_TotalCust',
+                        className: `ttu tracked tc pointer`,
+                        width: standardWidthFix
+                    },
+                ]
+            },
+            {
+                title: 'Close',
+                dataIndex: 'W1_4_Close_Total',
+                className: `ttu tracked tc pointer`,
+                children: [
+                    {
+                        title: '%',
+                        dataIndex: 'W1_4_Close_TotalPer',
+                        className: `ttu tracked tc pointer`,
+                        width: standardWidthFix
+                    }
+                ]
+            },
+            {
+                title: 'ST',
+                dataIndex: 'W1_4_Stable_Total',
+                className: `ttu tracked tc pointer`,
+                children: [
+                    {
+                        title: '%',
+                        dataIndex: 'W1_4_Stable_TotalPer',
+                        className: `ttu tracked tc pointer`,
+                        width: standardWidthFix
+                    }
+                ]
+            },
+            {
+                title: 'FW',
+                dataIndex: 'W1_4_Flow_Total',
+                className: `ttu tracked tc pointer`,
+                children: [
+                    {
+                        title: '%',
+                        dataIndex: 'W1_4_Flow_TotalPer',
+                        className: `ttu tracked tc pointer`,
+                        width: standardWidthFix
+                    }
+                ]
+            },
+            {
+                title: 'RB',
+                dataIndex: 'W1_4_Rollback_Total',
+                className: `ttu tracked tc pointer`,
+                children: [
+                    {
+                        title: '%',
+                        dataIndex: 'W1_4_Rollback_TotalPer',
+                        className: `ttu tracked tc pointer`,
+                        width: standardWidthFix
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        title: `XDay`,
+        dataIndex: 'XDay',
+        className: `ttu tracked tc`,
+        children: [
+            {
+                title: 'Begin',
+                dataIndex: 'XDay_Begin_Total',
+                className: `ttu tracked tc pointer`,
+                children: [
+                    {
+                        title: 'Vol',
+                        dataIndex: 'XDay_Begin_TotalVol',
+                        className: `ttu tracked tc pointer`,
+                        width: standardWidthFix
+                    },
+                    {
+                        title: 'CIF',
+                        dataIndex: 'XDay_Begin_TotalCust',
+                        className: `ttu tracked tc pointer`,
+                        width: standardWidthFix
+                    },
+                ]
+            },
+            {
+                title: 'Close',
+                dataIndex: 'XDay_Close_Total',
+                className: `ttu tracked tc pointer`,
+                children: [
+                    {
+                        title: '%',
+                        dataIndex: 'XDay_Close_TotalPer',
+                        className: `ttu tracked tc pointer`,
+                        width: standardWidthFix
+                    }
+                ]
+            },
+            {
+                title: 'ST',
+                dataIndex: 'XDay_Stable_Total',
+                className: `ttu tracked tc pointer`,
+                children: [
+                    {
+                        title: '%',
+                        dataIndex: 'XDay_Stable_TotalPer',
+                        className: `ttu tracked tc pointer`,
+                        width: standardWidthFix
+                    }
+                ]
+            },
+            {
+                title: 'FW',
+                dataIndex: 'XDay_Flow_Total',
+                className: `ttu tracked tc pointer`,
+                children: [
+                    {
+                        title: '%',
+                        dataIndex: 'XDay_Flow_TotalPer',
+                        className: `ttu tracked tc pointer`,
+                        width: standardWidthFix
+                    }
+                ]
+            },
+            {
+                title: 'RB',
+                dataIndex: 'XDay_Rollback_Total',
+                className: `ttu tracked tc pointer`,
+                children: [
+                    {
+                        title: '%',
+                        dataIndex: 'XDay_Rollback_TotalPer',
+                        className: `ttu tracked tc pointer`,
+                        width: standardWidthFix
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        title: `M1`,
+        dataIndex: 'M1',
+        className: `ttu tracked tc`,
+        children: [
+            {
+                title: 'Begin',
+                dataIndex: 'M1_Begin_Total',
+                className: `ttu tracked tc pointer`,
+                children: [
+                    {
+                        title: 'Vol',
+                        dataIndex: 'M1_Begin_TotalVol',
+                        className: `ttu tracked tc pointer`,
+                        width: standardWidthFix
+                    },
+                    {
+                        title: 'CIF',
+                        dataIndex: 'M1_Begin_TotalCust',
+                        className: `ttu tracked tc pointer`,
+                        width: standardWidthFix
+                    },
+                ]
+            },
+            {
+                title: 'Close',
+                dataIndex: 'M1_Close_Total',
+                className: `ttu tracked tc pointer`,
+                children: [
+                    {
+                        title: '%',
+                        dataIndex: 'M1_Close_TotalPer',
+                        className: `ttu tracked tc pointer`,
+                        width: standardWidthFix
+                    }
+                ]
+            },
+            {
+                title: 'ST',
+                dataIndex: 'M1_Stable_Total',
+                className: `ttu tracked tc pointer`,
+                children: [
+                    {
+                        title: '%',
+                        dataIndex: 'M1_Stable_TotalPer',
+                        className: `ttu tracked tc pointer`,
+                        width: standardWidthFix
+                    }
+                ]
+            },
+            {
+                title: 'FW',
+                dataIndex: 'M1_Flow_Total',
+                className: `ttu tracked tc pointer`,
+                children: [
+                    {
+                        title: '%',
+                        dataIndex: 'M1_Flow_TotalPer',
+                        className: `ttu tracked tc pointer`,
+                        width: standardWidthFix
+                    }
+                ]
+            },
+            {
+                title: 'RB',
+                dataIndex: 'M1_Rollback_Total',
+                className: `ttu tracked tc pointer`,
+                children: [
+                    {
+                        title: '%',
+                        dataIndex: 'M1_Rollback_TotalPer',
+                        className: `ttu tracked tc pointer`,
+                        width: standardWidthFix
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        title: `M2`,
+        dataIndex: 'M2',
+        className: `ttu tracked tc`,
+        children: [
+            {
+                title: 'Begin',
+                dataIndex: 'M2_Begin_Total',
+                className: `ttu tracked tc pointer`,
+                children: [
+                    {
+                        title: 'Vol',
+                        dataIndex: 'M2_Begin_TotalVol',
+                        className: `ttu tracked tc pointer`,
+                        width: standardWidthFix
+                    },
+                    {
+                        title: 'CIF',
+                        dataIndex: 'M2_Begin_TotalCust',
+                        className: `ttu tracked tc pointer`,
+                        width: standardWidthFix
+                    },
+                ]
+            },
+            {
+                title: 'Close',
+                dataIndex: 'M2_Close_Total',
+                className: `ttu tracked tc pointer`,
+                children: [
+                    {
+                        title: '%',
+                        dataIndex: 'M2_Close_TotalPer',
+                        className: `ttu tracked tc pointer`,
+                        width: standardWidthFix
+                    }
+                ]
+            },
+            {
+                title: 'ST',
+                dataIndex: 'M2_Stable_Total',
+                className: `ttu tracked tc pointer`,
+                children: [
+                    {
+                        title: '%',
+                        dataIndex: 'M2_Stable_TotalPer',
+                        className: `ttu tracked tc pointer`,
+                        width: standardWidthFix
+                    }
+                ]
+            },
+            {
+                title: 'FW',
+                dataIndex: 'M2_Flow_Total',
+                className: `ttu tracked tc pointer`,
+                children: [
+                    {
+                        title: '%',
+                        dataIndex: 'M2_Flow_TotalPer',
+                        className: `ttu tracked tc pointer`,
+                        width: standardWidthFix
+                    }
+                ]
+            },
+            {
+                title: 'RB',
+                dataIndex: 'M2_Rollback_Total',
+                className: `ttu tracked tc pointer`,
+                children: [
+                    {
+                        title: '%',
+                        dataIndex: 'M2_Rollback_TotalPer',
+                        className: `ttu tracked tc pointer`,
+                        width: standardWidthFix
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        title: `NPL`,
+        dataIndex: 'NPL',
+        className: `ttu tracked tc`,
+        children: [
+            {
+                title: 'Begin',
+                dataIndex: 'NPL_Begin_Total',
+                className: `ttu tracked tc pointer`,
+                children: [
+                    {
+                        title: 'Vol',
+                        dataIndex: 'NPL_Begin_TotalVol',
+                        className: `ttu tracked tc pointer`,
+                        width: standardWidthFix
+                    },
+                    {
+                        title: 'CIF',
+                        dataIndex: 'NPL_Begin_TotalCust',
+                        className: `ttu tracked tc pointer`,
+                        width: standardWidthFix
+                    },
+                ]
+            },
+            {
+                title: 'Close',
+                dataIndex: 'NPL_Close_Total',
+                className: `ttu tracked tc pointer`,
+                children: [
+                    {
+                        title: '%',
+                        dataIndex: 'NPL_Close_TotalPer',
+                        className: `ttu tracked tc pointer`,
+                        width: standardWidthFix
+                    }
+                ]
+            },
+            {
+                title: 'ST',
+                dataIndex: 'NPL_Stable_Total',
+                className: `ttu tracked tc pointer`,
+                children: [
+                    {
+                        title: '%',
+                        dataIndex: 'NPL_Stable_TotalPer',
+                        className: `ttu tracked tc pointer`,
+                        width: standardWidthFix
+                    }
+                ]
+            },
+            {
+                title: 'FW',
+                dataIndex: 'NPL_Flow_Total',
+                className: `ttu tracked tc pointer`,
+                children: [
+                    {
+                        title: '%',
+                        dataIndex: 'NPL_Flow_TotalPer',
+                        className: `ttu tracked tc pointer`,
+                        width: standardWidthFix
+                    }
+                ]
+            },
+            {
+                title: 'RB',
+                dataIndex: 'NPL_Rollback_Total',
+                className: `ttu tracked tc pointer`,
+                children: [
+                    {
+                        title: '%',
+                        dataIndex: 'NPL_Rollback_TotalPer',
+                        className: `ttu tracked tc pointer`,
+                        width: standardWidthFix
+                    }
+                ]
+            }
+        ]
     }
 ]
 
@@ -2061,29 +3467,6 @@ const getCAListInMarket = (market_code) => {
         })
 
     }
-
-    
-    
-   
-
-    // let data =  []
-    // let results = fetch(request_set).then(response => response.json()).then(data => data)
-    // results.then(d => data.push(d))
-
-    // console.log(data)
-
-    // data.then(data => {
-    //     if(data && data.length > 0) {
-    //         return 'test'
-    //         // return (
-    //         //     <Popover  content={} trigger="hover">
-    //         //         <span style={{ borderBottom: '1px dashed #D1D1D1' }}>{scope_area}</span>
-    //         //     </Popover>
-    //         // )
-    //         console.log(data)
-    //     }
-        
-    // })
     
 }
 
@@ -2114,4 +3497,9 @@ const handleProfile = (e) => {
             $(element[1]).css('background', '#0046B6 ')
         }
     }, 200)
+}
+
+const handleMoney = (amt_conv, amt_full, digit) => {
+    if(amt_full >= 1000000) return `${numberWithCommas(roundFixed(amt_conv, digit))}M`
+    else return `${numberWithCommas(roundFixed(amt_conv, digit))}K`
 }

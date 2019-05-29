@@ -74,7 +74,7 @@ div[class^="ant-popover-inner-content"]:not(.unset) {
     .grid_header {
         width: 100%;
         display: grid;
-        grid-template-columns: 30% 70%;
+        grid-template-columns: 15% 85%;
         margin-bottom:  5px;
         .item_header {
             position: relative;
@@ -84,7 +84,7 @@ div[class^="ant-popover-inner-content"]:not(.unset) {
         .item_header:nth-child(2) {
             text-align: right;
             .tools_container {
-                width: 355px;
+                width: max-content;
                 height: 45px;
                 position: absolute;
                 right: 45px;
@@ -110,18 +110,35 @@ div[class^="ant-popover-inner-content"]:not(.unset) {
                         transform: rotate(-45deg);
                     }
                 }
+                .tools_icon.switch {
+                    min-width: 40px;  
+                    color: #666 !important;
+                    background-color: #FFF;
+                    margin-top: 1px;
+                    margin-right: 15px;
+                    i { margin-top: 0px; }
+                    .title {
+                        font-size: 0.8em;
+                        position: absolute;
+                        bottom: -5px;
+                        left: 0;
+                    }
+                }
                 .tools_icon.unset {
-                    width: 220px;
+                    width: auto;
                     background: transparent;
                     margin-top: 5px;
                     
                     label[class^="ant-radio-button-wrapper"]:first-child {
                         margin-right: 0px;
                     }
-                    label[class^="ant-radio-button-wrapper"]:first-child, label[class^="ant-radio-button-wrapper"]:last-child {
+                    
+                    label[class^="ant-radio-button-wrapper"]:first-child, label[class^="ant-radio-button-wrapper"], label[class^="ant-radio-button-wrapper"]:last-child {
                         border-radius: 0px;
                         padding: 0px;
                         width: 110px;
+                        text-transform: uppercase;
+                        font-size: 0.8em;
 
                         i {
                             font-size: 16px;
@@ -191,7 +208,9 @@ div[class^="ant-popover-inner-content"]:not(.unset) {
             .item_footer.bg_option1,
             .item_footer.bg_option2,
             .item_footer.bg_option3,
-            .item_footer.bg_option4 {
+            .item_footer.bg_option4,
+            .item_footer.bg_option5,
+            .item_footer.bg_option6 {
                 height: 27px;
                 padding: 3px !important; 
                 border-right: 1px solid #e9e9e9; 
@@ -226,7 +245,9 @@ div[class^="ant-popover-inner-content"]:not(.unset) {
             .grand_item_footer.bg_option1,
             .grand_item_footer.bg_option2,
             .grand_item_footer.bg_option3,
-            .grand_item_footer.bg_option4 {
+            .grand_item_footer.bg_option4,
+            .grand_item_footer.bg_option5,
+            .grand_item_footer.bg_option6 {
                 height: 27px;
                 padding: 3px !important; 
                 border-right: 1px solid #e9e9e9; 
@@ -251,7 +272,7 @@ div[class^="ant-popover-inner-content"]:not(.unset) {
         opacity: 0;
     }
 
-    table thead th:not(.bg_lemon):not(.bg_option1):not(.bg_option2):not(.bg_option3):not(.bg_option4) {
+    table thead th:not(.bg_lemon):not(.bg_option1):not(.bg_option2):not(.bg_option3):not(.bg_option4):not(.bg_option5):not(.bg_option6) {
         background: #4390DF !important;
         span { color: #FFF !important; } 
     }
@@ -381,6 +402,13 @@ table.grid_ca_tooltip {
     
 }
 
+table.grid_toolip_os {
+    th, td {
+        font-size: 0.8em !important;
+        padding: 0 !important;
+    }
+}
+
 .grid_container.unset {
 
     & tbody {
@@ -414,6 +442,12 @@ table.grid_ca_tooltip {
         span[class$="indent-level-2"] { padding-left: 10px !important; }
         span[class$="indent-level-3"] { padding-left: 15px !important; }
         span[class$="indent-level-4"] { padding-left: 20px !important; }
+        span[class$="indent-level-5"] { padding-left: 25px !important; }
+        span[class$="indent-level-6"] { padding-left: 30px !important; }
+        span[class$="indent-level-7"] { padding-left: 35px !important; }
+        span[class$="indent-level-8"] { padding-left: 40px !important; }
+        span[class$="indent-level-9"] { padding-left: 45px !important; }
+        span[class$="indent-level-10"] { padding-left: 50px !important; }
     }
 
     /*
@@ -424,7 +458,7 @@ table.grid_ca_tooltip {
 }
 
 .grid_container.unset.grid_topup {
-    table td, th, {
+    table td, th {
         font-size: $default_grid_fontsize;
         letter-spacing: $default_grid_letterspacing;
     }
@@ -497,7 +531,7 @@ table.grid_ca_tooltip {
 }
 
 .grid_container.unset.grid_collection {
-    table td, th, {
+    table td, th {
         font-size: $default_grid_fontsize;
         letter-spacing: $default_grid_letterspacing;
     }
@@ -569,6 +603,36 @@ table.grid_ca_tooltip {
         color: $perform_font_color !important;
     }
 */
+}
+
+.grid_container.unset.grid_flow {
+    table td, th {
+        font-size: $default_grid_fontsize;
+        letter-spacing: $default_grid_letterspacing;
+    }
+
+    tbody[class="ant-table-tbody"] > tr > td:nth-child(2) {
+        background: #FFF !important;
+    }
+
+    
+    & ::-webkit-scrollbar {
+        height: 6px;
+	    background-color: #F5F5F5;
+    }
+
+    & ::-webkit-scrollbar-track {
+        height: 1px;
+        background-color: rgba(0,0,0,0.4)
+    }
+
+    & ::-webkit-scrollbar-thumb {
+        width: 0.35em !important;
+        margin: 0 auto !important;
+        border-radius: 16px;
+        background-color: rgba(255,255,255,0.85)
+    }
+
 }
 
 .customer_modal {
@@ -1623,7 +1687,16 @@ td.bg_option3, div.bg_option3 {
 th.bg_option4 { 
     background: #e87b30 !important; 
     span {color: #FFF !important;} 
+}
 
+th.bg_option5 { 
+    background: #982020 !important; 
+    span {color: #FFF !important;} 
+}
+
+th.bg_option6 { 
+    background: gray !important; 
+    span {color: #FFF !important;} 
 }
 
 /*

@@ -15,6 +15,7 @@ import {
     KIOSK_SUMMARY_URL,
     MARKET_SUMMARY_URL,
     CA_SUMMARY_URL,
+    MARKETCA_SUMMARY_URL,
     CUSTOMER_GRIDSUMMARY_URL,
     CUSTOMER_WARNING_GRIDSUMMARY_URL,
 
@@ -216,6 +217,22 @@ export const gridMarketSummaryAPI = (param) => {
 
 export const gridCASummaryAPI = (param) => {
     return fetch(`${CA_SUMMARY_URL}`, {
+        method: 'POST',
+        body: JSON.stringify(param),
+        headers: { 'Content-Type': 'application/json' },
+        timeout: 10000000
+    })
+    .then(response => {
+        return {
+            data: (response) ? response.json() : [],
+            status: (response) ? response.status : false,
+            msg: (response) ? response.statusText : 'falied'
+        }
+    })
+}
+
+export const gridMarketCASummaryAPI = (param) => {
+    return fetch(`${MARKETCA_SUMMARY_URL}`, {
         method: 'POST',
         body: JSON.stringify(param),
         headers: { 'Content-Type': 'application/json' },

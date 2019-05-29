@@ -433,8 +433,6 @@ export const customer_column_modal = [
                 return null
             }
 
-            
-
         }
     },
     {
@@ -505,9 +503,9 @@ export const customer_column_modal = [
         children: [           
             {
                 title: 'Due',
-                dataIndex: 'WkCycleDueNo',
+                dataIndex: 'MthCycleDueDay',
                 className: 'mktcol_modal_15 ttu tracked tc pointer',
-                sorter: (a, b) => compareByAmount(a.WkCycleDueNo, b.WkCycleDueNo),
+                sorter: (a, b) => compareByAmount(a.MthCycleDueDay, b.MthCycleDueDay),
                 width: standardWidth,
                 onHeaderCell: () => {
                     return {
@@ -626,31 +624,31 @@ export const customer_column_modal = [
                     }
                 },
                 render: (bucket, rowData) => {
-                    let overdue_day = (rowData.OverdueDay) ? rowData.OverdueDay : 0
-                    let current_point = (rowData.Cust_DPDBucketNow && in_array(rowData.Cust_DPDBucketNow, ['XDay', 'M1-2', 'NPL'])) ? 'MDPD': 'WDPD'
+                    let overdue_day = (rowData.DueDPD) ? rowData.DueDPD : 0
+                    let current_point = (rowData.Cust_DPDBucketNow && in_array(rowData.Cust_DPDBucketNow, ['XDay', 'M1', 'M2', 'NPL'])) ? 'MDPD': 'WDPD'
 
-                    let text_bucket = ''
-                    if(current_point == 'WDPD') {
-                        if(overdue_day == 0)
-                            text_bucket = '0 WDPD'
-                        else if(overdue_day > 0 && overdue_day <= 7)
-                            text_bucket = '1-7 WDPD'
-                        else if(overdue_day > 8 && overdue_day <= 14)
-                            text_bucket = '8-14 WDPD'
-                        else if(overdue_day >= 15 && overdue_day <= 21)
-                            text_bucket = '15-21 WDPD'
-                        else if(overdue_day >= 22 && overdue_day <= 30)
-                            text_bucket = '22-30 WDPD'
-                    } else {
-                        if(overdue_day > 1 && overdue_day <= 30)
-                            text_bucket = '1-30 MDPD'
-                        else if(overdue_day >= 31 && overdue_day <= 60)
-                            text_bucket = '31-60 MDPD'
-                        else if(overdue_day >= 61 && overdue_day <= 90)
-                            text_bucket = '61-90 MDPD'
-                        else if(overdue_day > 90)
-                            text_bucket = '90+ MDPD'
-                    }
+                    let text_bucket = `${overdue_day} ${current_point}`
+                    // if(current_point == 'WDPD') {
+                    //     if(overdue_day == 0)
+                    //         text_bucket = '0 WDPD'
+                    //     else if(overdue_day > 0 && overdue_day <= 7)
+                    //         text_bucket = '1-7 WDPD'
+                    //     else if(overdue_day > 8 && overdue_day <= 14)
+                    //         text_bucket = '8-14 WDPD'
+                    //     else if(overdue_day >= 15 && overdue_day <= 21)
+                    //         text_bucket = '15-21 WDPD'
+                    //     else if(overdue_day >= 22 && overdue_day <= 30)
+                    //         text_bucket = '22-30 WDPD'
+                    // } else {
+                    //     if(overdue_day > 1 && overdue_day <= 30)
+                    //         text_bucket = '1-30 MDPD'
+                    //     else if(overdue_day >= 31 && overdue_day <= 60)
+                    //         text_bucket = '31-60 MDPD'
+                    //     else if(overdue_day >= 61 && overdue_day <= 90)
+                    //         text_bucket = '61-90 MDPD'
+                    //     else if(overdue_day > 90)
+                    //         text_bucket = '90+ MDPD'
+                    // }
                     return (<Popover placement="top" content={`${text_bucket}`}>{bucket}</Popover>)
                 }
             },

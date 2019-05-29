@@ -34,7 +34,15 @@ export const configAccessHeader = (req, res, next) => {
 // CONFIGURATION DEFINITION
 export const config = {
     database: {
-        production: {}
+        production: {
+            server: 'TC001PCIS1P',
+            database: 'PCIS_Nano',
+            user: 'sa',
+            password: 'P@ssw0rd1234',
+            connectionTimeout: 50000,
+            parseJSON: true,
+            option: { encrypt: false }
+        }
     },
     cookies_config: {
         path: '/',
