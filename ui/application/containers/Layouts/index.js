@@ -195,7 +195,8 @@ class MarketLayout extends Component {
             }
 
             this.setState({ 
-                sideable: _.assignIn({}, this.state.sideable, changeState), active_sideno: activeSideno,
+                sideable: _.assignIn({}, this.state.sideable, changeState), 
+                active_sideno: activeSideno,
                 visible: _.assignIn({}, this.state.visible, { cell_extension_tool: false })
             })
 
@@ -225,7 +226,7 @@ class MarketLayout extends Component {
         const customer_name = (data && data.CustomerName != '') ? data.CustomerName : null
         const is_potential = (data && data.IsPotential == 'Y') ? 'YES' : 'NO'
 
-        let potential_icon = (is_potential == 'Y') ? 'fa fa-check green' : 'fa fa-close red'
+        /*let potential_icon = (is_potential == 'Y') ? 'fa fa-check green' : 'fa fa-close red'*/
 
         element_cell
         .before(() => { element_cell.find(`div.${cls['cell']}`).empty() })
@@ -275,6 +276,7 @@ class MarketLayout extends Component {
         
         _.delay(() => {
             let result = _.filter(this.state.mktCustomers, function (data) { return data.IsActive == 'Y' })
+
             this.setState({
                 visible: _.assignIn({}, this.state.visible, { assign_modal: true, cell_extension_tool: false }),
                 navable: _.assignIn({}, this.state.navable, { summary: false, collapse: true }),
@@ -349,7 +351,7 @@ class MarketLayout extends Component {
             })
             .unbind(this)
         }
-        
+
     }
 
     handleExtensionClose = (e) => {
@@ -901,7 +903,7 @@ class MarketLayout extends Component {
         const { layouts } = this.state
 
         // THE DATA FOUND
-        if(CUSTOMER_LIST_INFO.state) {
+        if(layouts && layouts.sidename_activation.length > 0 && layouts.boxsname_activation.length > 0) {
             _.delay(() => { this.setState({ progress_status: 0, progress_desc: 'พบข้อมูลก่อนหน้า ระบบกำลังโหลดเลย์เอาท์ตลาด...' }) }, 1000)
         }
 
@@ -942,7 +944,11 @@ class MarketLayout extends Component {
             // FIND ELEMENT CELL WAS ACTIVED
             const cell = document.querySelectorAll(`.${cls['cell_active']}`)
             // DEFINE A VARIABLE FOR GET CUSTOMER LIST OF MARKET
-            const cust = (CUSTOMER_LIST_INFO.data && CUSTOMER_LIST_INFO.data.length > 0) ? CUSTOMER_LIST_INFO.data : []
+            let cust_state = (this.state.mktCustomers && this.state.mktCustomers.length > 0) ? this.state.mktCustomers : []
+            let cust = (CUSTOMER_LIST_INFO.data && CUSTOMER_LIST_INFO.data.length > 0) ? CUSTOMER_LIST_INFO.data : null
+            if(!cust) {
+                cust = cust_state
+            }
 
             // UPDATE CUSOMTER
             if (cust && cust.length > 0) {
@@ -973,14 +979,17 @@ class MarketLayout extends Component {
         const pathArray = window.location.pathname.split( '/')
         const param_info = (pathArray[2]) && pathArray[2]
 
+        console.info({ MarketCode: param_info })
+
         // CALL DEFAULT BASIC INFORMATION 
         if(param_info && !_.isEmpty(param_info)) {
+            
             let params = { 
                 AuthID: Auth.EmployeeCode,
                 MarketCode: param_info.substr(0, (param_info.length - 3)).toUpperCase()               
             }
 
-            let apis = [GET_MASTER_DATA, GET_EMP_TESTER_DATA, GET_MARKET_LOCKINFO, GET_BRANCHMARKET_INFO, GET_CUSTOMER_INFO, GET_MARKETSHARE_CA]
+            let apis = [GET_MASTER_DATA, GET_EMP_TESTER_DATA, GET_BRANCHMARKET_INFO, GET_CUSTOMER_INFO, GET_MARKETSHARE_CA, GET_MARKET_LOCKINFO]
             bluebird.all(apis).each((fn, i) => {
                 if(in_array(i, [0, 1])) fn()
                 else fn(params)
@@ -992,8 +1001,10 @@ class MarketLayout extends Component {
     
     componentWillReceiveProps(props) {
         if(props) {
+
             if(props.CUSTOMER_LIST_INFO.data && props.CUSTOMER_LIST_INFO.data.length > 0) {
                 const { mktCustomers } = this.state
+              
                 if(mktCustomers && mktCustomers.length <= 0) {
                     this.setState({ mktCustomers: props.CUSTOMER_LIST_INFO.data })
                 }
@@ -1017,6 +1028,23 @@ class MarketLayout extends Component {
 
     componentDidMount() {
         const { Auth } = this.state.authen
+        const { BRANCH_MARKET_PROFILE } = this.props
+
+        // let recheck_limit = 0
+        // let recheck_branch_info = undefined
+        // recheck_branch_info = setInterval(() => {
+
+        //     console.log(BRANCH_MARKET_PROFILE)
+        //     recheck_limit++
+
+            
+        //     if(BRANCH_MARKET_PROFILE.status || recheck_limit > 10) {
+        //         clearInterval(recheck_branch_info)
+        //     }
+            
+        // }, 300)
+
+        console.log(BRANCH_MARKET_PROFILE.data)
        
         // CHECK AUTHORITY 
         if (!Auth && !Auth.EmployeeCode) {
@@ -1035,46 +1063,60 @@ class MarketLayout extends Component {
                     this.getInitialLayout() 
 
                 // NOT ANYTHING LAYOUT, THE SYSTEM WILL PASS TO CREATE LAYOUT
-                } else {
-                    const { BRANCH_MARKET_PROFILE } = this.props
+                } else {                   
 
+                    
+                   
                     _.delay(() => {
-
+                  
                         this.setState({ progress_status: 0, progress_desc: 'กำลังโหลดข้อมูล กรุณารอสักครู่...' })
 
-                        // CHECK BASIC BRANCH AND MARKET INFORMATION
-                        if(BRANCH_MARKET_PROFILE.status) {
-                            // CREATE OBJECT FOR INITIAL LAYOUT
-                            const market_profile = (BRANCH_MARKET_PROFILE.data && BRANCH_MARKET_PROFILE.data[0]) ? BRANCH_MARKET_PROFILE.data[0] : null
-                            let requestData = {
-                                branch_filter: (market_profile) ? market_profile.BranchCode : null,
-                                market_filter: (market_profile) ? market_profile.MarketCode : null,
-                                market_info: market_profile
-                            }
-                            
-                            // INITIAL DATA FOR CREATE LAYOUT
-                            this.handleInitialCreation(requestData)
+                  
+                       
 
-                        } else {
-                            _.delay(() => { this.setState({ progress_status: 2, progress_desc: `เกิดข้อผิดพลาดในการรับข้อมูล [${EX.MARKET_ERR.CODE}]` }) }, 700)
-                        }
+                        // // CHECK BASIC BRANCH AND MARKET INFORMATION
+                        // if(BRANCH_MARKET_PROFILE.status) {
+                        //     // CREATE OBJECT FOR INITIAL LAYOUT
+                        //     const market_profile = (BRANCH_MARKET_PROFILE && BRANCH_MARKET_PROFILE.status) ? BRANCH_MARKET_PROFILE.data : null
+                        //     let requestData = {
+                        //         branch_filter: (market_profile) ? market_profile.BranchCode : null,
+                        //         market_filter: (market_profile) ? market_profile.MarketCode : null,
+                        //         market_info: market_profile
+                        //     }
+                            
+                        //     // INITIAL DATA FOR CREATE LAYOUT
+                        //     this.handleInitialCreation(requestData)
+
+                        // } else {
+                        //     _.delay(() => { this.setState({ progress_status: 2, progress_desc: `เกิดข้อผิดพลาดในการรับข้อมูล [${EX.MARKET_ERR.CODE}]` }) }, 700)
+                        // }
                         
-                    }, 500)
+                    }, 1000)
                 }
 
-            }, 700)
+            }, 500)
 
         }
 
         document.title = 'Nano Layout'
     }
 
+    // componentDidUpdate() {
+    //     // GET PARAM WITH URL
+    //     const pathArray = window.location.pathname.split( '/')
+    //     const param_info = (pathArray[2]) && pathArray[2]
+
+    //     console.log(this.state)
+    // }
+
     shouldComponentUpdate(nextProps, nextState) {
-        return this.props.master !== nextProps.master ||
-            this.props.BRANCH_MARKET_PROFILE !== nextProps.BRANCH_MARKET_PROFILE ||
+        return  this.props.master !== nextProps.master ||
+            this.props.BRANCH_MARKET_PROFILE.data !== nextProps.BRANCH_MARKET_PROFILE.data ||
             this.props.CUSTOMER_LIST_INFO !== nextProps.CUSTOMER_LIST_INFO ||
             this.props.MARKETSHARE_CA_INFO !== nextProps.MARKETSHARE_CA_INFO ||
             this.props.MARKET_LOCKINFO !== nextProps.MARKET_LOCKINFO ||
+            this.state.mktcode !== nextState.mktcode ||
+            this.state.mktCustomers !== nextState.mktCustomers ||
             this.state.elements !== nextState.elements ||
             this.state.layouts !== nextState.layouts ||
             this.state.preview_layouts !== nextState.preview_layouts ||
@@ -1105,8 +1147,7 @@ class MarketLayout extends Component {
             this.state.table_info.cols !== nextState.table_info.cols ||
             this.state.table_info.rows !== nextState.table_info.rows ||
             this.state.table_info.total !== nextState.table_info.total ||
-            this.state.mktPotential !== nextState.mktPotential ||
-            this.state.mktCustomers !== nextState.mktCustomers ||
+            this.state.mktPotential !== nextState.mktPotential ||           
             this.state.mktCustFilter !== nextState.mktCustFilter ||
             this.state.mktMasterFilter !== nextState.mktMasterFilter ||
             this.state.preview_bigscale !== nextState.preview_bigscale || 
@@ -1685,7 +1726,12 @@ class MarketLayout extends Component {
 
                         _.delay(() => {
                             const cell = document.getElementById('grid_previews').querySelectorAll(`.${cls['cell_active']}`)
-                            const cust = (CUSTOMER_LIST_INFO.data && CUSTOMER_LIST_INFO.data.length > 0) ? CUSTOMER_LIST_INFO.data : []
+                            let cust_state = (this.state.mktCustomers && this.state.mktCustomers.length > 0) ? this.state.mktCustomers : []
+                            let cust = (CUSTOMER_LIST_INFO.data && CUSTOMER_LIST_INFO.data.length > 0) ? CUSTOMER_LIST_INFO.data : null
+                            if(!cust) {
+                                cust = cust_state
+                            }
+                            
                             if (cell[0] && cell.length > 0) {
                                 _.forEach(cell, (v) => {
                                     if (cust && cust.length > 0) {

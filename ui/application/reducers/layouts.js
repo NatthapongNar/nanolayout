@@ -4,12 +4,12 @@ import {
     LAYOUT_EMP_TESTER_INFO_SUCCESS,
     LAYOUT_EMP_TESTER_INFO_FAILURE,
 
+    LAYOUT_BRANCH_MARKET_INFO_REQUEST,
     LAYOUT_BRANCH_MARKET_INFO_SUCCESS,
-    LAYOUT_BRANCH_MARKET_INFO_FAILURE,
 
+    LAYOUT_CUSTOMER_INFO_REQUEST,
     LAYOUT_CUSTOMER_INFO_SUCCESS,
-    LAYOUT_CUSTOMER_INFO_FAILURE,
-
+    
     LAYOUT_MARKETSHARE_CA_SUCCESS,
     LAYOUT_MARKETSHARE_CA_FAILURE,
 
@@ -22,6 +22,7 @@ import {
 } from '../constants/actionType'
 
 const initialState = { data: [], status: false, msg: '' }
+const initialRespData = { data: [], status: false, loading: true, msg: '' }
 
 export const GET_EMP_TESTER_INFO = (state = initialState, action) => {
     switch (action.type) {
@@ -34,12 +35,12 @@ export const GET_EMP_TESTER_INFO = (state = initialState, action) => {
     }
 }
 
-export const GET_BRANCH_MARKET_PROFILE = (state = initialState, action) => {
+export const GET_BRANCH_MARKET_PROFILE = (state = initialRespData, action) => {
     switch (action.type) {
-        case LAYOUT_BRANCH_MARKET_INFO_SUCCESS:        
-            return { data: action.payload, status: true, msg: 'load success' }
-        case LAYOUT_BRANCH_MARKET_INFO_FAILURE:
-            return { data: action.payload, status: true, msg: 'load falied' }
+        case LAYOUT_BRANCH_MARKET_INFO_REQUEST:
+            return action.payload
+        case LAYOUT_BRANCH_MARKET_INFO_SUCCESS:
+            return action.payload
         default:
             return state
     }
@@ -47,10 +48,10 @@ export const GET_BRANCH_MARKET_PROFILE = (state = initialState, action) => {
 
 export const GET_CUSTOMER_INFO = (state = initialState, action) => {
     switch (action.type) {
+        case LAYOUT_CUSTOMER_INFO_REQUEST:
+            return { data: [], status: false, msg: 'loading' }
         case LAYOUT_CUSTOMER_INFO_SUCCESS:        
-            return { data: action.payload, status: true, msg: 'load success' }
-        case LAYOUT_CUSTOMER_INFO_FAILURE:
-            return { data: action.payload, status: true, msg: 'load falied' }
+            return { data: action.payload, status: true, msg: 'load success' }      
         default:
             return state
     }

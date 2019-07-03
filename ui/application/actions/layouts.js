@@ -67,14 +67,22 @@ export const getBranchMarketInfo = (params) => ((dispatch) =>
             method: 'POST',
             body: JSON.stringify(params),
             types: [
-                LAYOUT_BRANCH_MARKET_INFO_REQUEST,
+                {
+                    type: LAYOUT_BRANCH_MARKET_INFO_REQUEST,
+                    payload: { data: [], status: false, loading: true, msg: 'The data is loading...' }
+                },
                 {
                     type: LAYOUT_BRANCH_MARKET_INFO_SUCCESS,
                     payload: (_action, _state, res) => {
-                        return res.json().then((data) => data)
+                        return res.json().then((item) => {
+                            return { data: item, status: true, loading: false, msg: 'The data was loaded successfully.' }
+                        })
                     }
                 },
-                LAYOUT_BRANCH_MARKET_INFO_FAILURE
+                {
+                    type: LAYOUT_BRANCH_MARKET_INFO_FAILURE,
+                    payload: { data: [], status: false, loading: false, msg: 'Not found items' }
+                }
             ]
         }
     })

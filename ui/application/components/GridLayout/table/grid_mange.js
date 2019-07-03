@@ -55,6 +55,9 @@ const maxHeightScreen = window.screen.availHeight - (window.outerHeight - window
 const update_feature = (
     <div className={cls['feature']} style={{ padding: '10px', background: '#FFF', color: 'black', height: '400px', fontSize: '1em', overflow: 'scroll' }}>
         <h4 className="ttu"><b>Feature update</b></h4>
+        <div><b>Version Version 1.3.0 <small className="tr fr">(06 Jun 2019)</small></b></div>
+        <div>1. เพิ่มโหมดใหม่ Port Assigment</div>
+        <div>2. แก้ไขปัญหาภายในระบบและปรับปรุงระบบข้อมูลใหม่</div>
         <div><b>Version Version 1.2.1 <small className="tr fr">(09 Feb 2019)</small></b></div>
         <div>1. เพิ่ม Column New Booking ใหม่ในโหมด Port Quality</div>
         <div>2. ปรับปรุงระบบข้อความจากระบบ Tablet ใหม่</div>
@@ -359,394 +362,658 @@ class GridMangement extends Component {
     handleFooterSummary = (currentPageData) => {
         const { dataSoruce, progress, mode } = this.state
 
-        if (!progress && currentPageData) {
+        if(in_array(mode, ['Performance', 'Collection'])) {
+            if (!progress && currentPageData) {
+                _.delay(() => {
+                    const parentTable = document.querySelector(`.${cls['grid_container']}`)
+                    if (parentTable) {
+    
+                        let rtd_element = parentTable.querySelectorAll(`tr:first-child td`)
+                        let rtd_count = parentTable.querySelectorAll('tr:first-child td').length
+    
+                        if (rtd_count > 0) {
+    
+                            let rtd_size = []
+                            _.forEach(rtd_element, (v, i) => { rtd_size.push($(v).outerWidth()) })
+    
+                            let footer = {
+                                title: 'TOTAL',
+                                warining: '',
+                                area: '',
+                                branch: '',
+                                cycle: '',
+                                total_shop: 0,
+                                total_pot: 0,
+                                total_os_vol: 0,
+                                total_os_cust: 0,
+                                total_micro: 0,
+                                total_topup: 0
+                            }
+    
+                            let grand_footer = {
+                                title: 'GRAND TOTAL',
+                                warining: '',
+                                area: '',
+                                branch: '',
+                                cycle: '',
+                                total_shop: 0,
+                                total_pot: 0,
+                                total_os_vol: 0,
+                                total_os_cust: 0,
+                                total_micro: 0,
+                                total_topup: 0
+                            }
+    
+                            // TOTAL CURRENT PAGE
+                            let sum_total_shop = _.sumBy(currentPageData, 'MarketShop')
+                            let sum_total_cust = _.sumBy(currentPageData, 'TotalCust')
+                            let sum_total_pot = _.sumBy(currentPageData, 'TotalPotential')
+    
+                            let sum_total_osunit = _.sumBy(currentPageData, 'OS_Unit')
+                            let sum_total_osvol = _.sumBy(currentPageData, 'OS_Vol')
+    
+                            // ADD NEW ON 19 MAR 2019
+                            let sum_total_osunit_cutnpl = _.sumBy(currentPageData, 'TotalOS_Current_WithXDay_Acc')
+                            let sum_total_osvol_cutnpl = _.sumBy(currentPageData, 'TotalOS_Current_WithXDay_Bal')
+    
+                            let sum_total_oscurrent_acc = _.sumBy(currentPageData, 'TotalOS_Current_Acc')
+                            let sum_total_oscurrent_bal = _.sumBy(currentPageData, 'TotalOS_Current_Bal')
+    
+                            let sum_total_osacc_exclude_npl = _.sumBy(currentPageData, 'TotalOS_ExcludeNPL_Acc')
+                            let sum_total_osbal_exclude_npl = _.sumBy(currentPageData, 'TotalOS_ExcludeNPL_Bal')
+                            // END NEW ON 19 MAR 2019
+    
+                            let sum_total_osmicro = _.sumBy(currentPageData, 'OS_MF_Limit')
+                            let sum_total_topupapp = _.sumBy(currentPageData, 'OS_TopupApp')
+                            let sum_total_topupvol = _.sumBy(currentPageData, 'OS_TopupVol')
+    
+                            let sum_total_osvol_full = _.sumBy(currentPageData, 'OS_Vol_FullAmt')
+                            let sum_total_topup_full = _.sumBy(currentPageData, 'OS_TopupVol_FullAmt')
+                            let sum_total_osmf_full = _.sumBy(currentPageData, 'OS_MF_Limit_FullAmt')
+    
+                            // ADD NEW ON 20 MAR 2019
+                            let sum_total_base_current = _.sumBy(currentPageData, 'Base_0MDPD')
+                            let sum_total_base_xday = _.sumBy(currentPageData, 'Base_1_30MDPD')
+                            let sum_total_base_month = _.sumBy(currentPageData, 'Base_31_60MDPD')
+    
+                            let sum_total_flow_current = _.sumBy(currentPageData, 'Flow_0MDPD')
+                            let sum_total_flow_xday = _.sumBy(currentPageData, 'Flow_1_30MDPD')
+                            let sum_total_flow_month = _.sumBy(currentPageData, 'Flow_31_60MDPD')
+    
+                            let sum_total_problem_current = _.sumBy(currentPageData, 'Problem_0MDPD')
+                            let sum_total_problem_xday = _.sumBy(currentPageData, 'Problem_1_30MDPD')
+                            let sum_total_problem_month = _.sumBy(currentPageData, 'Problem_31_60MDPD')
+    
+                            let sum_total_new_amount = _.sumBy(currentPageData, 'TotalCust_NewAmt')
+                            let sum_total_allnew_amount = _.sumBy(currentPageData, 'TotalCust_NewAllAmt')
+                            
+                            let flow_rate_current = (sum_total_flow_current / sum_total_base_current) * 100
+                            let flow_rate_xday = (sum_total_flow_xday / sum_total_base_xday) * 100
+                            let flow_rate_month = (sum_total_flow_month / sum_total_base_month) * 100
+    
+                            let forcast_current = (sum_total_problem_current / sum_total_base_current) * 100
+                            let forcast_xday = (sum_total_problem_xday / sum_total_base_xday) * 100
+                            let forcast_month = (sum_total_problem_month / sum_total_base_month) * 100
+    
+                            let sum_new_account = (numValid(sum_total_new_amount) / numValid(sum_total_allnew_amount)) * 100
+                            // END NEW ON 20 MAR 2019
+    
+                            let os_avg_potential = (numValid(sum_total_pot) / numValid(sum_total_shop)) * 100
+                            let os_avg_micro = (sum_total_osmf_full / sum_total_osvol_full) * 100
+                            let os_avg_topup = (sum_total_topup_full / sum_total_osvol_full) * 100
+    
+                            footer.total_shop = parseTotalAccount(numValid(sum_total_shop))
+                            footer.total_pot = (os_avg_potential) ? `${roundFixed(os_avg_potential, 1)}%` : 0.0
+                            footer.total_os_vol = (sum_total_oscurrent_bal && sum_total_oscurrent_bal > 0) ? roundFixed(sum_total_oscurrent_bal, 1) : 0
+                            footer.total_os_cust = numValid(sum_total_oscurrent_acc)
+                            footer.total_micro = (os_avg_micro) ? `${roundFixed(os_avg_micro, 1)}%` : 0.0
+    
+                            // PERFORMANCE IS TOP UP / PORT QUALITY IS FLOW RATE W0MDPD
+                            footer.total_topup = (os_avg_topup && mode == 'Performance') ? `${roundFixed(os_avg_topup, 1)}%` : (flow_rate_current && flow_rate_current > 0.00) ? `${roundFixed(flow_rate_current, 1)}%` : '0.0%'
+    
+                            // GRAND TOTAL
+                            let sum_grandtotal_shop = _.sumBy(dataSoruce, 'MarketShop')
+                            let sum_grandtotal_cust = _.sumBy(dataSoruce, 'TotalCust')
+                            let sum_grandtotal_pot = _.sumBy(dataSoruce, 'TotalPotential')
+    
+                            let sum_grandtotal_osunit = _.sumBy(dataSoruce, 'OS_Unit')
+                            let sum_grandtotal_osvol = _.sumBy(dataSoruce, 'OS_Vol')
+                   
+                            // ADD NEW ON 19 MAR 2019
+                            let sum_grandtotal_osunit_cutnpl = _.sumBy(dataSoruce, 'TotalOS_Current_WithXDay_Acc')
+                            let sum_grandtotal_cutnpl = _.sumBy(dataSoruce, 'TotalOS_Current_WithXDay_Bal')
+    
+                            let sum_grandtotal_oscurrent_acc = _.sumBy(dataSoruce, 'TotalOS_Current_Acc')
+                            let sum_grandtotal_oscurrent_bal = _.sumBy(dataSoruce, 'TotalOS_Current_Bal')
+    
+                            let sum_grandtotal_osacc_exclude_npl = _.sumBy(dataSoruce, 'TotalOS_ExcludeNPL_Acc')
+                            let sum_grandtotal_osbal_exclude_npl = _.sumBy(dataSoruce, 'TotalOS_ExcludeNPL_Bal')
+                            // END NEW ON 19 MAR 2019
+    
+                            let sum_grandtotal_osmicro = _.sumBy(dataSoruce, 'OS_MF_Limit')
+                            let sum_grandtotal_topupapp = _.sumBy(dataSoruce, 'OS_TopupApp')
+                            let sum_grandtotal_topupvol = _.sumBy(dataSoruce, 'OS_TopupVol')
+    
+                            let sum_grandtotal_osvol_full = _.sumBy(dataSoruce, 'OS_Vol_FullAmt')
+                            let sum_grandtotal_topup_full = _.sumBy(dataSoruce, 'OS_TopupVol_FullAmt')
+                            let sum_grandtotal_osmf_full = _.sumBy(dataSoruce, 'OS_MF_Limit_FullAmt')
+    
+                            // ADD NEW ON 20 MAR 2019
+                            let sum_grandtotal_base_current = _.sumBy(dataSoruce, 'Base_0MDPD')
+                            let sum_grandtotal_base_xday = _.sumBy(dataSoruce, 'Base_1_30MDPD')
+                            let sum_grandtotal_base_month = _.sumBy(dataSoruce, 'Base_31_60MDPD')
+    
+                            let sum_grandtotal_flow_current = _.sumBy(dataSoruce, 'Flow_0MDPD')
+                            let sum_grandtotal_flow_xday = _.sumBy(dataSoruce, 'Flow_1_30MDPD')
+                            let sum_grandtotal_flow_month = _.sumBy(dataSoruce, 'Flow_31_60MDPD')
+    
+                            let sum_grandtotal_problem_current = _.sumBy(dataSoruce, 'Problem_0MDPD')
+                            let sum_grandtotal_problem_xday = _.sumBy(dataSoruce, 'Problem_1_30MDPD')
+                            let sum_grandtotal_problem_month = _.sumBy(dataSoruce, 'Problem_31_60MDPD')
+    
+                            let sum_grandtotal_new_amount = _.sumBy(dataSoruce, 'TotalCust_NewAmt')
+                            let sum_grandtotal_allnew_amount = _.sumBy(dataSoruce, 'TotalCust_NewAllAmt')
+    
+                            let grand_flow_rate_current = (sum_total_flow_current / sum_total_base_current) * 100
+                            let grand_flow_rate_xday = (sum_total_flow_xday / sum_total_base_xday) * 100
+                            let grand_flow_rate_month = (sum_total_flow_month / sum_total_base_month) * 100
+    
+                            let grand_forcast_current = (sum_total_problem_current / sum_total_base_current) * 100
+                            let grand_forcast_xday = (sum_total_problem_xday / sum_total_base_xday) * 100
+                            let grand_forcast_month = (sum_total_problem_month / sum_total_base_month) * 100
+    
+                            let grand_sum_new_account = (numValid(sum_grandtotal_new_amount) / numValid(sum_grandtotal_allnew_amount)) * 100
+                            // END NEW ON 20 MAR 2019
+    
+                            let grand_os_avg_potential = (numValid(sum_grandtotal_pot) / numValid(sum_grandtotal_shop)) * 100
+                            let grand_os_avg_micro = (sum_grandtotal_osmf_full / sum_grandtotal_osvol_full) * 100
+                            let grand_os_avg_topup = (sum_grandtotal_topup_full / sum_grandtotal_osvol_full) * 100
+    
+                            grand_footer.total_shop = parseTotalAccount(numValid(sum_grandtotal_shop))
+                            grand_footer.total_pot = (grand_os_avg_potential) ? `${roundFixed(grand_os_avg_potential, 1)}%` : 0.0
+                            // grand_footer.total_os_vol = (sum_grandtotal_osvol && sum_grandtotal_osvol > 0) ? roundFixed(sum_grandtotal_osvol, 1) : 0
+                            // grand_footer.total_os_cust = numValid(sum_grandtotal_osunit)
+                            grand_footer.total_os_vol = (sum_grandtotal_oscurrent_bal && sum_grandtotal_oscurrent_bal > 0) ? roundFixed(sum_grandtotal_oscurrent_bal, 1) : 0
+                            grand_footer.total_os_cust = numValid(sum_grandtotal_oscurrent_acc)
+    
+                            grand_footer.total_micro = (grand_os_avg_micro) ? `${roundFixed(grand_os_avg_micro, 1)}%` : 0.0
+    
+                            // PERFORMANCE IS TOP UP / PORT QUALITY IS FLOW RATE W0MDPD
+                            grand_footer.total_topup = (grand_os_avg_topup && mode == 'Performance') ? `${roundFixed(grand_os_avg_topup, 1)}%` : (grand_flow_rate_current && grand_flow_rate_current > 0.00) ? `${roundFixed(grand_flow_rate_current, 1)}%` : '0.0%'
+    
+                            if (mode == 'Performance') {
+    
+                                // TOTAL CURRENT PAGE
+                                let sum_ytd_target = _.sumBy(currentPageData, 'YTD_Target')
+                                let sum_ytd_app = _.sumBy(currentPageData, 'YTD_TotalApp')
+                                let sum_ytd_vol = _.sumBy(currentPageData, 'YTD_TotalVol')
+                                let sum_ytd_vol_fullamt = _.sumBy(currentPageData, 'YTD_TotalVol_FullAmt')
+                                let sum_ytd_approved = _.sumBy(currentPageData, 'YTD_Approved')
+                                let sum_ytd_total_final = _.sumBy(currentPageData, 'YTD_TotalFinalDecision')
+                                let sum_ytd_micro = _.sumBy(currentPageData, 'YTD_TotalMicroVol')
+                                let sum_ytd_micro_full = _.sumBy(currentPageData, 'YTD_TotalMicroVol_FullAmt')
+                                let sum_ytd_topup = _.sumBy(currentPageData, 'YTD_TotalTopupApp')
+                                let sum_ytd_topupvol = _.sumBy(currentPageData, 'YTD_TotalTopupVol')
+    
+                                let sum_mtd_target = _.sumBy(currentPageData, 'MTD_Target')
+                                let sum_mtd_app = _.sumBy(currentPageData, 'MTD_TotalApp')
+                                let sum_mtd_vol = _.sumBy(currentPageData, 'MTD_TotalVol')
+                                let sum_mtd_vol_fullamt = _.sumBy(currentPageData, 'MTD_TotalVol_FullAmt')
+                                let sum_mtd_approved = _.sumBy(currentPageData, 'MTD_Approved')
+                                let sum_mtd_total_final = _.sumBy(currentPageData, 'MTD_TotalFinalDecision')
+                                let sum_mtd_micro = _.sumBy(currentPageData, 'MTD_TotalMicroVol')
+                                let sum_mtd_topup = _.sumBy(currentPageData, 'MTD_TotalTopupApp')
+                                let sum_mtd_topup_vol = _.sumBy(currentPageData, 'MTD_TotalTopupVol')
+                                let sum_mtd_topup_svol = _.sumBy(currentPageData, 'MTD_TotalTopupSetupVol')
+                                let sum_mtd_topup_fvol = _.sumBy(currentPageData, 'MTD_TotalTopupVol_FullAmt')
+                                let sum_mtd_topup_setup = _.sumBy(currentPageData, 'MTD_TotalTopupSetupVol_FullAmt')
+    
+                                let ytd_avg_ach = (sum_ytd_vol / sum_ytd_target) * 100
+                                let ytd_avg_apv = (numValid(sum_ytd_approved) / numValid(sum_ytd_total_final)) * 100
+                                let ytd_ticketsize = ((sum_ytd_vol_fullamt / numValid(sum_ytd_app)) * 100) / 100000
+    
+                                let ytd_avg_micro = (numValid(sum_ytd_micro_full) / numValid(sum_ytd_vol_fullamt)) * 100
+                                let ytd_avg_topup = (sum_ytd_topupvol / sum_ytd_vol) * 100
+    
+                                let mtd_avg_ach = (sum_mtd_target && sum_mtd_target > 0.00) ? ((sum_mtd_vol / sum_mtd_target) * 100) : "0.0"
+                                let mtd_avg_apv = (sum_mtd_approved / sum_mtd_total_final) * 100
+                                let mtd_ticketsize = ((sum_mtd_vol_fullamt / sum_mtd_app) * 100) / 100000
+                                let mtd_avg_micro = (sum_mtd_micro / sum_mtd_vol) * 100
+                                let mtd_avg_topup = (sum_mtd_topup_setup / sum_mtd_topup_fvol) * 100
+
+                                footer.total_ytd_target = (sum_ytd_target && sum_ytd_target > 0) ? roundFixed(sum_ytd_target, 1) : 0.0
+                                footer.total_ytd_ach = (ytd_avg_ach) ? `${roundFixed(ytd_avg_ach, 1)}%` : '0.0%'
+                                footer.total_ytd_vol = (sum_ytd_vol && sum_ytd_vol > 0) ? roundFixed(sum_ytd_vol, 1) : 0
+                                footer.total_ytd_cust = parseTotalAccount(numValid(sum_ytd_app))
+                                footer.total_ytd_ticket = (ytd_ticketsize) ? `${roundFixed(ytd_ticketsize, 1)}K` : `0K`
+                                footer.total_ytd_apv = (ytd_avg_apv) ? `${roundFixed(ytd_avg_apv, 1)}%` : '0.0%'
+                                footer.total_ytd_micro = (ytd_avg_micro) ? `${roundFixed(ytd_avg_micro, 1)}%` : '0.0%'
+                                footer.total_ytd_topup = (ytd_avg_topup) ? `${roundFixed(ytd_avg_topup, 1)}%` : '0.0%'
+    
+                                footer.total_mtd_target = (sum_mtd_target && sum_mtd_target > 0) ? roundFixed(sum_mtd_target, 1) : '0.0%'
+                                footer.total_mtd_ach = (mtd_avg_ach && mtd_avg_ach > 0.00) ? `${roundFixed(mtd_avg_ach, 1)}%` : '0.0%'
+                                footer.total_mtd_vol = (sum_mtd_vol && sum_mtd_vol > 0.00) ? roundFixed(sum_mtd_vol, 1) : '0.0%'
+                                footer.total_mtd_cust = parseTotalAccount(numValid(sum_mtd_app))
+                                footer.total_mtd_ticket = (mtd_ticketsize) ? `${roundFixed(mtd_ticketsize, 1)}K` : `0K`
+                                footer.total_mtd_apv = (mtd_avg_apv) ? `${roundFixed(mtd_avg_apv, 1)}%` : '0.0%'
+                                footer.total_mtd_micro = (mtd_avg_micro) ? `${roundFixed(mtd_avg_micro, 1)}%` : '0.0%'
+    
+                                footer.total_mtd_topup_vol = (sum_mtd_topup_svol && sum_mtd_topup_svol > 0) ? roundFixed(sum_mtd_topup_svol, 2) : 0
+                                footer.total_mtd_topup_succ = (mtd_avg_topup) ? `${roundFixed(mtd_avg_topup, 1)}%` : '0.0%'
+    
+                                // GRAND TOTAL
+                                let grand_sum_ytd_target = _.sumBy(dataSoruce, 'YTD_Target')
+                                let grand_sum_ytd_app = _.sumBy(dataSoruce, 'YTD_TotalApp')
+                                let grand_sum_ytd_vol = _.sumBy(dataSoruce, 'YTD_TotalVol')
+                                let grand_sum_ytd_vol_fullamt = _.sumBy(dataSoruce, 'YTD_TotalVol_FullAmt')
+                                let grand_sum_ytd_approved = _.sumBy(dataSoruce, 'YTD_Approved')
+                                let grand_sum_ytd_total_final = _.sumBy(dataSoruce, 'YTD_TotalFinalDecision')
+                                let grand_sum_ytd_micro = _.sumBy(dataSoruce, 'YTD_TotalMicroVol')
+                                let grand_sum_ytd_micro_full = _.sumBy(dataSoruce, 'YTD_TotalMicroVol_FullAmt')
+                                let grand_sum_ytd_topup = _.sumBy(dataSoruce, 'YTD_TotalTopupApp')
+                                let grand_sum_ytd_topupvol = _.sumBy(dataSoruce, 'YTD_TotalTopupVol')
+    
+                                let grand_sum_mtd_target = _.sumBy(dataSoruce, 'MTD_Target')
+                                let grand_sum_mtd_app = _.sumBy(dataSoruce, 'MTD_TotalApp')
+                                let grand_sum_mtd_vol = _.sumBy(dataSoruce, 'MTD_TotalVol')
+                                let grand_sum_mtd_vol_fullamt = _.sumBy(dataSoruce, 'MTD_TotalVol_FullAmt')
+                                let grand_sum_mtd_approved = _.sumBy(dataSoruce, 'MTD_Approved')
+                                let grand_sum_mtd_total_final = _.sumBy(dataSoruce, 'MTD_TotalFinalDecision')
+                                let grand_sum_mtd_micro = _.sumBy(dataSoruce, 'MTD_TotalMicroVol')
+                                let grand_sum_mtd_topup = _.sumBy(dataSoruce, 'MTD_TotalTopupApp')
+                                let grand_sum_mtd_topup_vol = _.sumBy(dataSoruce, 'MTD_TotalTopupVol')
+                                let grand_sum_mtd_topup_svol = _.sumBy(dataSoruce, 'MTD_TotalTopupSetupVol')
+                                let grand_sum_mtd_topup_fvol = _.sumBy(dataSoruce, 'MTD_TotalTopupVol_FullAmt')
+                                let grand_sum_mtd_topup_setup = _.sumBy(dataSoruce, 'MTD_TotalTopupSetupVol_FullAmt')
+    
+                                let grand_ytd_avg_ach = (grand_sum_ytd_vol / grand_sum_ytd_target) * 100
+                                let grand_ytd_avg_apv = (numValid(grand_sum_ytd_approved) / numValid(grand_sum_ytd_total_final)) * 100
+                                let grand_ytd_ticketsize = ((grand_sum_ytd_vol_fullamt / numValid(grand_sum_ytd_app)) * 100) / 100000
+    
+                                let grand_ytd_avg_micro = (numValid(grand_sum_ytd_micro_full) / numValid(grand_sum_ytd_vol_fullamt)) * 100
+                                let grand_ytd_avg_topup = (grand_sum_ytd_topupvol / grand_sum_ytd_vol) * 100
+    
+                                let grand_mtd_avg_ach = (grand_sum_mtd_vol / grand_sum_mtd_target) * 100
+                                let grand_mtd_avg_apv = (grand_sum_mtd_approved / grand_sum_mtd_total_final) * 100
+                                let grand_mtd_ticketsize = ((grand_sum_mtd_vol_fullamt / grand_sum_mtd_app) * 100) / 100000
+                                let grand_mtd_avg_micro = (grand_sum_mtd_micro / sum_mtd_vol) * 100
+                                let grand_mtd_avg_topup = (grand_sum_mtd_topup_setup / grand_sum_mtd_topup_fvol) * 100
+    
+                                grand_footer.total_ytd_target = (grand_sum_ytd_target && grand_sum_ytd_target > 0) ? roundFixed(grand_sum_ytd_target, 1) : 0.0
+                                grand_footer.total_ytd_ach = (grand_ytd_avg_ach) ? `${roundFixed(grand_ytd_avg_ach, 1)}%` : '0.0%'
+                                grand_footer.total_ytd_vol = (grand_sum_ytd_vol && grand_sum_ytd_vol > 0) ? roundFixed(grand_sum_ytd_vol, 1) : 0
+                                grand_footer.total_ytd_cust = parseTotalAccount(numValid(grand_sum_ytd_app))
+                                grand_footer.total_ytd_ticket = (grand_ytd_ticketsize) ? `${roundFixed(grand_ytd_ticketsize, 1)}K` : `0K`
+                                grand_footer.total_ytd_apv = (grand_ytd_avg_apv) ? `${roundFixed(ytd_avg_apv, 1)}%` : '0.0%'
+                                grand_footer.total_ytd_micro = (grand_ytd_avg_micro) ? `${roundFixed(grand_ytd_avg_micro, 1)}%` : '0.0%'
+                                grand_footer.total_ytd_topup = (grand_ytd_avg_topup) ? `${roundFixed(grand_ytd_avg_topup, 1)}%` : '0.0%'
+    
+                                grand_footer.total_mtd_target = (grand_sum_mtd_target && grand_sum_mtd_target > 0) ? roundFixed(grand_sum_mtd_target, 1) : 0.0
+                                grand_footer.total_mtd_ach = (grand_mtd_avg_ach) ? `${roundFixed(grand_mtd_avg_ach, 1)}%` : '0.0%'
+                                grand_footer.total_mtd_vol = (grand_sum_mtd_vol && grand_sum_mtd_vol > 0) ? roundFixed(grand_sum_mtd_vol, 1) : 0
+                                grand_footer.total_mtd_cust = parseTotalAccount(numValid(sum_mtd_app))
+                                grand_footer.total_mtd_ticket = (grand_mtd_ticketsize) ? `${roundFixed(grand_mtd_ticketsize, 1)}K` : `0K`
+                                grand_footer.total_mtd_apv = (grand_mtd_avg_apv) ? `${roundFixed(grand_mtd_avg_apv, 1)}%` : '0.0%'
+                                grand_footer.total_mtd_micro = (grand_mtd_avg_micro) ? `${roundFixed(grand_mtd_avg_micro, 1)}%` : '0.0%'
+    
+                                grand_footer.total_mtd_topup_vol = (grand_sum_mtd_topup_svol && grand_sum_mtd_topup_svol > 0) ? roundFixed(grand_sum_mtd_topup_svol, 2) : 0
+                                grand_footer.total_mtd_topup_succ = (grand_mtd_avg_topup) ? `${roundFixed(grand_mtd_avg_topup, 1)}%` : '0.0%'
+    
+                            } else {
+                            
+                                // TOTAL CURRENT PAGE
+                                let sum_pmt_total = _.sumBy(currentPageData, 'OS_Total_Collect')
+                                let sum_pmt_succ = _.sumBy(currentPageData, 'OS_Succ_Collect')
+    
+                                let sum_newnpl_bal = _.sumBy(currentPageData, 'OS_TotalNew_NPLVol')
+    
+                                let sum_w0_bal = _.sumBy(currentPageData, 'TotalBal_W0')
+                                let sum_w1_bal = _.sumBy(currentPageData, 'TotalBal_W1_2')
+                                let sum_w2_bal = _.sumBy(currentPageData, 'TotalBal_W3_4')
+                                let sum_xday_bal = _.sumBy(currentPageData, 'TotalBal_XDay')
+                                let sum_mth_bal = _.sumBy(currentPageData, 'TotalBal_M1_2')
+                                let sum_npl_bal = _.sumBy(currentPageData, 'TotalBal_NPL')
+    
+                                // UPDATE 09 Feb 2019
+                                let sum_new_booking_vol = _.sumBy(dataSoruce, 'New_Booking_Vol')
+                                let sum_new_booking_npl_vol = _.sumBy(dataSoruce, 'New_BookingNPL_Vol')
+    
+                                let os_pmt_succ = (sum_pmt_succ / sum_pmt_total) * 100
+                                let os_newnpl_bal = (sum_newnpl_bal / sum_total_osvol_full) * 100
+                                
+                                let os_w0_ach = (sum_w0_bal / sum_total_osvol) * 100
+                                let os_w1_ach = (sum_w1_bal / sum_total_osvol) * 100
+                                let os_w2_ach = (sum_w2_bal / sum_total_osvol) * 100
+
+                                let os_xday_ach = (sum_xday_bal / sum_total_osvol) * 100
+                                let os_mth_ach = (sum_mth_bal / sum_total_osvol) * 100
+                                let os_npl_ach = (sum_npl_bal / sum_total_osvol) * 100
+    
+                                let npl_newbooking = (sum_new_booking_npl_vol / sum_new_booking_vol) * 100
+    
+                                // Move to new footer
+                                footer.flow_rate_xday = (flow_rate_xday && flow_rate_xday > 0.00) ? `${roundFixed(flow_rate_xday, 1)}%` : '0.0%'
+                                footer.flow_rate_month = (flow_rate_month && flow_rate_month > 0.00) ? `${roundFixed(flow_rate_month, 1)}%` : '0.0%'
+                                footer.new_customer = (sum_new_account && sum_new_account > 0.00) ? `${roundFixed(sum_new_account, 1)}%` : '0.0%'
+                                
+                                footer.pmt_success = (os_pmt_succ && os_pmt_succ > 0) ? `${roundFixed(os_pmt_succ, 1)}%` : '0.0%'
+                                footer.nb_new_npl = (npl_newbooking && npl_newbooking > 0) ? `${roundFixed(npl_newbooking, 1)}%` : '0.0%'
+                                footer.ytd_new_npl = (os_newnpl_bal && os_newnpl_bal > 0) ? `${roundFixed(os_newnpl_bal, 1)}%` : '0.0%'
+
+                                footer.bucket_w0 = (os_w0_ach) ? `${roundFixed(os_w0_ach, 1)}%` : '0.0%'
+                                footer.bucket_week1 = (os_w1_ach) ? `${roundFixed(os_w1_ach, 1)}%` : '0.0%'
+                                footer.bucket_week2 = (os_w2_ach) ? `${roundFixed(os_w2_ach, 1)}%` : '0.0%'
+                                footer.bucket_xday = (os_xday_ach) ? `${roundFixed(os_xday_ach, 1)}%` : '0.0%'
+                                footer.bucket_month = (os_mth_ach) ? `${roundFixed(os_mth_ach, 1)}%` : '0.0%'
+                                footer.bucket_npl = (os_npl_ach) ? `${roundFixed(os_npl_ach, 1)}%` : '0.0%'
+    
+                                // GRAND TOTAL
+                                let grand_sum_pmt_total = _.sumBy(dataSoruce, 'OS_Total_Collect')
+                                let grand_sum_pmt_succ = _.sumBy(dataSoruce, 'OS_Succ_Collect')
+    
+                                let grand_sum_newnpl_bal = _.sumBy(dataSoruce, 'OS_TotalNew_NPLVol')
+    
+                                let grand_sum_w0_bal = _.sumBy(dataSoruce, 'TotalBal_W0')
+                                let grand_sum_w1_bal = _.sumBy(dataSoruce, 'TotalBal_W1_2')
+                                let grand_sum_w2_bal = _.sumBy(dataSoruce, 'TotalBal_W3_4')
+                                let grand_sum_xday_bal = _.sumBy(dataSoruce, 'TotalBal_XDay')
+                                let grand_sum_mth_bal = _.sumBy(dataSoruce, 'TotalBal_M1_2')
+                                let grand_sum_npl_bal = _.sumBy(dataSoruce, 'TotalBal_NPL')
+    
+                                // UPDATE 09 Feb 2019
+                                let grand_sum_new_booking_vol = _.sumBy(dataSoruce, 'New_Booking_Vol')
+                                let grand_sum_new_booking_npl_vol = _.sumBy(dataSoruce, 'New_BookingNPL_Vol')
+    
+                                let grand_os_pmt_succ = (grand_sum_pmt_succ / grand_sum_pmt_total) * 100
+                                let grand_os_newnpl_bal = (grand_sum_newnpl_bal / sum_grandtotal_osvol_full) * 100
+                                
+                                let grand_os_w0_ach = (grand_sum_w0_bal / sum_grandtotal_osvol) * 100
+                                let grand_os_w1_ach = (grand_sum_w1_bal / sum_grandtotal_osvol) * 100
+                                let grand_os_w2_ach = (grand_sum_w2_bal / sum_grandtotal_osvol) * 100
+                                let grand_os_xday_ach = (grand_sum_xday_bal / sum_grandtotal_osvol) * 100
+                                let grand_os_mth_ach = (grand_sum_mth_bal / sum_grandtotal_osvol) * 100
+                                let grand_os_npl_ach = (grand_sum_npl_bal / sum_grandtotal_osvol) * 100
+                                let grand_npl_newbooking = (grand_sum_new_booking_npl_vol / grand_sum_new_booking_vol) * 100
+    
+                                grand_footer.flow_rate_xday = (grand_flow_rate_xday && grand_flow_rate_xday > 0.00) ? `${roundFixed(grand_flow_rate_xday, 1)}%` : '0.0%'
+                                grand_footer.flow_rate_month = (grand_flow_rate_month && grand_flow_rate_month > 0.00) ? `${roundFixed(grand_flow_rate_month, 1)}%` : '0.0%'
+                                grand_footer.new_customer = (grand_sum_new_account && grand_sum_new_account > 0.00) ? `${roundFixed(grand_sum_new_account, 1)}%` : '0.0%'
+                                
+                                grand_footer.pmt_success = (grand_os_pmt_succ && grand_os_pmt_succ > 0) ? `${roundFixed(grand_os_pmt_succ, 1)}%` : '0.0%'
+                                grand_footer.nb_new_npl = (grand_npl_newbooking && grand_npl_newbooking > 0) ? `${roundFixed(grand_npl_newbooking, 1)}%` : '0.0%'
+                                grand_footer.ytd_new_npl = (grand_os_newnpl_bal && grand_os_newnpl_bal > 0) ? `${roundFixed(grand_os_newnpl_bal, 1)}%` : '0.0%'
+                                grand_footer.bucket_w0 = (grand_os_w0_ach) ? `${roundFixed(grand_os_w0_ach, 1)}%` : '0.0%'
+                                grand_footer.bucket_week1 = (grand_os_w1_ach) ? `${roundFixed(grand_os_w1_ach, 1)}%` : '0.0%'
+                                grand_footer.bucket_week2 = (grand_os_w2_ach) ? `${roundFixed(grand_os_w2_ach, 1)}%` : '0.0%'
+                                grand_footer.bucket_xday = (grand_os_xday_ach) ? `${roundFixed(grand_os_xday_ach, 1)}%` : '0.0%'
+                                grand_footer.bucket_month = (grand_os_mth_ach) ? `${roundFixed(grand_os_mth_ach, 1)}%` : '0.0%'
+                                grand_footer.bucket_npl = (grand_os_npl_ach) ? `${roundFixed(grand_os_npl_ach, 1)}%` : '0.0%'
+    
+                            }
+    
+                            const element_footer = document.querySelector('.ant-table-footer')
+    
+                            $(element_footer)
+                            .empty()
+                            .append(
+                                createElement('div', { 'class': `${cls['grid_footer']}` }, _.map(['footer_partition', 'grand_footer_partition'], (v) => { 
+                                        return createElement('div', { 'class': `${cls[`${v}`]}` })
+                                    })
+                                )
+                            )
+    
+                            let grid_footer = $(`.${cls['grid_footer']}`)
+                            let footer_partition = $(`.${cls['footer_partition']}`)
+                            let grand_footer_partition = $(`.${cls['grand_footer_partition']}`)
+    
+                            let data_footer = $.map(footer, function (el) { return el })
+                            let data_grand_footer = $.map(grand_footer, function (el) { return el })
+    
+                            _.forEach(rtd_size, (size, i) => {
+                                let addWidth = 0
+                                let footerColor = ''
+                                if (mode == 'Performance') {
+                                    if (i >= 11 && i <= 18) {
+                                        footerColor = `${cls['bg_lemon']}`
+                                        if (i == 18) {
+                                            footerColor = `${cls['bLDash']} ${cls['bRDash']}`
+                                        }
+                                    }
+                                    if (i >= 19 && i <= 27) {
+                                        footerColor = `${cls['bg_option2']}`
+                                    }
+    
+                                    // ADD WITH                                
+                                    switch (i) {
+                                        case 14:
+                                            addWidth = 1
+                                        break;
+                                    }
+    
+                                } else {
+                                    if (i >= 11 && i <= 16) {
+                                        footerColor = `${cls['bg_option3']}`
+                                    }
+                                    if (i >= 17 && i <= 22) {
+                                        footerColor = `${cls['bg_option4']}`
+                                    }
+                                }
+
+                                footer_partition.append(createElement('div', { 'class': `${cls['item_footer']} ${footerColor} mktft_${(i + 1)} ${(i == 0) ? 'tl' : 'tc'}`, 'style': `width: ${(size + addWidth)}px; ${(i == 0) ? 'font-weight: 600;' : ''}` }, data_footer[i]))
+           
+                                if(dataSoruce && dataSoruce.length > 20) {
+                                    grand_footer_partition.append(createElement('div', { 'class': `${cls['grand_item_footer']} ${footerColor} mktft_${(i + 1)} ${(i == 0) ? 'tl' : 'tc'}`, 'style': `width: ${(size + addWidth)}px; ${(i == 0) ? 'font-weight: 600;' : ''}` }, data_grand_footer[i]))
+                                }
+    
+                            })
+                            
+                        }
+    
+                    }
+    
+                }, 200)
+    
+            } else {
+                return (<div className={`${cls['grid_footer']}`} style={{ minHeight: 25 }}></div>)
+            }
+        } else {
+
             _.delay(() => {
                 const parentTable = document.querySelector(`.${cls['grid_container']}`)
                 if (parentTable) {
 
                     let rtd_element = parentTable.querySelectorAll(`tr:first-child td`)
                     let rtd_count = parentTable.querySelectorAll('tr:first-child td').length
-
+                   
                     if (rtd_count > 0) {
-
+    
                         let rtd_size = []
-                        _.forEach(rtd_element, (v, i) => { rtd_size.push($(v).outerWidth()) })
+                        _.forEach(rtd_element, (v) => { rtd_size.push($(v).outerWidth()) })
+
+                        // FOR FOOTER: CURRENT PAGINATION
+                        // OUTSTANDING
+                        let total_os_vol = _.sumBy(currentPageData, 'OS_Vol_Now')
+                        let total_os_vol_full = _.sumBy(currentPageData, 'OS_Vol_FullAmt_Now')
+                        let total_os_unit = _.sumBy(currentPageData, 'OS_Unit_Now')
+                        
+                        let total_oscurrent_bal = _.sumBy(currentPageData, 'TotalOS_Current_Bal_Now')
+                        let total_current_withxday = _.sumBy(currentPageData, 'TotalOS_Current_WithXDay_Bal_Now')
+
+                        // Transfer
+                        let total_vol_transfer = _.sumBy(currentPageData, 'Transfer_Vol')
+                        let total_vol_transfer_full = _.sumBy(currentPageData, 'Transfer_FullAmt_Now')
+                        let total_unit_transfer = _.sumBy(currentPageData, 'Transfer_Cust')
+ 
+                        let total_percent_transfer = (total_vol_transfer_full / total_os_vol_full) * 100
+
+                        // Flow Rate
+                        let total_base_current = _.sumBy(currentPageData, 'Base_0MDPD_Now')
+                        let total_base_xday = _.sumBy(currentPageData, 'Base_1_30MDPD_Now')
+                        let total_base_month = _.sumBy(currentPageData, 'Base_31_60MDPD_Now')
+
+                        let total_flow_current = _.sumBy(currentPageData, 'Flow_0MDPD_Now')
+                        let total_flow_xday = _.sumBy(currentPageData, 'Flow_1_30MDPD_Now')
+                        let total_flow_month = _.sumBy(currentPageData, 'Flow_31_60MDPD_Now')
+
+                        // let total_problem_current = _.sumBy(currentPageData, 'Problem_0MDPD_Now')
+                        // let total_problem_xday = _.sumBy(currentPageData, 'Problem_1_30MDPD_Now')
+                        // let total_problem_month = _.sumBy(currentPageData, 'Problem_31_60MDPD_Now')
+
+                        let flow_rate_current = (total_flow_current / total_base_current) * 100
+                        let flow_rate_xday = (total_flow_xday / total_base_xday) * 100
+                        let flow_rate_month = (total_flow_month / total_base_month) * 100
+
+                        // New Account
+                        let total_new_amount = _.sumBy(currentPageData, 'TotalCust_NewAmt')
+                        let total_allnew_amount = _.sumBy(currentPageData, 'TotalCust_NewAllAmt')
+
+                        let total_new_account = (numValid(total_new_amount) / numValid(total_allnew_amount)) * 100
+
+                        // Success 
+                        let total_pmt_totalcollect = _.sumBy(currentPageData, 'OS_Total_Collect')
+                        let total_pmt_totalcollect_succ = _.sumBy(currentPageData, 'OS_Succ_Collect')
+
+                        let total_pmt__success_per = (total_pmt_totalcollect_succ / total_pmt_totalcollect) * 100
+
+                        // New Booking
+                        // NEW NPL
+                        let total_newnpl_bal = _.sumBy(currentPageData, 'OS_TotalNew_NPLVol')
+                        let total_newnpl_per = (total_newnpl_bal / total_os_vol_full) * 100
+
+                        console.log(total_newnpl_per, total_newnpl_bal, total_os_vol_full)
+
+                        // Port Quality
+                        let total_w0_bal = _.sumBy(currentPageData, 'TotalBal_W0')
+                        let total_w1_2_bal = _.sumBy(currentPageData, 'TotalBal_W1_2')
+                        let total_w3_4_bal = _.sumBy(currentPageData, 'TotalBal_W3_4')
+                        let total_xday_bal = _.sumBy(currentPageData, 'TotalBal_XDay')
+                        // let total_mth_bal = _.sumBy(currentPageData, 'TotalBal_M1_2')
+                        // let total_npl_bal = _.sumBy(currentPageData, 'TotalBal_NPL')
+
+                        let total_os_w0_ach = (total_w0_bal / total_oscurrent_bal) * 100
+                        let total_os_w1_2_ach = (total_w1_2_bal / total_oscurrent_bal) * 100
+                        let total_os_w3_4_ach = (total_w3_4_bal / total_oscurrent_bal) * 100
+                        let total_os_xday_ach = (total_xday_bal / total_current_withxday) * 100
+                        let total_os_mth_ach = 0 //(total_mth_bal / total_os_vol) * 100
+                        let total_os_npl_ach = 0 //(total_npl_bal / total_os_vol) * 100
 
                         let footer = {
                             title: 'TOTAL',
                             warining: '',
                             area: '',
-                            branch: '',
-                            cycle: '',
-                            total_shop: 0,
-                            total_pot: 0,
-                            total_os_vol: 0,
-                            total_os_cust: 0,
-                            total_micro: 0,
-                            total_topup: 0
+                            branch: '',                           
+                            total_os_vol: (total_os_vol && total_os_vol > 0.00) ? `${roundFixed(total_os_vol, 1)}` : '0',
+                            total_os_cust: (total_os_unit && total_os_unit > 0.00) ? `${total_os_unit}` : '0',
+                            total_trans_per: (total_percent_transfer && total_percent_transfer > 0.00) ? `${roundFixed(total_percent_transfer, 1)}%` : '0.0%',
+                            total_trans_vol: (total_vol_transfer && total_vol_transfer > 0.00) ? `${roundFixed(total_vol_transfer, 1)}` : '0',
+                            total_trans_cust: total_unit_transfer,
+                            total_flow_0mdpd: (flow_rate_current && flow_rate_current > 0.00) ? `${roundFixed(flow_rate_current, 1)}%` : '0.0%',
+                            total_flow_1_30mdpd: (flow_rate_xday && flow_rate_xday > 0.00) ? `${roundFixed(flow_rate_xday, 1)}%` : '0.0%',
+                            total_flow_31_60mdpd: (flow_rate_month && flow_rate_month > 0.00) ? `${roundFixed(flow_rate_month, 1)}%` : '0.0%',
+                            total_newcust: (total_new_account && total_new_account > 0.00) ? `${roundFixed(total_new_account, 1)}%` : '0.0%',
+                            total_pmt_success: (total_pmt__success_per && total_pmt__success_per > 0.00) ? `${roundFixed(total_pmt__success_per, 1)}%` : '0.0%',
+                            total_newbooking: 0,
+                            total_os_newnpl: (total_newnpl_per && total_newnpl_per > 0.00) ? `${roundFixed(total_newnpl_per, 1)}%` : '0.0%',                          
+                            total_bucket_w0: (total_os_w0_ach && total_os_w0_ach > 0.00) ? `${roundFixed(total_os_w0_ach, 1)}%` : '0.0%',
+                            total_bucket_week1: (total_os_w1_2_ach && total_os_w1_2_ach > 0.00) ? `${roundFixed(total_os_w1_2_ach, 1)}%` : '0.0%',
+                            total_bucket_week2: (total_os_w3_4_ach && total_os_w3_4_ach > 0.00) ? `${roundFixed(total_os_w3_4_ach, 1)}%` : '0.0%',
+                            total_bucket_xday: (total_os_xday_ach && total_os_xday_ach > 0.00) ? `${roundFixed(total_os_xday_ach, 1)}%` : '0.0%',
+                            total_bucket_month: (total_os_mth_ach && total_os_mth_ach > 0.00) ? `${roundFixed(total_os_mth_ach, 1)}%` : '0.0%',
+                            total_bucket_npl: (total_os_npl_ach && total_os_npl_ach > 0.00) ? `${roundFixed(total_os_npl_ach, 1)}%` : '0.0%'
                         }
+
+                        // FOR FOOTER: GRAND TOTAL - ALL PAGINATION
+                        // OUTSTANDING
+                        let grand_total_os_vol = _.sumBy(dataSoruce, 'OS_Vol_Now')
+                        let grand_total_os_vol_full = _.sumBy(dataSoruce, 'OS_Vol_FullAmt_Now')
+                        let grand_total_os_unit = _.sumBy(dataSoruce, 'OS_Unit_Now')                        
+
+                        let grand_total_oscurrent_bal = _.sumBy(dataSoruce, 'TotalOS_Current_Bal_Now')
+                        let grand_total_current_withxday = _.sumBy(dataSoruce, 'TotalOS_Current_WithXDay_Bal_Now')
+
+                        // Transfer
+                        let grand_total_vol_transfer = _.sumBy(dataSoruce, 'Transfer_Vol')
+                        let grand_total_vol_transfer_full = _.sumBy(dataSoruce, 'Transfer_FullAmt_Now')
+                        let grand_total_unit_transfer = _.sumBy(dataSoruce, 'Transfer_Cust')
+ 
+                        let grand_total_percent_transfer = (grand_total_vol_transfer_full / grand_total_os_vol_full) * 100
+
+                        // Flow Rate
+                        let grand_total_base_current = _.sumBy(dataSoruce, 'Base_0MDPD_Now')
+                        let grand_total_base_xday = _.sumBy(dataSoruce, 'Base_1_30MDPD_Now')
+                        let grand_total_base_month = _.sumBy(dataSoruce, 'Base_31_60MDPD_Now')
+
+                        let grand_total_flow_current = _.sumBy(dataSoruce, 'Flow_0MDPD_Now')
+                        let grand_total_flow_xday = _.sumBy(dataSoruce, 'Flow_1_30MDPD_Now')
+                        let grand_total_flow_month = _.sumBy(dataSoruce, 'Flow_31_60MDPD_Now')
+
+                        // let grand_total_problem_current = _.sumBy(dataSoruce, 'Problem_0MDPD_Now')
+                        // let grand_total_problem_xday = _.sumBy(dataSoruce, 'Problem_1_30MDPD_Now')
+                        // let grand_total_problem_month = _.sumBy(dataSoruce, 'Problem_31_60MDPD_Now')
+
+                        let grand_flow_rate_current = (grand_total_flow_current / grand_total_base_current) * 100
+                        let grand_flow_rate_xday = (grand_total_flow_xday / grand_total_base_xday) * 100
+                        let grand_flow_rate_month = (grand_total_flow_month / grand_total_base_month) * 100
+
+                        // New Account
+                        let grand_total_new_amount = _.sumBy(dataSoruce, 'TotalCust_NewAmt')
+                        let grand_total_allnew_amount = _.sumBy(dataSoruce, 'TotalCust_NewAllAmt')
+
+                        let grand_total_new_account = (numValid(grand_total_new_amount) / numValid(grand_total_allnew_amount)) * 100
+
+                        // Success 
+                        let grand_total_pmt_totalcollect = _.sumBy(dataSoruce, 'OS_Total_Collect')
+                        let grand_total_pmt_totalcollect_succ = _.sumBy(dataSoruce, 'OS_Succ_Collect')
+
+                        let grand_total_pmt__success_per = (grand_total_pmt_totalcollect_succ / grand_total_pmt_totalcollect) * 100
+
+                        // New Booking
+                        // NEW NPL
+                        let grand_total_newnpl_bal = _.sumBy(dataSoruce, 'OS_TotalNew_NPLVol')
+                        let grand_total_newnpl_per = (grand_total_newnpl_bal / grand_total_os_vol_full) * 100
+
+                        // Port Quality
+                        let grand_total_w0_bal = _.sumBy(dataSoruce, 'TotalBal_W0')
+                        let grand_total_w1_2_bal = _.sumBy(dataSoruce, 'TotalBal_W1_2')
+                        let grand_total_w3_4_bal = _.sumBy(dataSoruce, 'TotalBal_W3_4')
+                        let grand_total_xday_bal = _.sumBy(dataSoruce, 'TotalBal_XDay')
+                        // let grand_total_mth_bal = _.sumBy(dataSoruce, 'TotalBal_M1_2')
+                        // let grand_total_npl_bal = _.sumBy(dataSoruce, 'TotalBal_NPL')
+
+                        let grand_total_os_w0_ach = (grand_total_w0_bal / grand_total_oscurrent_bal) * 100
+                        let grand_total_os_w1_2_ach = (grand_total_w1_2_bal / grand_total_oscurrent_bal) * 100
+                        let grand_total_os_w3_4_ach = (grand_total_w3_4_bal / grand_total_oscurrent_bal) * 100
+                        let grand_total_os_xday_ach = (grand_total_xday_bal / grand_total_current_withxday) * 100
+                        let grand_total_os_mth_ach = 0 //(grand_total_mth_bal / grand_total_os_vol) * 100
+                        let grand_total_os_npl_ach = 0 //(grand_total_npl_bal / grand_total_os_vol) * 100
 
                         let grand_footer = {
                             title: 'GRAND TOTAL',
                             warining: '',
                             area: '',
-                            branch: '',
-                            cycle: '',
-                            total_shop: 0,
-                            total_pot: 0,
-                            total_os_vol: 0,
-                            total_os_cust: 0,
-                            total_micro: 0,
-                            total_topup: 0
-                        }
-
-                        // TOTAL CURRENT PAGE
-                        let sum_total_shop = _.sumBy(currentPageData, 'MarketShop')
-                        let sum_total_cust = _.sumBy(currentPageData, 'TotalCust')
-                        let sum_total_pot = _.sumBy(currentPageData, 'TotalPotential')
-
-                        let sum_total_osunit = _.sumBy(currentPageData, 'OS_Unit')
-                        let sum_total_osvol = _.sumBy(currentPageData, 'OS_Vol')
-
-                        // ADD NEW ON 19 MAR 2019
-                        let sum_total_osunit_cutnpl = _.sumBy(currentPageData, 'TotalOS_Current_WithXDay_Acc')
-                        let sum_total_osvol_cutnpl = _.sumBy(currentPageData, 'TotalOS_Current_WithXDay_Bal')
-
-                        let sum_total_oscurrent_acc = _.sumBy(currentPageData, 'TotalOS_Current_Acc')
-                        let sum_total_oscurrent_bal = _.sumBy(currentPageData, 'TotalOS_Current_Bal')
-
-                        let sum_total_osacc_exclude_npl = _.sumBy(currentPageData, 'TotalOS_ExcludeNPL_Acc')
-                        let sum_total_osbal_exclude_npl = _.sumBy(currentPageData, 'TotalOS_ExcludeNPL_Bal')
-                        // END NEW ON 19 MAR 2019
-
-                        let sum_total_osmicro = _.sumBy(currentPageData, 'OS_MF_Limit')
-                        let sum_total_topupapp = _.sumBy(currentPageData, 'OS_TopupApp')
-                        let sum_total_topupvol = _.sumBy(currentPageData, 'OS_TopupVol')
-
-                        let sum_total_osvol_full = _.sumBy(currentPageData, 'OS_Vol_FullAmt')
-                        let sum_total_topup_full = _.sumBy(currentPageData, 'OS_TopupVol_FullAmt')
-                        let sum_total_osmf_full = _.sumBy(currentPageData, 'OS_MF_Limit_FullAmt')
-
-                        // ADD NEW ON 20 MAR 2019
-                        let sum_total_base_current = _.sumBy(currentPageData, 'Base_0MDPD')
-                        let sum_total_base_xday = _.sumBy(currentPageData, 'Base_1_30MDPD')
-                        let sum_total_base_month = _.sumBy(currentPageData, 'Base_31_60MDPD')
-
-                        let sum_total_flow_current = _.sumBy(currentPageData, 'Flow_0MDPD')
-                        let sum_total_flow_xday = _.sumBy(currentPageData, 'Flow_1_30MDPD')
-                        let sum_total_flow_month = _.sumBy(currentPageData, 'Flow_31_60MDPD')
-
-                        let sum_total_problem_current = _.sumBy(currentPageData, 'Problem_0MDPD')
-                        let sum_total_problem_xday = _.sumBy(currentPageData, 'Problem_1_30MDPD')
-                        let sum_total_problem_month = _.sumBy(currentPageData, 'Problem_31_60MDPD')
-
-                        let sum_total_new_amount = _.sumBy(currentPageData, 'TotalCust_NewAmt')
-                        let sum_total_allnew_amount = _.sumBy(currentPageData, 'TotalCust_NewAllAmt')
-                        
-                        let flow_rate_current = (sum_total_flow_current / sum_total_base_current) * 100
-                        let flow_rate_xday = (sum_total_flow_xday / sum_total_base_xday) * 100
-                        let flow_rate_month = (sum_total_flow_month / sum_total_base_month) * 100
-
-                        let forcast_current = (sum_total_problem_current / sum_total_base_current) * 100
-                        let forcast_xday = (sum_total_problem_xday / sum_total_base_xday) * 100
-                        let forcast_month = (sum_total_problem_month / sum_total_base_month) * 100
-
-                        let sum_new_account = (numValid(sum_total_new_amount) / numValid(sum_total_allnew_amount)) * 100
-                        // END NEW ON 20 MAR 2019
-
-                        let os_avg_potential = (numValid(sum_total_pot) / numValid(sum_total_shop)) * 100
-                        let os_avg_micro = (sum_total_osmf_full / sum_total_osvol_full) * 100
-                        let os_avg_topup = (sum_total_topup_full / sum_total_osvol_full) * 100
-
-                        footer.total_shop = parseTotalAccount(numValid(sum_total_shop))
-                        footer.total_pot = (os_avg_potential) ? `${roundFixed(os_avg_potential, 1)}%` : 0.0
-                        footer.total_os_vol = (sum_total_oscurrent_bal && sum_total_oscurrent_bal > 0) ? roundFixed(sum_total_oscurrent_bal, 1) : 0
-                        footer.total_os_cust = numValid(sum_total_oscurrent_acc)
-                        footer.total_micro = (os_avg_micro) ? `${roundFixed(os_avg_micro, 1)}%` : 0.0
-
-                        // PERFORMANCE IS TOP UP / PORT QUALITY IS FLOW RATE W0MDPD
-                        footer.total_topup = (os_avg_topup && mode == 'Performance') ? `${roundFixed(os_avg_topup, 1)}%` : (flow_rate_current && flow_rate_current > 0.00) ? `${roundFixed(flow_rate_current, 1)}%` : '0.0%'
-
-                        // GRAND TOTAL
-                        let sum_grandtotal_shop = _.sumBy(dataSoruce, 'MarketShop')
-                        let sum_grandtotal_cust = _.sumBy(dataSoruce, 'TotalCust')
-                        let sum_grandtotal_pot = _.sumBy(dataSoruce, 'TotalPotential')
-
-                        let sum_grandtotal_osunit = _.sumBy(dataSoruce, 'OS_Unit')
-                        let sum_grandtotal_osvol = _.sumBy(dataSoruce, 'OS_Vol')
-               
-                        // ADD NEW ON 19 MAR 2019
-                        let sum_grandtotal_osunit_cutnpl = _.sumBy(dataSoruce, 'TotalOS_Current_WithXDay_Acc')
-                        let sum_grandtotal_cutnpl = _.sumBy(dataSoruce, 'TotalOS_Current_WithXDay_Bal')
-
-                        let sum_grandtotal_oscurrent_acc = _.sumBy(dataSoruce, 'TotalOS_Current_Acc')
-                        let sum_grandtotal_oscurrent_bal = _.sumBy(dataSoruce, 'TotalOS_Current_Bal')
-
-                        let sum_grandtotal_osacc_exclude_npl = _.sumBy(dataSoruce, 'TotalOS_ExcludeNPL_Acc')
-                        let sum_grandtotal_osbal_exclude_npl = _.sumBy(dataSoruce, 'TotalOS_ExcludeNPL_Bal')
-                        // END NEW ON 19 MAR 2019
-
-                        let sum_grandtotal_osmicro = _.sumBy(dataSoruce, 'OS_MF_Limit')
-                        let sum_grandtotal_topupapp = _.sumBy(dataSoruce, 'OS_TopupApp')
-                        let sum_grandtotal_topupvol = _.sumBy(dataSoruce, 'OS_TopupVol')
-
-                        let sum_grandtotal_osvol_full = _.sumBy(dataSoruce, 'OS_Vol_FullAmt')
-                        let sum_grandtotal_topup_full = _.sumBy(dataSoruce, 'OS_TopupVol_FullAmt')
-                        let sum_grandtotal_osmf_full = _.sumBy(dataSoruce, 'OS_MF_Limit_FullAmt')
-
-                        // ADD NEW ON 20 MAR 2019
-                        let sum_grandtotal_base_current = _.sumBy(dataSoruce, 'Base_0MDPD')
-                        let sum_grandtotal_base_xday = _.sumBy(dataSoruce, 'Base_1_30MDPD')
-                        let sum_grandtotal_base_month = _.sumBy(dataSoruce, 'Base_31_60MDPD')
-
-                        let sum_grandtotal_flow_current = _.sumBy(dataSoruce, 'Flow_0MDPD')
-                        let sum_grandtotal_flow_xday = _.sumBy(dataSoruce, 'Flow_1_30MDPD')
-                        let sum_grandtotal_flow_month = _.sumBy(dataSoruce, 'Flow_31_60MDPD')
-
-                        let sum_grandtotal_problem_current = _.sumBy(dataSoruce, 'Problem_0MDPD')
-                        let sum_grandtotal_problem_xday = _.sumBy(dataSoruce, 'Problem_1_30MDPD')
-                        let sum_grandtotal_problem_month = _.sumBy(dataSoruce, 'Problem_31_60MDPD')
-
-                        let sum_grandtotal_new_amount = _.sumBy(dataSoruce, 'TotalCust_NewAmt')
-                        let sum_grandtotal_allnew_amount = _.sumBy(dataSoruce, 'TotalCust_NewAllAmt')
-
-                        let grand_flow_rate_current = (sum_total_flow_current / sum_total_base_current) * 100
-                        let grand_flow_rate_xday = (sum_total_flow_xday / sum_total_base_xday) * 100
-                        let grand_flow_rate_month = (sum_total_flow_month / sum_total_base_month) * 100
-
-                        let grand_forcast_current = (sum_total_problem_current / sum_total_base_current) * 100
-                        let grand_forcast_xday = (sum_total_problem_xday / sum_total_base_xday) * 100
-                        let grand_forcast_month = (sum_total_problem_month / sum_total_base_month) * 100
-
-                        let grand_sum_new_account = (numValid(sum_grandtotal_new_amount) / numValid(sum_grandtotal_allnew_amount)) * 100
-                        // END NEW ON 20 MAR 2019
-
-                        let grand_os_avg_potential = (numValid(sum_grandtotal_pot) / numValid(sum_grandtotal_shop)) * 100
-                        let grand_os_avg_micro = (sum_grandtotal_osmf_full / sum_grandtotal_osvol_full) * 100
-                        let grand_os_avg_topup = (sum_grandtotal_topup_full / sum_grandtotal_osvol_full) * 100
-
-                        grand_footer.total_shop = parseTotalAccount(numValid(sum_grandtotal_shop))
-                        grand_footer.total_pot = (grand_os_avg_potential) ? `${roundFixed(grand_os_avg_potential, 1)}%` : 0.0
-                        // grand_footer.total_os_vol = (sum_grandtotal_osvol && sum_grandtotal_osvol > 0) ? roundFixed(sum_grandtotal_osvol, 1) : 0
-                        // grand_footer.total_os_cust = numValid(sum_grandtotal_osunit)
-                        grand_footer.total_os_vol = (sum_grandtotal_oscurrent_bal && sum_grandtotal_oscurrent_bal > 0) ? roundFixed(sum_grandtotal_oscurrent_bal, 1) : 0
-                        grand_footer.total_os_cust = numValid(sum_grandtotal_oscurrent_acc)
-
-                        grand_footer.total_micro = (grand_os_avg_micro) ? `${roundFixed(grand_os_avg_micro, 1)}%` : 0.0
-
-                        // PERFORMANCE IS TOP UP / PORT QUALITY IS FLOW RATE W0MDPD
-                        grand_footer.total_topup = (grand_os_avg_topup && mode == 'Performance') ? `${roundFixed(grand_os_avg_topup, 1)}%` : (grand_flow_rate_current && grand_flow_rate_current > 0.00) ? `${roundFixed(grand_flow_rate_current, 1)}%` : '0.0%'
-
-                        if (mode == 'Performance') {
-
-                            // TOTAL CURRENT PAGE
-                            let sum_ytd_target = _.sumBy(currentPageData, 'YTD_Target')
-                            let sum_ytd_app = _.sumBy(currentPageData, 'YTD_TotalApp')
-                            let sum_ytd_vol = _.sumBy(currentPageData, 'YTD_TotalVol')
-                            let sum_ytd_vol_fullamt = _.sumBy(currentPageData, 'YTD_TotalVol_FullAmt')
-                            let sum_ytd_approved = _.sumBy(currentPageData, 'YTD_Approved')
-                            let sum_ytd_total_final = _.sumBy(currentPageData, 'YTD_TotalFinalDecision')
-                            let sum_ytd_micro = _.sumBy(currentPageData, 'YTD_TotalMicroVol')
-                            let sum_ytd_micro_full = _.sumBy(currentPageData, 'YTD_TotalMicroVol_FullAmt')
-                            let sum_ytd_topup = _.sumBy(currentPageData, 'YTD_TotalTopupApp')
-                            let sum_ytd_topupvol = _.sumBy(currentPageData, 'YTD_TotalTopupVol')
-
-                            let sum_mtd_target = _.sumBy(currentPageData, 'MTD_Target')
-                            let sum_mtd_app = _.sumBy(currentPageData, 'MTD_TotalApp')
-                            let sum_mtd_vol = _.sumBy(currentPageData, 'MTD_TotalVol')
-                            let sum_mtd_vol_fullamt = _.sumBy(currentPageData, 'MTD_TotalVol_FullAmt')
-                            let sum_mtd_approved = _.sumBy(currentPageData, 'MTD_Approved')
-                            let sum_mtd_total_final = _.sumBy(currentPageData, 'MTD_TotalFinalDecision')
-                            let sum_mtd_micro = _.sumBy(currentPageData, 'MTD_TotalMicroVol')
-                            let sum_mtd_topup = _.sumBy(currentPageData, 'MTD_TotalTopupApp')
-                            let sum_mtd_topup_vol = _.sumBy(currentPageData, 'MTD_TotalTopupVol')
-                            let sum_mtd_topup_svol = _.sumBy(currentPageData, 'MTD_TotalTopupSetupVol')
-                            let sum_mtd_topup_fvol = _.sumBy(currentPageData, 'MTD_TotalTopupVol_FullAmt')
-                            let sum_mtd_topup_setup = _.sumBy(currentPageData, 'MTD_TotalTopupSetupVol_FullAmt')
-
-                            let ytd_avg_ach = (sum_ytd_vol / sum_ytd_target) * 100
-                            let ytd_avg_apv = (numValid(sum_ytd_approved) / numValid(sum_ytd_total_final)) * 100
-                            let ytd_ticketsize = ((sum_ytd_vol_fullamt / numValid(sum_ytd_app)) * 100) / 100000
-
-                            let ytd_avg_micro = (numValid(sum_ytd_micro_full) / numValid(sum_ytd_vol_fullamt)) * 100
-                            let ytd_avg_topup = (sum_ytd_topupvol / sum_ytd_vol) * 100
-
-                            let mtd_avg_ach = (sum_mtd_vol / sum_mtd_target) * 100
-                            let mtd_avg_apv = (sum_mtd_approved / sum_mtd_total_final) * 100
-                            let mtd_ticketsize = ((sum_mtd_vol_fullamt / sum_mtd_app) * 100) / 100000
-                            let mtd_avg_micro = (sum_mtd_micro / sum_mtd_vol) * 100
-                            let mtd_avg_topup = (sum_mtd_topup_setup / sum_mtd_topup_fvol) * 100
-
-                            footer.total_ytd_target = (sum_ytd_target && sum_ytd_target > 0) ? roundFixed(sum_ytd_target, 1) : 0.0
-                            footer.total_ytd_ach = (ytd_avg_ach) ? `${roundFixed(ytd_avg_ach, 1)}%` : '0.0%'
-                            footer.total_ytd_vol = (sum_ytd_vol && sum_ytd_vol > 0) ? roundFixed(sum_ytd_vol, 1) : 0
-                            footer.total_ytd_cust = parseTotalAccount(numValid(sum_ytd_app))
-                            footer.total_ytd_ticket = (ytd_ticketsize) ? `${roundFixed(ytd_ticketsize, 1)}K` : `0K`
-                            footer.total_ytd_apv = (ytd_avg_apv) ? `${roundFixed(ytd_avg_apv, 1)}%` : '0.0%'
-                            footer.total_ytd_micro = (ytd_avg_micro) ? `${roundFixed(ytd_avg_micro, 1)}%` : '0.0%'
-                            footer.total_ytd_topup = (ytd_avg_topup) ? `${roundFixed(ytd_avg_topup, 1)}%` : '0.0%'
-
-                            footer.total_mtd_target = (sum_mtd_target && sum_mtd_target > 0) ? roundFixed(sum_mtd_target, 1) : 0.0
-                            footer.total_mtd_ach = (mtd_avg_ach) ? `${roundFixed(mtd_avg_ach, 1)}%` : '0.0%'
-                            footer.total_mtd_vol = (sum_mtd_vol && sum_mtd_vol > 0) ? roundFixed(sum_mtd_vol, 1) : 0
-                            footer.total_mtd_cust = parseTotalAccount(numValid(sum_mtd_app))
-                            footer.total_mtd_ticket = (mtd_ticketsize) ? `${roundFixed(mtd_ticketsize, 1)}K` : `0K`
-                            footer.total_mtd_apv = (mtd_avg_apv) ? `${roundFixed(mtd_avg_apv, 1)}%` : '0.0%'
-                            footer.total_mtd_micro = (mtd_avg_micro) ? `${roundFixed(mtd_avg_micro, 1)}%` : '0.0%'
-
-                            footer.total_mtd_topup_vol = (sum_mtd_topup_svol && sum_mtd_topup_svol > 0) ? roundFixed(sum_mtd_topup_svol, 2) : 0
-                            footer.total_mtd_topup_succ = (mtd_avg_topup) ? `${roundFixed(mtd_avg_topup, 1)}%` : '0.0%'
-
-                            // GRAND TOTAL
-                            let grand_sum_ytd_target = _.sumBy(dataSoruce, 'YTD_Target')
-                            let grand_sum_ytd_app = _.sumBy(dataSoruce, 'YTD_TotalApp')
-                            let grand_sum_ytd_vol = _.sumBy(dataSoruce, 'YTD_TotalVol')
-                            let grand_sum_ytd_vol_fullamt = _.sumBy(dataSoruce, 'YTD_TotalVol_FullAmt')
-                            let grand_sum_ytd_approved = _.sumBy(dataSoruce, 'YTD_Approved')
-                            let grand_sum_ytd_total_final = _.sumBy(dataSoruce, 'YTD_TotalFinalDecision')
-                            let grand_sum_ytd_micro = _.sumBy(dataSoruce, 'YTD_TotalMicroVol')
-                            let grand_sum_ytd_micro_full = _.sumBy(dataSoruce, 'YTD_TotalMicroVol_FullAmt')
-                            let grand_sum_ytd_topup = _.sumBy(dataSoruce, 'YTD_TotalTopupApp')
-                            let grand_sum_ytd_topupvol = _.sumBy(dataSoruce, 'YTD_TotalTopupVol')
-
-                            let grand_sum_mtd_target = _.sumBy(dataSoruce, 'MTD_Target')
-                            let grand_sum_mtd_app = _.sumBy(dataSoruce, 'MTD_TotalApp')
-                            let grand_sum_mtd_vol = _.sumBy(dataSoruce, 'MTD_TotalVol')
-                            let grand_sum_mtd_vol_fullamt = _.sumBy(dataSoruce, 'MTD_TotalVol_FullAmt')
-                            let grand_sum_mtd_approved = _.sumBy(dataSoruce, 'MTD_Approved')
-                            let grand_sum_mtd_total_final = _.sumBy(dataSoruce, 'MTD_TotalFinalDecision')
-                            let grand_sum_mtd_micro = _.sumBy(dataSoruce, 'MTD_TotalMicroVol')
-                            let grand_sum_mtd_topup = _.sumBy(dataSoruce, 'MTD_TotalTopupApp')
-                            let grand_sum_mtd_topup_vol = _.sumBy(dataSoruce, 'MTD_TotalTopupVol')
-                            let grand_sum_mtd_topup_svol = _.sumBy(dataSoruce, 'MTD_TotalTopupSetupVol')
-                            let grand_sum_mtd_topup_fvol = _.sumBy(dataSoruce, 'MTD_TotalTopupVol_FullAmt')
-                            let grand_sum_mtd_topup_setup = _.sumBy(dataSoruce, 'MTD_TotalTopupSetupVol_FullAmt')
-
-                            let grand_ytd_avg_ach = (grand_sum_ytd_vol / grand_sum_ytd_target) * 100
-                            let grand_ytd_avg_apv = (numValid(grand_sum_ytd_approved) / numValid(grand_sum_ytd_total_final)) * 100
-                            let grand_ytd_ticketsize = ((grand_sum_ytd_vol_fullamt / numValid(grand_sum_ytd_app)) * 100) / 100000
-
-                            let grand_ytd_avg_micro = (numValid(grand_sum_ytd_micro_full) / numValid(grand_sum_ytd_vol_fullamt)) * 100
-                            let grand_ytd_avg_topup = (grand_sum_ytd_topupvol / grand_sum_ytd_vol) * 100
-
-                            let grand_mtd_avg_ach = (grand_sum_mtd_vol / grand_sum_mtd_target) * 100
-                            let grand_mtd_avg_apv = (grand_sum_mtd_approved / grand_sum_mtd_total_final) * 100
-                            let grand_mtd_ticketsize = ((grand_sum_mtd_vol_fullamt / grand_sum_mtd_app) * 100) / 100000
-                            let grand_mtd_avg_micro = (grand_sum_mtd_micro / sum_mtd_vol) * 100
-                            let grand_mtd_avg_topup = (grand_sum_mtd_topup_setup / grand_sum_mtd_topup_fvol) * 100
-
-                            grand_footer.total_ytd_target = (grand_sum_ytd_target && grand_sum_ytd_target > 0) ? roundFixed(grand_sum_ytd_target, 1) : 0.0
-                            grand_footer.total_ytd_ach = (grand_ytd_avg_ach) ? `${roundFixed(grand_ytd_avg_ach, 1)}%` : '0.0%'
-                            grand_footer.total_ytd_vol = (grand_sum_ytd_vol && grand_sum_ytd_vol > 0) ? roundFixed(grand_sum_ytd_vol, 1) : 0
-                            grand_footer.total_ytd_cust = parseTotalAccount(numValid(grand_sum_ytd_app))
-                            grand_footer.total_ytd_ticket = (grand_ytd_ticketsize) ? `${roundFixed(grand_ytd_ticketsize, 1)}K` : `0K`
-                            grand_footer.total_ytd_apv = (grand_ytd_avg_apv) ? `${roundFixed(ytd_avg_apv, 1)}%` : '0.0%'
-                            grand_footer.total_ytd_micro = (grand_ytd_avg_micro) ? `${roundFixed(grand_ytd_avg_micro, 1)}%` : '0.0%'
-                            grand_footer.total_ytd_topup = (grand_ytd_avg_topup) ? `${roundFixed(grand_ytd_avg_topup, 1)}%` : '0.0%'
-
-                            grand_footer.total_mtd_target = (grand_sum_mtd_target && grand_sum_mtd_target > 0) ? roundFixed(grand_sum_mtd_target, 1) : 0.0
-                            grand_footer.total_mtd_ach = (grand_mtd_avg_ach) ? `${roundFixed(grand_mtd_avg_ach, 1)}%` : '0.0%'
-                            grand_footer.total_mtd_vol = (grand_sum_mtd_vol && grand_sum_mtd_vol > 0) ? roundFixed(grand_sum_mtd_vol, 1) : 0
-                            grand_footer.total_mtd_cust = parseTotalAccount(numValid(sum_mtd_app))
-                            grand_footer.total_mtd_ticket = (grand_mtd_ticketsize) ? `${roundFixed(grand_mtd_ticketsize, 1)}K` : `0K`
-                            grand_footer.total_mtd_apv = (grand_mtd_avg_apv) ? `${roundFixed(grand_mtd_avg_apv, 1)}%` : '0.0%'
-                            grand_footer.total_mtd_micro = (grand_mtd_avg_micro) ? `${roundFixed(grand_mtd_avg_micro, 1)}%` : '0.0%'
-
-                            grand_footer.total_mtd_topup_vol = (grand_sum_mtd_topup_svol && grand_sum_mtd_topup_svol > 0) ? roundFixed(grand_sum_mtd_topup_svol, 2) : 0
-                            grand_footer.total_mtd_topup_succ = (grand_mtd_avg_topup) ? `${roundFixed(grand_mtd_avg_topup, 1)}%` : '0.0%'
-
-                        } else {
-                        
-                            // TOTAL CURRENT PAGE
-                            let sum_pmt_total = _.sumBy(currentPageData, 'OS_Total_Collect')
-                            let sum_pmt_succ = _.sumBy(currentPageData, 'OS_Succ_Collect')
-
-                            let sum_newnpl_bal = _.sumBy(currentPageData, 'OS_TotalNew_NPLVol')
-
-                            let sum_w0_bal = _.sumBy(currentPageData, 'TotalBal_W0')
-                            let sum_w1_bal = _.sumBy(currentPageData, 'TotalBal_W1_2')
-                            let sum_w2_bal = _.sumBy(currentPageData, 'TotalBal_W3_4')
-                            let sum_xday_bal = _.sumBy(currentPageData, 'TotalBal_XDay')
-                            let sum_mth_bal = _.sumBy(currentPageData, 'TotalBal_M1_2')
-                            let sum_npl_bal = _.sumBy(currentPageData, 'TotalBal_NPL')
-
-                            // UPDATE 09 Feb 2019
-                            let sum_new_booking_vol = _.sumBy(dataSoruce, 'New_Booking_Vol')
-                            let sum_new_booking_npl_vol = _.sumBy(dataSoruce, 'New_BookingNPL_Vol')
-
-                            let os_pmt_succ = (sum_pmt_succ / sum_pmt_total) * 100
-                            let os_newnpl_bal = (sum_newnpl_bal / sum_total_osvol_full) * 100
-                            
-                            let os_w0_ach = (sum_w0_bal / sum_total_osvol) * 100
-                            let os_w1_ach = (sum_w1_bal / sum_total_osvol) * 100
-                            let os_w2_ach = (sum_w2_bal / sum_total_osvol) * 100
-                            let os_xday_ach = (sum_xday_bal / sum_total_osvol) * 100
-                            let os_mth_ach = (sum_mth_bal / sum_total_osvol) * 100
-                            let os_npl_ach = (sum_npl_bal / sum_total_osvol) * 100
-
-                            let npl_newbooking = (sum_new_booking_npl_vol / sum_new_booking_vol) * 100
-
-                            // Move to new footer
-                            footer.flow_rate_xday = (flow_rate_xday && flow_rate_xday > 0.00) ? `${roundFixed(flow_rate_xday, 1)}%` : '0.0%'
-                            footer.flow_rate_month = (flow_rate_month && flow_rate_month > 0.00) ? `${roundFixed(flow_rate_month, 1)}%` : '0.0%'
-                            footer.new_customer = (sum_new_account && sum_new_account > 0.00) ? `${roundFixed(sum_new_account, 1)}%` : '0.0%'
-                            
-                            footer.pmt_success = (os_pmt_succ && os_pmt_succ > 0) ? `${roundFixed(os_pmt_succ, 1)}%` : '0.0%'
-                            footer.nb_new_npl = (npl_newbooking && npl_newbooking > 0) ? `${roundFixed(npl_newbooking, 1)}%` : '0.0%'
-                            footer.ytd_new_npl = (os_newnpl_bal && os_newnpl_bal > 0) ? `${roundFixed(os_newnpl_bal, 1)}%` : '0.0%'
-                            footer.bucket_w0 = (os_w0_ach) ? `${roundFixed(os_w0_ach, 1)}%` : '0.0%'
-                            footer.bucket_week1 = (os_w1_ach) ? `${roundFixed(os_w1_ach, 1)}%` : '0.0%'
-                            footer.bucket_week2 = (os_w2_ach) ? `${roundFixed(os_w2_ach, 1)}%` : '0.0%'
-                            footer.bucket_xday = (os_xday_ach) ? `${roundFixed(os_xday_ach, 1)}%` : '0.0%'
-                            footer.bucket_month = (os_mth_ach) ? `${roundFixed(os_mth_ach, 1)}%` : '0.0%'
-                            footer.bucket_npl = (os_npl_ach) ? `${roundFixed(os_npl_ach, 1)}%` : '0.0%'
-
-                            // GRAND TOTAL
-                            let grand_sum_pmt_total = _.sumBy(dataSoruce, 'OS_Total_Collect')
-                            let grand_sum_pmt_succ = _.sumBy(dataSoruce, 'OS_Succ_Collect')
-
-                            let grand_sum_newnpl_bal = _.sumBy(dataSoruce, 'OS_TotalNew_NPLVol')
-
-                            let grand_sum_w0_bal = _.sumBy(dataSoruce, 'TotalBal_W0')
-                            let grand_sum_w1_bal = _.sumBy(dataSoruce, 'TotalBal_W1_2')
-                            let grand_sum_w2_bal = _.sumBy(dataSoruce, 'TotalBal_W3_4')
-                            let grand_sum_xday_bal = _.sumBy(dataSoruce, 'TotalBal_XDay')
-                            let grand_sum_mth_bal = _.sumBy(dataSoruce, 'TotalBal_M1_2')
-                            let grand_sum_npl_bal = _.sumBy(dataSoruce, 'TotalBal_NPL')
-
-                            // UPDATE 09 Feb 2019
-                            let grand_sum_new_booking_vol = _.sumBy(dataSoruce, 'New_Booking_Vol')
-                            let grand_sum_new_booking_npl_vol = _.sumBy(dataSoruce, 'New_BookingNPL_Vol')
-
-                            let grand_os_pmt_succ = (grand_sum_pmt_succ / grand_sum_pmt_total) * 100
-                            let grand_os_newnpl_bal = (grand_sum_newnpl_bal / sum_grandtotal_osvol_full) * 100
-                            
-                            let grand_os_w0_ach = (grand_sum_w0_bal / sum_grandtotal_osvol) * 100
-                            let grand_os_w1_ach = (grand_sum_w1_bal / sum_grandtotal_osvol) * 100
-                            let grand_os_w2_ach = (grand_sum_w2_bal / sum_grandtotal_osvol) * 100
-                            let grand_os_xday_ach = (grand_sum_xday_bal / sum_grandtotal_osvol) * 100
-                            let grand_os_mth_ach = (grand_sum_mth_bal / sum_grandtotal_osvol) * 100
-                            let grand_os_npl_ach = (grand_sum_npl_bal / sum_grandtotal_osvol) * 100
-                            let grand_npl_newbooking = (grand_sum_new_booking_npl_vol / grand_sum_new_booking_vol) * 100
-
-                            grand_footer.flow_rate_xday = (grand_flow_rate_xday && grand_flow_rate_xday > 0.00) ? `${roundFixed(grand_flow_rate_xday, 1)}%` : '0.0%'
-                            grand_footer.flow_rate_month = (grand_flow_rate_month && grand_flow_rate_month > 0.00) ? `${roundFixed(grand_flow_rate_month, 1)}%` : '0.0%'
-                            grand_footer.new_customer = (grand_sum_new_account && grand_sum_new_account > 0.00) ? `${roundFixed(grand_sum_new_account, 1)}%` : '0.0%'
-                            
-                            grand_footer.pmt_success = (grand_os_pmt_succ && grand_os_pmt_succ > 0) ? `${roundFixed(grand_os_pmt_succ, 1)}%` : '0.0%'
-                            grand_footer.nb_new_npl = (grand_npl_newbooking && grand_npl_newbooking > 0) ? `${roundFixed(grand_npl_newbooking, 1)}%` : '0.0%'
-                            grand_footer.ytd_new_npl = (grand_os_newnpl_bal && grand_os_newnpl_bal > 0) ? `${roundFixed(grand_os_newnpl_bal, 1)}%` : '0.0%'
-                            grand_footer.bucket_w0 = (grand_os_w0_ach) ? `${roundFixed(grand_os_w0_ach, 1)}%` : '0.0%'
-                            grand_footer.bucket_week1 = (grand_os_w1_ach) ? `${roundFixed(grand_os_w1_ach, 1)}%` : '0.0%'
-                            grand_footer.bucket_week2 = (grand_os_w2_ach) ? `${roundFixed(grand_os_w2_ach, 1)}%` : '0.0%'
-                            grand_footer.bucket_xday = (grand_os_xday_ach) ? `${roundFixed(grand_os_xday_ach, 1)}%` : '0.0%'
-                            grand_footer.bucket_month = (grand_os_mth_ach) ? `${roundFixed(grand_os_mth_ach, 1)}%` : '0.0%'
-                            grand_footer.bucket_npl = (grand_os_npl_ach) ? `${roundFixed(grand_os_npl_ach, 1)}%` : '0.0%'
-
+                            branch: '',                           
+                            total_os_vol: (grand_total_os_vol && grand_total_os_vol > 0.00) ? `${roundFixed(grand_total_os_vol, 1)}` : '0',
+                            total_os_cust: (grand_total_os_unit && grand_total_os_unit > 0) ? `${(grand_total_os_unit)}` : '0',
+                            total_trans_per: (grand_total_percent_transfer && grand_total_percent_transfer > 0.00) ? `${roundFixed(grand_total_percent_transfer, 1)}%` : '0.0%',
+                            total_trans_vol: (grand_total_vol_transfer && grand_total_vol_transfer > 0.00) ? `${roundFixed(grand_total_vol_transfer, 1)}` : '0.0',
+                            total_trans_cust: grand_total_unit_transfer,
+                            total_flow_0mdpd: (grand_flow_rate_current && grand_flow_rate_current > 0.00) ? `${roundFixed(grand_flow_rate_current, 1)}%` : '0.0%',
+                            total_flow_1_30mdpd: (grand_flow_rate_xday && grand_flow_rate_xday > 0.00) ? `${roundFixed(grand_flow_rate_xday, 1)}%` : '0.0%',
+                            total_flow_31_60mdpd: (grand_flow_rate_month && grand_flow_rate_month > 0.00) ? `${roundFixed(grand_flow_rate_month, 1)}%` : '0.0%',
+                            total_newcust: (grand_total_new_account && grand_total_new_account > 0.00) ? `${roundFixed(grand_total_new_account, 1)}%` : '0.0%',
+                            total_pmt_success: (grand_total_pmt__success_per && grand_total_pmt__success_per > 0.00) ? `${roundFixed(grand_total_pmt__success_per, 1)}%` : '0.0%',
+                            total_newbooking: 0,
+                            total_os_newnpl: (grand_total_newnpl_per && grand_total_newnpl_per > 0.00) ? `${roundFixed(grand_total_newnpl_per, 1)}%` : '0.0%',                                   
+                            total_bucket_w0: (grand_total_os_w0_ach && grand_total_os_w0_ach > 0.00) ? `${roundFixed(grand_total_os_w0_ach, 1)}%` : '0.0%',
+                            total_bucket_week1: (grand_total_os_w1_2_ach && grand_total_os_w1_2_ach > 0.00) ? `${roundFixed(grand_total_os_w1_2_ach, 1)}%` : '0.0%',
+                            total_bucket_week2: (grand_total_os_w3_4_ach && grand_total_os_w3_4_ach > 0.00) ? `${roundFixed(grand_total_os_w3_4_ach, 1)}%` : '0.0%',
+                            total_bucket_xday: (grand_total_os_xday_ach && grand_total_os_xday_ach > 0.00) ? `${roundFixed(grand_total_os_xday_ach, 1)}%` : '0.0%',
+                            total_bucket_month: (grand_total_os_mth_ach && grand_total_os_mth_ach > 0.00) ? `${roundFixed(grand_total_os_mth_ach, 1)}%` : '0.0%',
+                            total_bucket_npl: (grand_total_os_npl_ach && grand_total_os_npl_ach > 0.00) ? `${roundFixed(grand_total_os_npl_ach, 1)}%` : '0.0%'
                         }
 
                         const element_footer = document.querySelector('.ant-table-footer')
-
+    
                         $(element_footer)
                         .empty()
                         .append(
@@ -756,7 +1023,6 @@ class GridMangement extends Component {
                             )
                         )
 
-                        let grid_footer = $(`.${cls['grid_footer']}`)
                         let footer_partition = $(`.${cls['footer_partition']}`)
                         let grand_footer_partition = $(`.${cls['grand_footer_partition']}`)
 
@@ -766,49 +1032,23 @@ class GridMangement extends Component {
                         _.forEach(rtd_size, (size, i) => {
                             let addWidth = 0
                             let footerColor = ''
-                            if (mode == 'Performance') {
-                                if (i >= 11 && i <= 18) {
-                                    footerColor = `${cls['bg_lemon']}`
-                                    if (i == 18) {
-                                        footerColor = `${cls['bLDash']} ${cls['bRDash']}`
-                                    }
-                                }
-                                if (i >= 19 && i <= 27) {
-                                    footerColor = `${cls['bg_option2']}`
-                                }
 
-                                // ADD WITH                                
-                                switch (i) {
-                                    case 14:
-                                        addWidth = 1
-                                    break;
-                                }
-
-                            } else {
-                                if (i >= 11 && i <= 16) {
-                                    footerColor = `${cls['bg_option3']}`
-                                }
-                                if (i >= 17 && i <= 22) {
-                                    footerColor = `${cls['bg_option4']}`
-                                }
-                            }
-
-                            footer_partition.append(createElement('div', { 'class': `${cls['item_footer']} ${footerColor} mktft_${(i + 1)} ${(i == 0) ? 'tl' : 'tc'}`, 'style': `width: ${(size + addWidth)}px; ${(i == 0) ? 'font-weight: 600;' : ''}` }, data_footer[i]))
-       
+                            footer_partition.append(createElement('div', { 'class': `${cls['item_footer']} ${footerColor}  mktft_${(i + 1)} ${(i == 0) ? 'tl' : 'tc'}`, 'style': `width: ${(size + addWidth)}px; ${(i == 0) ? 'font-weight: 600;' : ''}` }, data_footer[i]))
+           
                             if(dataSoruce && dataSoruce.length > 20) {
                                 grand_footer_partition.append(createElement('div', { 'class': `${cls['grand_item_footer']} ${footerColor} mktft_${(i + 1)} ${(i == 0) ? 'tl' : 'tc'}`, 'style': `width: ${(size + addWidth)}px; ${(i == 0) ? 'font-weight: 600;' : ''}` }, data_grand_footer[i]))
                             }
-
+                            
                         })
-                        
+
+                        console.log(footer, grand_footer)
                     }
 
                 }
+            })
 
-            }, 200)
-
-        } else {
-            return (<div className={`${cls['grid_footer']}`} style={{ minHeight: 25 }}></div>)
+            // $(`.${cls['grid_footer']}`).find(`div`).empty()
+            // return (<div className={`${cls['grid_footer']}`} style={{ minHeight: 25 }}></div>)
         }
 
     }
@@ -816,6 +1056,10 @@ class GridMangement extends Component {
     /** TABLE OPTIONAL HANDLER **/
     // CHANGE MODE OF COLUMNS
     handleGridMode = (e) => {
+        const { setFieldsValue, getFieldValue } = this.props.form
+        if(e.target.value == 'Assigned') {
+            setFieldsValue({ SwitchBase: 'CA' })
+        }
         this.setState({ mode: e.target.value })
     }
 
@@ -886,7 +1130,7 @@ class GridMangement extends Component {
         
         let handleSwitchBase = (in_array(field_SwitchBase, ['Kiosk'])) ? true : false
         let handleCAOnly = (in_array(field_SwitchBase, ['Market', 'Kiosk'])) ? true : false
-        
+
         return (
             <div className={cls['grid_header']}>
 
@@ -921,7 +1165,7 @@ class GridMangement extends Component {
                             <RadioGroup defaultValue={mode} size="default" onChange={this.handleGridMode}>
                                 <RadioButton value="Performance"><i className="fa fa-bar-chart" aria-hidden="true" style={{ color: '#40a9ff' }}></i> Performance</RadioButton>
                                 <RadioButton value="Collection"><Icon type="pie-chart" style={{ color: '#ff7f50' }} /> Port Quality</RadioButton>
-                                <RadioButton value="Assigned"><i className="fa fa-users" aria-hidden="true" style={{ color: '#708090' }}></i> Port Assigned</RadioButton>
+                                <RadioButton value="Assigned" disabled={(in_array(field_SwitchBase, ['Kiosk', 'Market'])) ? true : false}><i className="fa fa-users" aria-hidden="true" style={{ color: '#708090' }}></i> Port Assigned</RadioButton>
                                 <RadioButton value="Flow" disabled={true}><i className="fa fa-universal-access" aria-hidden="true" style={{ color: '#1b6eae' }}></i> DPD Flow</RadioButton>
                             </RadioGroup>
                         </div>
@@ -1018,7 +1262,7 @@ class GridMangement extends Component {
                                                             treeDefaultExpandedKeys={[`all`]}
                                                             dropdownMatchSelectWidth={true}
                                                             dropdownStyle={{ height: '400px' }}
-                                                            treeNodeFilterProp="label"
+                                                            treeNodeFilterProp="label "
                                                             size="default"
                                                             disabled={handle_field.ca || handleCAOnly}
                                                         />
@@ -1034,8 +1278,8 @@ class GridMangement extends Component {
                                                 getFieldDecorator('SwitchBase', { initialValue: 'CA' })(
                                                     <RadioGroup onChange={this.handleSwitchBaseAPI}>
                                                         <Radio value="CA" className={`${cls['pl1']} ${cls['pr0']} ${cls['mh0']} ${cls['f8']}`} style={{ paddingTop: '4px' }}>CA</Radio>
-                                                        <Radio value="Kiosk" className={`${cls['pl1']} ${cls['pr0']} ${cls['mh0']} ${cls['f8']}`} style={{ paddingTop: '4px' }}>Kiosk</Radio>
-                                                        <Radio value="Market" className={`${cls['pl1']} ${cls['pr0']} ${cls['mh0']} ${cls['f8']}`} style={{ paddingTop: '4px' }}>Market</Radio>
+                                                        <Radio value="Kiosk" className={`${cls['pl1']} ${cls['pr0']} ${cls['mh0']} ${cls['f8']}`} disabled={(in_array(mode, ['Assigned']) ? true : false)} style={{ paddingTop: '4px' }}>Kiosk</Radio>
+                                                        <Radio value="Market" className={`${cls['pl1']} ${cls['pr0']} ${cls['mh0']} ${cls['f8']}`} disabled={(in_array(mode, ['Assigned']) ? true : false)} style={{ paddingTop: '4px' }}>Market</Radio>
                                                     </RadioGroup>
                                                 )
                                             }   
@@ -1100,17 +1344,48 @@ class GridMangement extends Component {
         )
     }
 
+    handleEmpSearch = (sdata) => {
+        const { masters, config, locales, form: { getFieldValue } } = this.props
+        const lang_field_default = config.lang[locales.region_type].grid.default
+        const calist_appstorge = localStorageRead('nanolayout_master', 'master_calist')
+
+        let data = !_.isEmpty(masters.calist) ? masters.calist : calist_appstorge
+
+        let f_label = (data && data.length > 0) ? _.filter(data, { CA_Name: sdata }) : []
+        // let f_value = (data && data.length > 0) ? _.filter(data, (item) => {
+        //     return _.some(item.CA_Code, (tag) => { return _.startsWith(tag, sdata) })
+        // }) : []
+
+        var findValue = this.searchByText(data, sdata)
+
+
+        console.log(data, sdata, f_label, f_value)
+
+    }
+
+    searchByText = (collection, text, exclude) => {
+        return _.filter(collection, _.flow(
+          _.partial(_.omit, _, exclude),
+          _.partial(
+            _.some, _,
+            _.flow(_.toLower, _.partial(_.includes, _, _.toLower(text), 0))
+          )
+        ))
+    }
+      
+
     // SET FILTER HANDLER
 
     getOptionalItem = () => {
         const { master_option } = this.props
         const { form } = this.props
+        const { mode } = this.state
 
         let field_SwitchBase = form.getFieldValue('SwitchBase')
         if(master_option && !_.isEmpty(master_option)) {
             let category = _.map(master_option, (v) => { return v.OptGroup })               
             let category_items = _.map(_.uniqWith(category, _.isEqual), (category_item) => {
-                let sub_category = _.filter(master_option, { OptGroup: category_item }) 
+            let sub_category = _.filter(master_option, { OptGroup: category_item }) 
                 return {                                   
                     key: `${category_item}`,
                     title: `VIEW BY ${category_item}`,
@@ -1124,7 +1399,7 @@ class GridMangement extends Component {
                             key: `opt${item.OptID}`,
                             title: `${item.OptName}`,
                             value: `${item.OptCode}`,
-                            disabled: permission_allow
+                            disabled: (in_array(mode, ['Performance', 'Collection']) && item.OptCode == 'FCR') ? true : permission_allow
                         })
 
                     }),
@@ -1623,7 +1898,6 @@ class GridMangement extends Component {
         }
 
         bluebird.all(api_fetch).spread((region, area, zone, branch, kiosk, ca, subca) => {
-
             let data_temp =  {
                 val: [
                     _.uniqBy(region, 'RowsKey'), 
@@ -1649,8 +1923,6 @@ class GridMangement extends Component {
                 search,
                 handleBaseAPI
             )
-         
-           
 
         })
 
@@ -2007,9 +2279,9 @@ class GridMangement extends Component {
     }
 
     handleInstallOpenModal = (dataList) => {
-        const { handleBaseAPI } = this.state
+        const { mode, handleBaseAPI } = this.state
         const { Auth } = this.props.authen
-        
+
         if (!_.isEmpty(dataList)) {
             return dataList.map((v, i) => {
                 
@@ -2062,6 +2334,16 @@ class GridMangement extends Component {
                         </div>
                     )
                 )
+
+                v.linkPortAssigment = (
+                    (
+                        <div key={(i+1)} className={cls['ctrlColumns']}>
+                            <div title="Customer Information" className={cls['ctrlColumnsItem']}><i className={`${cls['icon']} fa fa-close ${styles['fg_red']}`} /></div>
+                            <div className={cls['ctrlColumnsItem']} onClick={this.handleOpenSalePortfolio.bind(this, { authen, data: v })}><i className={`${cls['icon']} fa fa-usd ${styles['fg_gray']}`} /></div>
+                        </div>
+                    )
+                )
+                
                 
                 return v
             })

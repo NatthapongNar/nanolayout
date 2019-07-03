@@ -588,7 +588,7 @@ export const performance_columns = [
                     const content = (
                         <table className={cls['grid_toolip_os']}>
                             <tbody>
-                                <tr style={{ backgroundColor: '#a52a2a', color: '#FFF' }}>
+                                <tr>
                                     <td className="tr">Current (W0-4) =</td>
                                     <td className="tc" style={{ minWidth: td_amount }}>{`${handleMoney(total_os_current, total_os_current_full, digit)}`}</td>
                                 </tr>
@@ -601,7 +601,7 @@ export const performance_columns = [
                                     <td className="tr">Total OS - NPL =</td>
                                     <td className="tc" style={{ minWidth: td_amount }}>{`${handleMoney(total_os_exclude_npl, total_os_exclude_npl_full, digit)}`}</td>
                                 </tr>
-                                <tr>
+                                <tr  style={{ backgroundColor: '#a52a2a', color: '#FFF' }}>
                                     <td className="tr">Total OS (All) =</td>
                                     <td className="tc" style={{ minWidth: td_amount }}>{`${handleMoney(total_os, total_os_full, digit)}`}</td>
                                 </tr>
@@ -611,7 +611,7 @@ export const performance_columns = [
 
                     return (
                         <Popover content={content}>
-                            <span className={`${cls['spanTootltip']}`}>{`${ (total_os_current && total_os_current > 0) ? roundFixed(total_os_current, digit) : 0 }`}</span>
+                            <span className={`${cls['spanTootltip']}`}>{`${ (total_os && total_os > 0) ? roundFixed(total_os, digit) : 0 }`}</span>
                         </Popover>
                     )
 
@@ -650,7 +650,7 @@ export const performance_columns = [
                     const content = (
                         <table className={cls['grid_toolip_os']}>
                             <tbody>
-                                <tr style={{ backgroundColor: '#a52a2a', color: '#FFF' }}>
+                                <tr>
                                     <td className="tr">Current (W0-4) =</td>
                                     <td className="tc" style={{ minWidth: td_width }}>{`${numberWithCommas(total_os_current)}`}</td>
                                 </tr>
@@ -662,7 +662,7 @@ export const performance_columns = [
                                     <td className="tr">Total OS - NPL =</td>
                                     <td className="tc" style={{ minWidth: td_width }}>{`${numberWithCommas(total_os_exclude_npl)}`}</td>
                                 </tr>
-                                <tr>
+                                <tr style={{ backgroundColor: '#a52a2a', color: '#FFF' }}>
                                     <td className="tr">Total OS (All) =</td>
                                     <td className="tc" style={{ minWidth: td_width }}>{`${numberWithCommas(total_os)}`}</td>
                                 </tr>
@@ -672,7 +672,7 @@ export const performance_columns = [
 
                     return (
                         <Popover content={content}>
-                            <span className={`${cls['spanTootltip']}`}>{`${ (total_os_current && total_os_current > 0) ? total_os_current : 0 }`}</span>
+                            <span className={`${cls['spanTootltip']}`}>{`${ (total_os && total_os > 0) ? total_os : 0 }`}</span>
                         </Popover>
                     )
 
@@ -2148,11 +2148,11 @@ export const port_assign_columns = [
                     const content = (
                         <table className={cls['grid_toolip_os']}>
                             <tbody>
-                                <tr >
+                                <tr style={{ backgroundColor: '#a52a2a', color: '#FFF' }}>
                                     <td className="tr">Current (W0-4) =</td>
                                     <td className="tc" style={{ minWidth: td_amount }}>{`${handleMoney(total_os_current, total_os_current_full, digit)}`}</td>
                                 </tr>
-                                <tr style={{ backgroundColor: '#a52a2a', color: '#FFF' }}>
+                                <tr>
                                     <td className="tr">Current + XDay =</td>
                                     <td className="tc" style={{ minWidth: td_amount }}>{`${handleMoney(total_os_currxday, total_os_currxday_full, digit)}`}</td>
                                 </tr>      
@@ -2172,7 +2172,7 @@ export const port_assign_columns = [
 
                     return (
                         <Popover content={content}>
-                            <span className={`${cls['spanTootltip']}`}>{`${ (total_os_currxday && total_os_currxday > 0) ? roundFixed(total_os_currxday, digit) : 0 }`}</span>
+                            <span className={`${cls['spanTootltip']}`}>{`${ (total_os_current && total_os_current > 0) ? roundFixed(total_os_current, digit) : 0 }`}</span>
                             {/* <span className={`${cls['spanTootltip']}`}>{`${ (total_os_current && total_os_current > 0) ? roundFixed(total_os_current, digit_label) : 0 }`}</span> */}
                         </Popover>
                     )
@@ -2407,7 +2407,13 @@ export const port_assign_columns = [
             }
         })
     }, 
-    collection_columns[10]
+    {
+        title: (<div className="ttu">Cust<br/>Link</div>),
+        dataIndex: 'linkPortAssigment',
+        className: 'ttu tracked tc',
+        width: 50
+    }
+    // collection_columns[10]
 ]
 
 export const flow_columns = [

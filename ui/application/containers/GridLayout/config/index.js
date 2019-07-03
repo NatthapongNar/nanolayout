@@ -35,7 +35,7 @@ export const configAccessHeader = (req, res, next) => {
 export const config = {
     database: {
         production: {
-            server: 'TC001PCIS1P',
+            server: 'TC001PCIS1U',
             database: 'PCIS_Nano',
             user: 'sa',
             password: 'P@ssw0rd1234',
@@ -74,7 +74,7 @@ export const config = {
     tester: ['57251', '56225', '57170','59151','58202', '56367'],
     version: {
         name: (process.env && process.env.NODE_ENV == 'dev') ? 'Alpha' : 'Beta',
-        code: '1.2.1'
+        code: '1.3.0'
     }
 }
 
