@@ -35,10 +35,10 @@ export const configAccessHeader = (req, res, next) => {
 export const config = {
     database: {
         production: {
-            server: 'TC001PCIS1U',
-            database: 'PCIS_Nano',
-            user: 'sa',
-            password: 'P@ssw0rd1234',
+            server: '',
+            database: '',
+            user: '',
+            password: '',
             connectionTimeout: 50000,
             parseJSON: true,
             option: { encrypt: false }
